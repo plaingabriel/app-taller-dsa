@@ -9,7 +9,7 @@ const loginSchema = z.object({
   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
 });
 
-export async function login(prevState: string, formData: FormData) {
+export async function login(prevState: any, formData: FormData) {
   const entryCI = parseInt(formData.get("ci") as string);
   const entryPassword = formData.get("password");
 

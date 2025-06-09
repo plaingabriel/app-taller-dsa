@@ -1,11 +1,4 @@
-export default function SubmitButton({
-  text,
-  logout = false,
-}: {
-  text: string;
-  logout: boolean;
-}) {
-  console.log(logout);
+export default function SubmitButton({ text }: { text: string }) {
   return (
     <button
       type="submit"
