@@ -1,8 +1,6 @@
 "use server";
-import { db } from "@db";
-import { usersTable } from "@db/schemas";
+import { getUserByCI } from "@db/utils/user";
 import { createSession, deleteSession } from "@lib/session";
-import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -27,11 +25,7 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   const { ci, password } = result.data;
-  const user = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.ci, ci))
-    .get();
+  const user = await getUserByCI(ci);
 
   if (!user) {
     return {

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,49 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body>
-        <header className="bg-secondary shadow-light sticky top-0 z-100">
-          <nav className="flex justify-between items-center py-4 px-8 max-w-7xl mx-auto">
-            <ul className="flex gap-x-[2rem]">
-              <li>
-                <Link href="/" className="nav-link active">
-                  Inicio
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="nav-link">
-                  Historial
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="nav-link">
-                  Sobre Nosotros
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="nav-link">
-                  Información
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="https://www.notion.so/Documentacion-Sistema-de-Torneos-20880e65a4c380299c0ce35a1be03681?source=copy_link"
-                  className="nav-link"
-                >
-                  Documentación
-                </Link>
-              </li>
-            </ul>
-
-            <Link href="/login" className="login-btn">
-              Iniciar sesión
-            </Link>
-          </nav>
-        </header>
-        <main className="flex py-[3rem] px-0">
-          <div className="max-w-7xl mx-auto px-[2rem]">{children}</div>
-        </main>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
