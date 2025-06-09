@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import path from "path";
 
 export default function NavBar() {
   const pathname = usePathname();

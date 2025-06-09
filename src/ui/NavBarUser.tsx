@@ -13,7 +13,7 @@ export default async function NavBar() {
     editor: "EDITOR",
     operator: "OPERADOR",
   };
-  // @ts-ignore
+  // @ts-expect-error
   const role = roles[userRole];
 
   return (
