@@ -4,7 +4,7 @@ export default function AboutPage() {
       <h1>Sobre Nosotros</h1>
       <div className="bg-secondary-light rounded-2xl shadow-heavy mx-auto mb-[3rem] max-w-[900px]">
         <div className="p-[3rem] text-text-light">
-          <h2 className="text-[2rem] mb-[1.5rem] font-bold border-b-2 border-b-primary pb-[0.5rem] text-primary">
+          <h2 className="text-[2rem] mb-[1.5rem] font-bold border-b-2 border-b-primary-500 pb-[0.5rem] text-primary-500">
             Quiénes Somos
           </h2>
           <p>

@@ -3,7 +3,7 @@ import React from "react";
 export default async function page() {
   return (
     <>
-      <h1>Torneos Disponibles</h1>
+      <h1 className="font-bold text-5xl">Planifica tu próximo torneo de</h1>
 
       <div className="tournaments-grid">
         <button className="tournament-card">

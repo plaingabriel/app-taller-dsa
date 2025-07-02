@@ -1,27 +1,83 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #3498db;
-  --color-primary-dark: #2980b9;
-  --color-secondary: #2c3e50;
-  --color-secondary-light: #34495e;
-  --color-text-light: #ecf0f1;
-  --color-text-dark: #333;
-  --color-text-muted: #7f8c8d;
-  --color-background-light: #f5f5f5;
-  --color-danger: #e74c3c;
-  --color-danger-hover: #c0392b;
-  --color-border: #ecf0f1;
-  --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.1);
-  --shadow-heavy: 0 15px 30px rgba(0, 0, 0, 0.2);
-  --border-radius: 8px;
-  --border-radius-large: 15px;
-  --transition: all 0.3s ease;
+  --color-neutral-50: #f5f5f5;
+  --color-neutral-100: #e0dee3;
+  --color-neutral-200: #d6d3d9;
+  --color-neutral-300: #b8b3bd;
+  --color-neutral-400: #a39daa;
+  --color-neutral-500: #827c8d;
+  --color-neutral-600: #635f6d;
+  --color-neutral-700: #4f4c57;
+  --color-neutral-800: #3b3941;
+  --color-neutral-900: #141316;
+  --color-neutral-950: #0a090b;
+
+  --color-primary-100: #eef7fc;
+  --color-primary-200: #badcf3;
+  --color-primary-300: #97caed;
+  --color-primary-400: #74b9e7;
+  --color-primary-500: #3498db;
+  --color-primary-600: #2180c0;
+  --color-primary-700: #185d8b;
+  --color-primary-800: #0f3a57;
+  --color-primary-900: #061923;
+
+  --color-secondary-100: #f0effa;
+  --color-secondary-200: #c5c1ec;
+  --color-secondary-300: #a8a1e2;
+  --color-secondary-400: #7c73d4;
+  --color-secondary-500: #453bba;
+  --color-secondary-600: #352b8c;
+  --color-secondary-700: #28226d;
+  --color-secondary-800: #1d184e;
+  --color-secondary-900: #0b091f;
+
+  --color-tomato-100: #feedec;
+  --color-tomato-200: #fbb5b1;
+  --color-tomato-300: #f87e77;
+  --color-tomato-400: #f65951;
+  --color-tomato-500: #f32116;
+  --color-tomato-600: #ae1109;
+  --color-tomato-700: #880e07;
+  --color-tomato-800: #4e0804;
+  --color-tomato-900: #270402;
+  --color-tomato-950: #130201;
+
+  --color-danger-100: #ffebec;
+  --color-danger-200: #ffc2c5;
+  --color-danger-300: #ff858b;
+  --color-danger-400: #ff333d;
+  --color-danger-500: #ff0a16;
+  --color-danger-600: #e0000b;
+  --color-danger-700: #a30008;
+  --color-danger-800: #660005;
+  --color-danger-900: #290002;
+
+  --color-warning-100: #fefbec;
+  --color-warning-200: #fbedb1;
+  --color-warning-300: #f8e077;
+  --color-warning-400: #f6d851;
+  --color-warning-500: #f3ca16;
+  --color-warning-600: #d5b00b;
+  --color-warning-700: #9b8008;
+  --color-warning-800: #746006;
+  --color-warning-900: #4e4104;
+
+  --color-success-100: #ebfff5;
+  --color-success-200: #adffd6;
+  --color-success-300: #70ffb8;
+  --color-success-400: #33ff99;
+  --color-success-500: #00e070;
+  --color-success-600: #00b85c;
+  --color-success-700: #008f47;
+  --color-success-800: #005229;
+  --color-success-900: #002914;
+  --color-success-950: #00140a;
 }
 
 @layer components {
-  .nav-link {
+  /* .nav-link {
     color: var(--color-text-light);
     font-weight: 500;
     padding: 0.5rem 1rem;
@@ -32,27 +88,11 @@
   .nav-link:hover,
   .nav-link.active {
     background-color: var(--color-secondary-light);
-    color: var(--color-primary);
-  }
-
-  .login-btn {
-    background-color: var(--color-primary);
-    color: white;
-    padding: 0.7rem 1.5rem;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: var(--transition);
-  }
-
-  .login-btn:hover,
-  .login-btn.active {
-    background-color: var(--color-primary-dark);
-    transform: translateY(-2px);
+    color: var(--color-primary-500);
   }
 
   /* Grid de torneos */
-  .tournaments-grid {
+  /* .tournaments-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
@@ -107,6 +147,22 @@
 
   .tournament-card:hover p {
     color: var(--color-text-light);
+  } */
+
+  .login-btn {
+    background-color: var(--color-primary-500);
+    color: white;
+    padding: 0.7rem 1.5rem;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+
+  .login-btn:hover,
+  .login-btn.active {
+    background-color: var(--color-primary-500);
+    transform: translateY(-2px);
   }
 }
 
@@ -122,7 +178,7 @@
   h3 {
     font-size: 1.5rem;
     margin: 2rem 0 1rem;
-    color: var(--color-primary);
+    color: var(--color-primary-500);
     font-weight: bold;
   }
 
@@ -143,9 +199,7 @@
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: var(--color-text-dark);
   background-color: var(--color-background-light);
   min-height: 100vh;
   display: flex;
