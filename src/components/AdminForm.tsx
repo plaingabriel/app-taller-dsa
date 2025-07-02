@@ -1,5 +1,5 @@
 "use client";
-import SubmitButton from "@ui/SubmitButton";
+import SubmitButton from "@/components/SubmitButton";
 import { useActionState } from "react";
 import { updateAdmin } from "../actions/user-actions";
 

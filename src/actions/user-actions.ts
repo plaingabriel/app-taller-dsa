@@ -1,6 +1,6 @@
 "use server";
-import { putUser } from "@db/utils/user";
-import { getUserCI } from "@lib/session";
+import { putUser } from "@/db/methods/user";
+import { getUserCI } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 

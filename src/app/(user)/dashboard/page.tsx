@@ -1,7 +1,7 @@
-import { getUserByCI } from "@db/utils/user";
+import Admin from "@/components/Admin";
+import Editor from "@/components/Editor";
+import { getUserByCI } from "@/db/methods/user";
 import { getUserCI } from "@lib/session";
-import Admin from "@ui/Admin";
-import Editor from "@ui/Editor";
 
 export default async function DashboardPage() {
   const userCI = await getUserCI();

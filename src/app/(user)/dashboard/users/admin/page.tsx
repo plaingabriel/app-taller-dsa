@@ -1,6 +1,6 @@
-import AdminForm from "@/src/ui/AdminForm";
-import ReturnLink from "@/src/ui/Return";
-import FormWrapper from "@ui/FormWrapper";
+import AdminForm from "@/components/AdminForm";
+import FormWrapper from "@/components/FormWrapper";
+import ReturnLink from "@/components/Return";
 
 export default function AdminPage() {
   return (

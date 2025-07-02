@@ -1,4 +1,4 @@
-import ReturnLink from "@ui/Return";
+import ReturnLink from "@/components/Return";
 
 export default function UsersManagementPage() {
   return (

@@ -1,14 +1,15 @@
-import { logout } from "@actions/auth-actions";
-import { getUserByCI } from "../db/utils/user";
-import { getUserCI } from "../lib/session";
-import DangerButton from "./DangerButton";
+import { logout } from "@/actions/auth-actions";
+import DangerButton from "@/components/DangerButton";
+import NavBarWrapper from "@/components/navbar/NavBarWrapper";
+import { getUserByCI } from "@/db/methods/user";
+import { getUserCI } from "@/lib/session";
 
 export default async function NavBar() {
   const userCI = await getUserCI();
   const user = await getUserByCI(userCI);
 
   return (
-    <nav className="flex justify-between items-center py-4 px-8 max-w-7xl mx-auto">
+    <NavBarWrapper>
       <div>
         <span className="text-text-light font-[600] text-[1rem] py-2 px-4 bg-secondary-light rounded-[20px] border-2 border-primary-500">
           {user?.role === "admin" && "SESIÓN:ADMINISTRADOR"}
@@ -22,6 +23,6 @@ export default async function NavBar() {
       <form action={logout}>
         <DangerButton text="CERRAR SESIÓN" />
       </form>
-    </nav>
+    </NavBarWrapper>
   );
 }

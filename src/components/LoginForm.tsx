@@ -1,6 +1,6 @@
 "use client";
-import { login } from "@actions/auth-actions";
-import SubmitButton from "@ui/SubmitButton";
+import { login } from "@/actions/auth-actions";
+import SubmitButton from "@/components/SubmitButton";
 import { useActionState } from "react";
 
 export default function LoginForm() {

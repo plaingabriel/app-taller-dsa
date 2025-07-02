@@ -1,6 +1,6 @@
 "use server";
-import { getUserByCI } from "@db/utils/user";
-import { createSession, deleteSession } from "@lib/session";
+import { getUserByCI } from "@/db/methods/user";
+import { createSession, deleteSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 

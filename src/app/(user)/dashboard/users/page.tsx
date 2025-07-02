@@ -1,4 +1,4 @@
-import ReturnLink from "@ui/Return";
+import ReturnLink from "@/components/Return";
 import Link from "next/link";
 
 export default function UsersPage() {
