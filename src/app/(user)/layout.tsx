@@ -7,9 +7,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
       <HeaderWrapper>
         <NavBar />
       </HeaderWrapper>
-      <main className="flex py-[3rem]">
-        <div className="max-w-7xl mx-auto">{children}</div>
-      </main>
+      <main>{children}</main>
     </>
   );
 }

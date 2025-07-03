@@ -1,7 +1,5 @@
-import Admin from "@/components/Admin";
-import Editor from "@/components/Editor";
 import { getUserByCI } from "@/db/methods/user";
-import { getUserCI } from "@lib/session";
+import { getUserCI } from "@/lib/session";
 
 export default async function DashboardPage() {
   const userCI = await getUserCI();
@@ -9,13 +7,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      {user?.role === "admin" && <Admin />}
-
-      {user?.role === "editor" && <Editor />}
-
-      {user?.role === "operator" && (
-        <h1>Panel de Operador - Gestión de Operaciones</h1>
-      )}
+      <h1>Cargando...</h1>
     </>
   );
 }

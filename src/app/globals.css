@@ -169,46 +169,6 @@
   }
 }
 
-@layer base {
-  h1 {
-    font-size: 2.5rem;
-    text-align: center;
-    color: var(--color-secondary);
-    margin-bottom: 3rem;
-    font-weight: 300;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-    margin: 2rem 0 1rem;
-    color: var(--color-primary-500);
-    font-weight: bold;
-  }
-
-  p {
-    margin-bottom: 1rem;
-    line-height: 1.8;
-  }
-
-  input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 2px solid var(--color-border);
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-    background-color: white;
-  }
-}
-
-body {
-  line-height: 1.6;
-  background-color: var(--color-background-light);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -320,7 +280,8 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  p {
+    @apply leading-6 text-pretty;
   }
 }

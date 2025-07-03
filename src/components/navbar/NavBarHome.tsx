@@ -1,23 +1,17 @@
 "use client";
 
-import MainLogo from "@/assets/MainLogo";
-import NavLink from "@/components/navbar/NavLink";
 import { usePathname } from "next/navigation";
 import LoginButton from "../buttons/LoginButton";
 import NavBarWrapper from "./NavBarWrapper";
+import NavLinkLogo from "./NavLinkLogo";
 
 export default function NavBar() {
   const pathname = usePathname();
 
   return (
     <NavBarWrapper>
-      <ul className="flex gap-x-[2rem]">
-        <li>
-          <NavLink href="/">
-            <MainLogo className="w-30 h-full fill-primary-800" />
-          </NavLink>
-        </li>
-        <li>
+      <NavLinkLogo />
+      {/* <li>
           <NavLink href="/" pathname={pathname === "/"}>
             Inicio
           </NavLink>
@@ -41,10 +35,9 @@ export default function NavBar() {
           <NavLink href="https://www.notion.so/Documentacion-Sistema-de-Torneos-20880e65a4c380299c0ce35a1be03681?source=copy_link">
             Documentación
           </NavLink>
-        </li>
-      </ul>
+        </li> */}
 
-      <LoginButton>Iniciar sesión</LoginButton>
+      {pathname === "/" && <LoginButton>Iniciar sesión</LoginButton>}
     </NavBarWrapper>
   );
 }

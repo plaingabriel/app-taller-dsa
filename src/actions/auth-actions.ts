@@ -5,7 +5,11 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 const loginSchema = z.object({
-  ci: z.number().min(1, "Cédula inválida"),
+  ci: z
+    .number({
+      invalid_type_error: "Cédula inválida",
+    })
+    .min(1, "Cédula inválida"),
   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
 });
 
@@ -45,7 +49,16 @@ export async function login(prevState: any, formData: FormData) {
 
   await createSession(user.ci);
 
-  redirect("/dashboard");
+  switch (user.role) {
+    case "admin":
+      redirect("/dashboard/admin");
+    case "editor":
+      redirect("/dashboard/editor");
+    case "operator":
+      redirect("/dashboard/operator");
+    default:
+      throw new Error("Ha ocurrido un error inesperado");
+  }
 }
 
 export async function logout() {

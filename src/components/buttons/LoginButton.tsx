@@ -8,7 +8,7 @@ export default function LoginButton({
   children: React.ReactNode;
 }) {
   return (
-    <Button className="bg-primary-600 hover:bg-primary-500" asChild>
+    <Button asChild>
       <Link href="/login">
         <LogIn />
         {children}
