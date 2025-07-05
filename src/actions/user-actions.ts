@@ -1,5 +1,5 @@
 "use server";
-import { getUserByCI, putPassword } from "@/db/methods/user";
+import { getUserByCI, putUser } from "@/db/methods/user";
 import { getUserCI } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -13,11 +13,13 @@ import { z } from "zod";
 
 // const updateSchema = userSchema.partial().omit({ ci: true });
 
+const nameSchema = z.string().min(1, "El nombre es requerido");
 const passwordSchema = z
   .string()
   .min(8, "La contraseña debe tener al menos 8 caracteres");
 
 const updatePasswordSchema = z.object({
+  name: nameSchema,
   currentPassword: passwordSchema,
   newPassword: passwordSchema,
   confirmPassword: passwordSchema,
@@ -29,13 +31,15 @@ export async function updatePassword(prevState: any, formData: FormData) {
 
   if (!user) redirect("/login");
 
-  // Get passwords
+  // Get credentials from form
+  const name = formData.get("name");
   const currentPassword = formData.get("currentPassword");
   const newPassword = formData.get("newPassword");
   const confirmPassword = formData.get("confirmPassword");
 
   // Validate passwords
   const result = updatePasswordSchema.safeParse({
+    name,
     currentPassword,
     newPassword,
     confirmPassword,
@@ -63,7 +67,10 @@ export async function updatePassword(prevState: any, formData: FormData) {
     };
   }
 
-  await putPassword(ci, formData.get("newPassword") as string);
+  await putUser(ci, {
+    name: result.data.name,
+    password: result.data.newPassword,
+  });
 
   redirect(`/dashboard/${user.role}`);
 }

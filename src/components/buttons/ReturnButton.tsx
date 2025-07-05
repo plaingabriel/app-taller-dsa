@@ -2,21 +2,11 @@ import { MoveLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 
-export default function ReturnButton({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+export default function ReturnButton({ href }: { href: string }) {
   return (
-    <Button asChild>
-      <Link
-        href={href}
-        className="flex items-center gap-x-2 bg-transparent hover:bg-secondary-200/80 text-secondary-600 border-2 border-secondary-600"
-      >
+    <Button asChild variant={"secondary"} size={"icon"}>
+      <Link href={href}>
         <MoveLeft />
-        {children}
       </Link>
     </Button>
   );
