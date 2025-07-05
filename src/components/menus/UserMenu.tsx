@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserClient } from "@/shared/types";
 import { CircleUserRound } from "lucide-react";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 
 interface Props {
@@ -18,6 +18,7 @@ interface Props {
 }
 
 export default function UserMenu({ user }: Props) {
+  const pathname = usePathname();
   const role =
     user.role === "admin"
       ? "administrador"
@@ -37,7 +38,9 @@ export default function UserMenu({ user }: Props) {
         <DropdownMenuItem onClick={() => redirect(`/dashboard/${user.role}`)}>
           Panel principal
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => redirect("/dashboard/account")}>
+        <DropdownMenuItem
+          onClick={() => redirect(`/dashboard/account?prevPage=${pathname}`)}
+        >
           Editar credenciales
         </DropdownMenuItem>
         <DropdownMenuItem onClick={logout}>Cerrar sesión</DropdownMenuItem>

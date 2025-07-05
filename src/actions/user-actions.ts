@@ -1,25 +1,45 @@
 "use server";
-import { putUser } from "@/db/methods/user";
+import { getUserByCI, putPassword } from "@/db/methods/user";
 import { getUserCI } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-const userSchema = z.object({
-  ci: z.number().int().min(1, "Cédula inválida"),
-  name: z.string().min(1, "El nombre es requerido"),
-  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
-  role: z.enum(["admin", "operator", "editor"]),
+// const userSchema = z.object({
+//   ci: z.number().int().min(1, "Cédula inválida"),
+//   name: z.string().min(1, "El nombre es requerido"),
+//   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+//   role: z.enum(["admin", "operator", "editor"]),
+// });
+
+// const updateSchema = userSchema.partial().omit({ ci: true });
+
+const passwordSchema = z
+  .string()
+  .min(8, "La contraseña debe tener al menos 8 caracteres");
+
+const updatePasswordSchema = z.object({
+  currentPassword: passwordSchema,
+  newPassword: passwordSchema,
+  confirmPassword: passwordSchema,
 });
 
-const updateSchema = userSchema.partial().omit({ ci: true });
-const updateAdminSchema = updateSchema.omit({ role: true });
-
-export async function updateAdmin(prevSate: any, formData: FormData) {
-  const name = formData.get("name") as string;
-  const password = formData.get("password") as string;
+export async function updatePassword(prevState: any, formData: FormData) {
   const ci = await getUserCI();
+  const user = await getUserByCI(ci);
 
-  const result = updateAdminSchema.safeParse({ name, password });
+  if (!user) redirect("/login");
+
+  // Get passwords
+  const currentPassword = formData.get("currentPassword");
+  const newPassword = formData.get("newPassword");
+  const confirmPassword = formData.get("confirmPassword");
+
+  // Validate passwords
+  const result = updatePasswordSchema.safeParse({
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  });
 
   if (!result.success) {
     return {
@@ -27,15 +47,23 @@ export async function updateAdmin(prevSate: any, formData: FormData) {
     };
   }
 
-  try {
-    await putUser(ci, { name, password, role: "admin" });
-  } catch {
+  if (formData.get("currentPassword") !== user.password) {
     return {
       errors: {
-        name: ["Error al actualizar el administrador"],
+        currentPassword: ["Contraseña inválida"],
       },
     };
   }
 
-  redirect("/dashboard/users");
+  if (formData.get("newPassword") !== formData.get("confirmPassword")) {
+    return {
+      errors: {
+        confirmPassword: ["Las contraseñas no coinciden"],
+      },
+    };
+  }
+
+  await putPassword(ci, formData.get("newPassword") as string);
+
+  redirect(`/dashboard/${user.role}`);
 }

@@ -40,6 +40,14 @@ export async function putUser(
   }
 }
 
+export async function putPassword(ci: number, password: string) {
+  try {
+    await db.update(usersTable).set({ password }).where(eq(usersTable.ci, ci));
+  } catch {
+    throw new Error("Error al actualizar contraseña");
+  }
+}
+
 export async function removeUser(ci: number) {
   try {
     await db.delete(usersTable).where(eq(usersTable.ci, ci));

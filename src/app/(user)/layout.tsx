@@ -7,7 +7,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
       <HeaderWrapper>
         <NavBar />
       </HeaderWrapper>
-      <main>{children}</main>
+      <main className="flex flex-col grow">{children}</main>
     </>
   );
 }
