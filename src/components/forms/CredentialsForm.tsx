@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import FormField from "../ui/form-field";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import PasswordInput from "../ui/password-input";
 
 export default function CredentialsForm() {
   const [state, updatePasswordAction, pending] = useActionState(
@@ -29,11 +30,7 @@ export default function CredentialsForm() {
                 >
                   Contraseña Actual
                 </Label>
-                <Input
-                  id="currentPassword"
-                  name="currentPassword"
-                  type="password"
-                />
+                <PasswordInput id="currentPassword" name="currentPassword" />
               </FormField>
 
               {state?.errors?.currentPassword && (
@@ -51,7 +48,7 @@ export default function CredentialsForm() {
                 >
                   Nueva Contraseña
                 </Label>
-                <Input id="newPassword" name="newPassword" type="password" />
+                <PasswordInput id="newPassword" name="newPassword" />
               </FormField>
 
               {state?.errors?.newPassword && (
@@ -67,11 +64,7 @@ export default function CredentialsForm() {
                 >
                   Confirmar Nueva Contraseña
                 </Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                />
+                <PasswordInput id="confirmPassword" name="confirmPassword" />
               </FormField>
 
               {state?.errors?.confirmPassword && (

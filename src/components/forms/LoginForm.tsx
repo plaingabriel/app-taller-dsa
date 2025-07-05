@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useActionState } from "react";
 import FormField from "../ui/form-field";
+import PasswordInput from "../ui/password-input";
 
 export function LoginForm({
   className,
@@ -44,7 +45,7 @@ export function LoginForm({
                 <div className="flex items-center">
                   <Label htmlFor="password">Contraseña</Label>
                 </div>
-                <Input name="password" type="password" required />
+                <PasswordInput name="password" required />
               </FormField>
               <FormField>
                 <Button
