@@ -13,7 +13,7 @@ export default function ReturnButton({
     <Button asChild>
       <Link
         href={href}
-        className="flex items-center gap-x-2 bg-secondary-400 hover:bg-secondary-400/80"
+        className="flex items-center gap-x-2 bg-transparent hover:bg-secondary-200/80 text-secondary-600 border-2 border-secondary-600"
       >
         <MoveLeft />
         {children}

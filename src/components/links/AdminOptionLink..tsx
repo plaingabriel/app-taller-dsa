@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Link, Trophy, User } from "lucide-react";
+import { Trophy, User } from "lucide-react";
 import { redirect } from "next/navigation";
 
 interface Props {
@@ -20,6 +20,7 @@ export function AdminOptionLink({ href, iconType, title, description }: Props) {
     <Card
       className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 py-0"
       onClick={handleClick}
+      role="link"
     >
       <CardContent className="p-12 text-center">
         <IconElement
