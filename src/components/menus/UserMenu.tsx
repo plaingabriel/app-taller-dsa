@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserClient } from "@/shared/types";
 import { CircleUserRound } from "lucide-react";
+import { redirect } from "next/navigation";
 import { Button } from "../ui/button";
 
 interface Props {
@@ -33,6 +34,12 @@ export default function UserMenu({ user }: Props) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 z-[999]" align="start">
         <DropdownMenuLabel>{role.toUpperCase()}</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => redirect(`/dashboard/${user.role}`)}>
+          Panel principal
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => redirect("/dashboard/account")}>
+          Editar credenciales
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={logout}>Cerrar sesión</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

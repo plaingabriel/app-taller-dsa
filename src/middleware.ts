@@ -5,11 +5,13 @@ import { getUserByCI } from "./db/methods/user";
 
 const protectedPrefix = "/dashboard";
 const publicRoutes = ["/login"];
+const commonRoute = "/dashboard/account"; // Ruta común para todos los roles
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const isProtectedRoute = path.startsWith(protectedPrefix);
   const isPublicRoute = publicRoutes.includes(path);
+  const isCommonRoute = path.startsWith(commonRoute); // Verifica rutas bajo /dashboard/account
 
   const cookie = (await cookies()).get("session")?.value;
   const session = await decrypt(cookie);
@@ -24,8 +26,8 @@ export default async function middleware(req: NextRequest) {
     return redirectByRole(session.userCI as number, req.nextUrl);
   }
 
-  // 3. Verificar permisos de rol en rutas protegidas
-  if (isProtectedRoute && session?.userCI) {
+  // 3. Verificar permisos de rol en rutas protegidas (excepto ruta común)
+  if (isProtectedRoute && session?.userCI && !isCommonRoute) {
     const user = await getUserByCI(session.userCI as number);
 
     if (!user) {
