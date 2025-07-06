@@ -1,6 +1,5 @@
 import { LogIn } from "lucide-react";
-import Link from "next/link";
-import { Button } from "../ui/button";
+import ButtonLink from "../ui/button-link";
 
 export default function LoginButton({
   children,
@@ -8,11 +7,9 @@ export default function LoginButton({
   children: React.ReactNode;
 }) {
   return (
-    <Button asChild>
-      <Link href="/login">
-        <LogIn />
-        {children}
-      </Link>
-    </Button>
+    <ButtonLink href="/login">
+      <LogIn />
+      {children}
+    </ButtonLink>
   );
 }

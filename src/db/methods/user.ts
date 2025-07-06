@@ -9,7 +9,7 @@ export async function getUsers(): Promise<User[]> {
 
     // Sort users by role
     users.sort((a, b) => {
-      const roles = ["admin", "operator", "editor"];
+      const roles = ["admin", "editor", "operator"];
       const roleA = roles.indexOf(a.role);
       const roleB = roles.indexOf(b.role);
       return roleA - roleB;
@@ -17,11 +17,12 @@ export async function getUsers(): Promise<User[]> {
 
     return users;
   } catch (error) {
+    console.log(error);
     throw new Error("Error al obtener usuarios");
   }
 }
 
-export async function getUserByCI(ci: number): Promise<User> {
+export async function getUserByCI(ci: number): Promise<User | null> {
   try {
     const user = (await db
       .select()
@@ -30,19 +31,21 @@ export async function getUserByCI(ci: number): Promise<User> {
       .get()) as User | undefined;
 
     if (!user) {
-      throw new Error("Usuario no encontrado");
+      return null;
     }
 
     return user;
   } catch (error) {
+    console.log(error);
     throw new Error("Error al obtener usuario");
   }
 }
 
-export async function postUser(user: typeof usersTable.$inferInsert) {
+export async function postUser(user: User) {
   try {
     await db.insert(usersTable).values(user);
-  } catch {
+  } catch (error) {
+    console.log(error);
     throw new Error("Error al crear usuario");
   }
 }
@@ -56,7 +59,8 @@ export async function putUser(
 ) {
   try {
     await db.update(usersTable).set(user).where(eq(usersTable.ci, ci));
-  } catch {
+  } catch (error) {
+    console.log(error);
     throw new Error("Error al actualizar usuario");
   }
 }
@@ -64,7 +68,8 @@ export async function putUser(
 export async function removeUser(ci: number) {
   try {
     await db.delete(usersTable).where(eq(usersTable.ci, ci));
-  } catch {
+  } catch (error) {
+    console.log(error);
     throw new Error("Error al eliminar usuario");
   }
 }

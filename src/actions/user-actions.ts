@@ -1,22 +1,21 @@
 "use server";
-import { getUserByCI, putUser } from "@/db/methods/user";
+import { getUserByCI, postUser, putUser, removeUser } from "@/db/methods/user";
 import { getUserCI } from "@/lib/session";
+import { User } from "@/shared/types";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-
-// const userSchema = z.object({
-//   ci: z.number().int().min(1, "Cédula inválida"),
-//   name: z.string().min(1, "El nombre es requerido"),
-//   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
-//   role: z.enum(["admin", "operator", "editor"]),
-// });
-
-// const updateSchema = userSchema.partial().omit({ ci: true });
 
 const nameSchema = z.string().min(1, "El nombre es requerido");
 const passwordSchema = z
   .string()
   .min(8, "La contraseña debe tener al menos 8 caracteres");
+
+const userSchema = z.object({
+  ci: z.string().regex(new RegExp("^[0-9]+$"), "Cédula inválida"),
+  name: nameSchema,
+  password: passwordSchema,
+  role: z.enum(["admin", "operator", "editor"]),
+});
 
 const updatePasswordSchema = z.object({
   name: nameSchema,
@@ -24,6 +23,57 @@ const updatePasswordSchema = z.object({
   newPassword: passwordSchema,
   confirmPassword: passwordSchema,
 });
+
+export async function createUser(prevState: any, formData: FormData) {
+  const ci = formData.get("ci");
+  const name = formData.get("name");
+  const password = formData.get("password");
+  const role = formData.get("role");
+
+  console.log(ci, name, password, role);
+
+  const result = userSchema.safeParse({
+    ci,
+    name,
+    password,
+    role,
+  });
+
+  if (!result.success) {
+    return {
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  const newUser: User = {
+    ci: parseInt(result.data.ci),
+    name: result.data.name,
+    password: result.data.password,
+    role: result.data.role,
+  };
+
+  if (newUser.role === "admin") {
+    return {
+      errors: {
+        role: ["No se puede crear un usuario con rol de administrador"],
+      },
+    };
+  }
+
+  const existingUser = await getUserByCI(newUser.ci);
+
+  if (existingUser !== null) {
+    return {
+      errors: {
+        ci: ["Cédula ya registrada"],
+      },
+    };
+  }
+
+  await postUser(newUser);
+
+  redirect("/dashboard/admin/users");
+}
 
 export async function updatePassword(prevState: any, formData: FormData) {
   const ci = await getUserCI();
@@ -73,4 +123,13 @@ export async function updatePassword(prevState: any, formData: FormData) {
   });
 
   redirect(`/dashboard/${user.role}`);
+}
+
+export async function deleteUser(ci: number) {
+  try {
+    await removeUser(ci);
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
 }
