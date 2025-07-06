@@ -21,7 +21,7 @@ export default function AdminPage() {
             />
 
             <AdminOptionLink
-              href="dashboard/admin/tournaments"
+              href="/dashboard/admin/tournaments"
               iconType="tournament"
               title="Gestionar Torneos"
               description="Gestiona los torneos del sistema"
