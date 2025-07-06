@@ -1,6 +1,5 @@
 import NewUserButton from "@/components/buttons/NewUserButton";
 import ReturnButton from "@/components/buttons/ReturnButton";
-import UserCard from "@/components/cards/UserCard";
 import UserList from "@/components/lists/UserList";
 import { getUsers } from "@/db/methods/user";
 

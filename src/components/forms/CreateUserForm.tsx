@@ -105,7 +105,9 @@ export default function CreateUserForm() {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="submit">Crear Usuario</Button>
+            <Button disabled={pending} type="submit">
+              Crear Usuario
+            </Button>
             <ButtonLink href="/dashboard/admin/users" variant={"outline"}>
               Cancelar
             </ButtonLink>
