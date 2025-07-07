@@ -1,4 +1,4 @@
-import NewUserButton from "@/components/buttons/NewUserButton";
+import AddButton from "@/components/buttons/AddButton";
 import ReturnButton from "@/components/buttons/ReturnButton";
 import UserList from "@/components/lists/UserList";
 import { getUsers } from "@/db/methods/user";
@@ -11,7 +11,7 @@ export default async function AdminUsersPage() {
         <ReturnButton href="/dashboard/admin" />
         <div className="flex justify-between items-center my-6">
           <h1 className="text-xl md:text-2xl font-bold">Gestión de Usuarios</h1>
-          <NewUserButton />
+          <AddButton href="/dashboard/admin/users/new">Nuevo Usuario</AddButton>
         </div>
 
         <UserList users={users} />

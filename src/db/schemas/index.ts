@@ -10,7 +10,7 @@ export const usersTable = sqliteTable("Users", {
 export const tournamentTable = sqliteTable("Tournament", {
   id: int().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
-  status: text().notNull().default("CREATED"),
+  status: text().notNull().default("created"),
   creationDate: text().notNull(),
 });
 
@@ -48,7 +48,7 @@ export const teamTable = sqliteTable("Team", {
     .notNull()
     .references(() => categoryTable.id),
   name: text().notNull(),
-  logo: text().notNull(),
+  logo: text(),
   wins: int().notNull().default(0),
   draws: int().notNull().default(0),
   losses: int().notNull().default(0),

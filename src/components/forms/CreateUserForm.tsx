@@ -21,6 +21,7 @@ import {
 import { useActionState } from "react";
 import ButtonLink from "../ui/button-link";
 import FormField from "../ui/form-field";
+import PasswordInput from "../ui/password-input";
 
 export default function CreateUserForm() {
   const [state, createUserAction, pending] = useActionState(
@@ -72,9 +73,8 @@ export default function CreateUserForm() {
           <div>
             <FormField>
               <Label htmlFor="password">Contraseña</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 name="password"
                 placeholder="Ingrese la contraseña"
               />
