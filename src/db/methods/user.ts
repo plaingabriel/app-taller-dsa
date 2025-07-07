@@ -22,7 +22,7 @@ export async function getUsers(): Promise<User[]> {
   }
 }
 
-export async function getUserByCI(ci: number): Promise<User | null> {
+export async function getUserByCI(ci: number): Promise<User> {
   try {
     const user = (await db
       .select()
@@ -31,7 +31,7 @@ export async function getUserByCI(ci: number): Promise<User | null> {
       .get()) as User | undefined;
 
     if (!user) {
-      return null;
+      throw new Error("Usuario no encontrado");
     }
 
     return user;
