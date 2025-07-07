@@ -17,15 +17,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { TournamentData } from "@/shared/types";
 import FormField from "../ui/form-field";
 
-export default function CreateTournamentForm() {
-  const [tournamentData, setTournamentData] = useState({
-    name: "",
-    numberOfCategories: 0,
-  });
+type CreateTournamentFormProps = {
+  handleStep: (step: number) => void;
+  tournamentData: TournamentData;
+  setTournamentData: React.Dispatch<
+    React.SetStateAction<{
+      name: string;
+      numberOfCategories: number;
+    }>
+  >;
+};
 
+export default function CreateTournamentForm({
+  handleStep,
+  setTournamentData,
+  tournamentData,
+}: CreateTournamentFormProps) {
   return (
     <Card>
       <CardHeader>
@@ -41,6 +51,7 @@ export default function CreateTournamentForm() {
             id="tournament-name"
             name="tournament-name"
             placeholder="Ej: Copa Primavera"
+            value={tournamentData.name}
             onChange={(e) => {
               setTournamentData({
                 ...tournamentData,
@@ -60,6 +71,7 @@ export default function CreateTournamentForm() {
                 numberOfCategories: parseInt(value),
               });
             }}
+            value={tournamentData.numberOfCategories.toString()}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecciona una categoría" />
@@ -80,6 +92,9 @@ export default function CreateTournamentForm() {
               tournamentData.name === "" ||
               tournamentData.numberOfCategories === 0
             }
+            onClick={() => {
+              handleStep(2);
+            }}
           >
             Siguiente: Configurar Categorías
           </Button>

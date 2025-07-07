@@ -20,6 +20,11 @@ export interface Tournament {
   creationDate: string;
 }
 
+export interface TournamentData {
+  name: string;
+  numberOfCategories: number;
+}
+
 export interface Category {
   id: number;
   name: string;
