@@ -1,4 +1,4 @@
-import AddButton from "@/components/buttons/AddButton";
+import AddButtonLink from "@/components/buttons/AddButtonLink";
 import ReturnButton from "@/components/buttons/ReturnButton";
 import { Card } from "@/components/ui/card";
 import { getTournaments } from "@/db/methods/tournament";
@@ -16,18 +16,18 @@ export default async function TournamentPage() {
           <h1 className="text-2xl font-semibold text-gray-900">
             Gestión de Torneos
           </h1>
-          <AddButton href="/dashboard/admin/tournaments/new">
+          <AddButtonLink href="/dashboard/admin/tournaments/new">
             Nuevo Torneo
-          </AddButton>
+          </AddButtonLink>
         </div>
 
         {/* Tournaments State */}
         <Card className="border-2 border-dashed border-neutral-300 bg-neutral-50">
           <div className="flex flex-col items-center justify-center py-16 px-8">
             <p className="text-gray-500 text-lg mb-6">No hay torneos creados</p>
-            <AddButton href="/dashboard/admin/tournaments/new">
+            <AddButtonLink href="/dashboard/admin/tournaments/new">
               Crear Primer Torneo
-            </AddButton>
+            </AddButtonLink>
           </div>
         </Card>
       </div>

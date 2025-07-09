@@ -1,17 +1,23 @@
+import { type VariantProps } from "class-variance-authority";
 import { Plus } from "lucide-react";
-import ButtonLink from "../ui/button-link";
+import { Button, buttonVariants } from "../ui/button";
+
+type AddButtonProps = {
+  children: React.ReactNode;
+} & React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants>;
 
 export default function AddButton({
   children,
-  href,
-}: {
-  children: React.ReactNode;
-  href: string;
-}) {
+  className,
+  size,
+  variant,
+  ...props
+}: AddButtonProps) {
   return (
-    <ButtonLink href={href}>
+    <Button {...{ className, size, variant, ...props }}>
       <Plus />
       {children}
-    </ButtonLink>
+    </Button>
   );
 }

@@ -32,3 +32,16 @@ export interface Category {
   max_age: number;
   tournament_id: Tournament["id"];
 }
+
+export type FixtureType = "groups" | "playoffs" | "groups+playoffs";
+
+export interface Fixture {
+  id: number;
+  category_id: Category["id"];
+  fixture_type: FixtureType;
+  team_count: number;
+  round_count: number;
+  group_count: number;
+  teams_per_group: number;
+  teams_qualified: number;
+}
