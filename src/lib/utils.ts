@@ -1,4 +1,4 @@
-import { Config, Fixture, FixtureType } from "@/shared/types";
+import { Config, FixtureType } from "@/shared/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 

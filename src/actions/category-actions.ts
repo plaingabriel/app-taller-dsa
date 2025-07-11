@@ -1,6 +1,5 @@
 "use server";
 
-import { getCategories } from "@/db/methods/category";
 import { getValidEquiposCounts } from "@/lib/utils";
 import { CategoryClient } from "@/shared/types";
 import { z } from "zod";
@@ -72,6 +71,7 @@ export async function validateCategory(
       };
     }
   } catch (error) {
+    console.error(error);
     return {
       success: false,
       error: "Ocurrió un error al validar la categoría",

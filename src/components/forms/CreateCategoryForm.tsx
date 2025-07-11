@@ -6,7 +6,7 @@ import {
   getAvailableConfigurations,
   getValidEquiposCounts,
 } from "@/lib/utils";
-import { CategoryClient, Config, Fixture, FixtureType } from "@/shared/types";
+import { CategoryClient, Fixture, FixtureType } from "@/shared/types";
 import { useState } from "react";
 import AddButton from "../buttons/AddButton";
 import InfoCardCategoryForm from "../cards/InfoCardCategoryForm";
