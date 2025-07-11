@@ -1,7 +1,12 @@
 "use client";
 
-import { getAvailableConfigurations, getValidEquiposCounts } from "@/lib/utils";
-import { Category, FixtureType } from "@/shared/types";
+import { validateCategory } from "@/actions/category-actions";
+import {
+  calculateGruposInfo,
+  getAvailableConfigurations,
+  getValidEquiposCounts,
+} from "@/lib/utils";
+import { CategoryClient, Config, Fixture, FixtureType } from "@/shared/types";
 import { useState } from "react";
 import AddButton from "../buttons/AddButton";
 import InfoCardCategoryForm from "../cards/InfoCardCategoryForm";
@@ -18,18 +23,18 @@ import {
 } from "../ui/select";
 import SelectFixture from "../ui/select-fixture";
 
-export default function CreateCategoryForm() {
-  const [categories, setCategories] = useState<
-    Omit<Category, "id" | "torneo_id">[]
-  >([]);
+type CreateCategoryFormProps = {
+  categoriesClient: CategoryClient[];
+  setCategoriesClient: React.Dispatch<React.SetStateAction<CategoryClient[]>>;
+  initialCategory: CategoryClient;
+};
 
-  const [currentCategory, setCurrentCategory] = useState({
-    name: "",
-    min_age: 6,
-    max_age: 99,
-    team_count: 4,
-    fixture_type: "groups" as FixtureType,
-  });
+export default function CreateCategoryForm({
+  categoriesClient,
+  setCategoriesClient,
+  initialCategory,
+}: CreateCategoryFormProps) {
+  const [currentCategory, setCurrentCategory] = useState(initialCategory);
 
   const [configurationGroups, setConfigurationGroups] =
     useState<string>("option-1");
@@ -40,11 +45,59 @@ export default function CreateCategoryForm() {
       ? currentCategory.team_count
       : validCounts[0];
 
-    setCurrentCategory({
-      ...currentCategory,
+    const fixtureData: Pick<Fixture, "fixture_type" | "team_count"> = {
       fixture_type: format,
       team_count: newCantidad,
+    };
+
+    setCurrentCategory({
+      ...currentCategory,
+      ...fixtureData,
     });
+  };
+
+  const addCategory = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    const validation = await validateCategory(
+      currentCategory,
+      categoriesClient
+    );
+
+    if (!validation.success) {
+      alert(validation.error);
+      return;
+    }
+
+    if (currentCategory.fixture_type === "groups+playoffs") {
+      const fixtureConfig = calculateGruposInfo(
+        currentCategory.team_count,
+        configurationGroups
+      );
+
+      setCategoriesClient([
+        ...categoriesClient,
+        {
+          ...currentCategory,
+          ...fixtureConfig,
+        },
+      ]);
+    } else {
+      setCategoriesClient([
+        ...categoriesClient,
+        {
+          ...currentCategory,
+          group_count: 1,
+          teams_per_group: currentCategory.team_count,
+          teams_qualified: 0,
+        },
+      ]);
+    }
+
+    setCurrentCategory(initialCategory);
+    setConfigurationGroups("option-1");
   };
 
   const validEquiposCounts = getValidEquiposCounts(
@@ -58,7 +111,6 @@ export default function CreateCategoryForm() {
       </CardHeader>
 
       <CardContent>
-        {/* TODO: Agregar validaciones con un server action */}
         <form className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <FormField>
@@ -66,6 +118,13 @@ export default function CreateCategoryForm() {
               <Input
                 id="category-name"
                 placeholder="Ej: Sub-15, Juvenil, Senior"
+                value={currentCategory.name}
+                onChange={(e) =>
+                  setCurrentCategory({
+                    ...currentCategory,
+                    name: e.target.value,
+                  })
+                }
               />
             </FormField>
 
@@ -102,6 +161,7 @@ export default function CreateCategoryForm() {
                   setCurrentCategory({
                     ...currentCategory,
                     team_count: parseInt(value),
+                    teams_per_group: parseInt(value),
                   })
                 }
               >
@@ -185,7 +245,12 @@ export default function CreateCategoryForm() {
             groups_config={configurationGroups}
           />
 
-          <AddButton type="submit" className="w-full" variant={"secondary"}>
+          <AddButton
+            type="submit"
+            onClick={(e) => addCategory(e)}
+            className="w-full"
+            variant={"secondary"}
+          >
             Agregar Categoría
           </AddButton>
         </form>

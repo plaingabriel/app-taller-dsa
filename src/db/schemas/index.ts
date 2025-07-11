@@ -36,7 +36,6 @@ export const fixture = sqliteTable("Fixture", {
     .references(() => categoryTable.id),
   fixture_type: text().notNull(),
   team_count: int().notNull(),
-  round_count: int().notNull().default(1),
   group_count: int().notNull(),
   teams_per_group: int().notNull(),
   teams_qualified: int().notNull(),

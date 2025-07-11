@@ -1,4 +1,4 @@
-import { Fixture, FixtureType } from "@/shared/types";
+import { Config, Fixture, FixtureType } from "@/shared/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -20,11 +20,6 @@ export function getValidEquiposCounts(format: FixtureType): number[] {
       return [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
   }
 }
-
-type Config = Pick<
-  Fixture,
-  "group_count" | "teams_per_group" | "teams_qualified"
->;
 
 function createConfiguration(id: string, label: string, config: Config) {
   return { id, label, config };
