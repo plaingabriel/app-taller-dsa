@@ -1,4 +1,4 @@
-import { Config, FixtureType } from "@/shared/types";
+import { Config, Fixture, FixtureType, Phase } from "@/shared/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -6,8 +6,55 @@ export function isPair(number: number): boolean {
   return number % 2 === 0;
 }
 
+export function allEqual(arr: string[]): boolean {
+  return arr.every((item, _, array) => item === array[0]);
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function getStartedPhaseByFixtureType(fixture: Fixture): Phase {
+  switch (fixture.fixture_type) {
+    case "playoffs":
+      if (fixture.team_count === 4) {
+        return {
+          id: 4,
+          name: "semifinals",
+        };
+      }
+
+      if (fixture.team_count === 8) {
+        return {
+          id: 3,
+          name: "quarterfinals",
+        };
+      }
+
+      if (fixture.team_count === 16) {
+        return {
+          id: 2,
+          name: "round_16",
+        };
+      }
+
+    default:
+      return {
+        id: 1,
+        name: "groups",
+      };
+  }
+}
+
+export function getTextByFixtureType(fixtureType: FixtureType): string {
+  switch (fixtureType) {
+    case "playoffs":
+      return "ELIMINATORIA";
+    case "groups+playoffs":
+      return "GRUPOS+ELIMINATORIA";
+    default:
+      return "GRUPOS";
+  }
 }
 
 export function getValidEquiposCounts(format: FixtureType): number[] {

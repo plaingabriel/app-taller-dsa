@@ -12,7 +12,10 @@ export default function CategoryClientCard({
   category,
   setCategoriesClient,
 }: CategoryClientCardProps) {
-  const handleRemove = () => {
+  const handleRemove = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const button = e.target as HTMLButtonElement;
+    button.disabled = true;
+
     setCategoriesClient((prevCategories) =>
       prevCategories.filter((c) => c.name !== category.name)
     );

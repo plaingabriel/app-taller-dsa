@@ -2,6 +2,7 @@
 
 import { createTournament } from "@/actions/tournament-actions";
 import AddButton from "@/components/buttons/AddButton";
+import ReturnButton from "@/components/buttons/ReturnButton";
 import CreateCategoryForm from "@/components/forms/CreateCategoryForm";
 import CreateTournamentForm from "@/components/forms/CreateTournamentForm";
 import CategoriesList from "@/components/lists/CategoriesList";
@@ -48,37 +49,41 @@ export default function NewTournamentPage() {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto md:px-0 px-6 pt-8 pb-20 space-y-6">
-      <h1 className="font-bold text-3xl">Crear Nuevo Torneo</h1>
+    <div className="w-full max-w-3xl mx-auto md:px-0 px-6 pt-8 pb-20 space-y-3">
+      <ReturnButton href="/dashboard/admin/tournaments" />
 
       <div className="space-y-6">
-        <CreateTournamentForm handleName={handleName} />
+        <h1 className="font-bold text-3xl">Crear Nuevo Torneo</h1>
 
-        <CreateCategoryForm
-          categoriesClient={categoriesClient}
-          setCategoriesClient={setCategoriesClient}
-          initialCategory={initialCategory}
-        />
+        <div className="space-y-6">
+          <CreateTournamentForm handleName={handleName} />
 
-        {categoriesClient.length > 0 && (
-          <CategoriesList
+          <CreateCategoryForm
             categoriesClient={categoriesClient}
             setCategoriesClient={setCategoriesClient}
+            initialCategory={initialCategory}
           />
-        )}
 
-        <div className="flex justify-end mt-6">
-          <div className="flex gap-x-6">
-            <ButtonLink
-              variant={"outline"}
-              href="/dashboard/admin/tournaments/"
-            >
-              Cancelar
-            </ButtonLink>
+          {categoriesClient.length > 0 && (
+            <CategoriesList
+              categoriesClient={categoriesClient}
+              setCategoriesClient={setCategoriesClient}
+            />
+          )}
 
-            <AddButton onClick={(e) => handleAddTournament(e)}>
-              Agregar Torneo
-            </AddButton>
+          <div className="flex justify-end mt-6">
+            <div className="flex gap-x-6">
+              <ButtonLink
+                variant={"outline"}
+                href="/dashboard/admin/tournaments/"
+              >
+                Cancelar
+              </ButtonLink>
+
+              <AddButton onClick={(e) => handleAddTournament(e)}>
+                Agregar Torneo
+              </AddButton>
+            </div>
           </div>
         </div>
       </div>

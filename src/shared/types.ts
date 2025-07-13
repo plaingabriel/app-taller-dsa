@@ -20,11 +20,6 @@ export interface Tournament {
   creationDate: string;
 }
 
-export interface TournamentData {
-  name: string;
-  numberOfCategories: number;
-}
-
 export interface Category {
   id: number;
   name: string;
@@ -43,6 +38,51 @@ export interface Fixture {
   teams_per_group: number;
   teams_qualified: number;
 }
+
+export type Phase =
+  | {
+      id: 1;
+      name: "groups";
+    }
+  | {
+      id: 2;
+      name: "round_16";
+    }
+  | {
+      id: 3;
+      name: "quarterfinals";
+    }
+  | {
+      id: 4;
+      name: "semifinals";
+    }
+  | {
+      id: 5;
+      name: "final";
+    };
+
+export interface Team {
+  id: number;
+  name: string;
+  category_id: Category["id"];
+  wins: number;
+  losses: number;
+  draws: number;
+  matches_played: number;
+  phase_id: Phase["id"];
+  logo?: string;
+  players_count: number;
+}
+
+export interface Player {
+  id: number;
+  name: string;
+  team_id: Team["id"];
+  number: number;
+  position: "portero" | "defensa" | "mediocampista" | "delantero";
+  goalScored: number;
+}
+
 export type Config = Pick<
   Fixture,
   "group_count" | "teams_per_group" | "teams_qualified"
@@ -51,6 +91,32 @@ export type Config = Pick<
 export type CategoryClient = Omit<Category, "tournament_id" | "id"> &
   Omit<Fixture, "id" | "category_id">;
 
+export type CategoryFixture = Omit<Category, "tournament_id"> & {
+  fixture: Omit<Fixture, "category_id">;
+};
+
+export type TournamentFixture = Tournament & {
+  categories: CategoryFixture[];
+};
+
 export type TournamentClient = Pick<Tournament, "name"> & {
   categories: CategoryClient[];
 };
+
+export type NewTeamExcel = Pick<Team, "name" | "logo"> & {
+  number_players: number;
+};
+
+export type NewTeam = Pick<
+  Team,
+  "name" | "logo" | "players_count" | "category_id" | "phase_id"
+>;
+
+export type TeamPlayers = Pick<
+  Team,
+  "id" | "name" | "logo" | "players_count"
+> & {
+  players: Player[];
+};
+
+export type NewPlayerExcel = Pick<Player, "name" | "number" | "position">;

@@ -55,6 +55,7 @@ export const teamTable = sqliteTable("Team", {
   phase_id: int()
     .notNull()
     .references(() => phaseTable.id),
+  players_count: int().notNull(),
 });
 
 export const teamGroupTable = sqliteTable("Team_Group", {
@@ -62,11 +63,14 @@ export const teamGroupTable = sqliteTable("Team_Group", {
   team_id: int()
     .notNull()
     .references(() => teamTable.id),
-  fixture_id: int()
-    .notNull()
-    .references(() => fixture.id),
-  name: text().notNull(),
+  group_id: int().references(() => groupTable.id),
   is_qualified: int().notNull().default(0),
+});
+
+export const groupTable = sqliteTable("Group", {
+  id: int().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  fixture_id: int().references(() => fixture.id),
 });
 
 export const groupStandingTable = sqliteTable("Group_Standing", {

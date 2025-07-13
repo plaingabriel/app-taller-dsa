@@ -1,11 +1,11 @@
 import AddButtonLink from "@/components/buttons/AddButtonLink";
 import ReturnButton from "@/components/buttons/ReturnButton";
+import TournamentCard from "@/components/cards/TournamentCard";
 import { Card } from "@/components/ui/card";
 import { getTournaments } from "@/db/methods/tournament";
 
 export default async function TournamentPage() {
   const tournaments = await getTournaments();
-  console.log(tournaments);
 
   return (
     <div>
@@ -22,14 +22,26 @@ export default async function TournamentPage() {
         </div>
 
         {/* Tournaments State */}
-        <Card className="border-2 border-dashed border-neutral-300 bg-neutral-50">
-          <div className="flex flex-col items-center justify-center py-16 px-8">
-            <p className="text-gray-500 text-lg mb-6">No hay torneos creados</p>
-            <AddButtonLink href="/dashboard/admin/tournaments/new">
-              Crear Primer Torneo
-            </AddButtonLink>
+        {tournaments.length === 0 && (
+          <Card className="border-2 border-dashed border-neutral-300 bg-neutral-50">
+            <div className="flex flex-col items-center justify-center py-16 px-8">
+              <p className="text-gray-500 text-lg mb-6">
+                No hay torneos creados
+              </p>
+              <AddButtonLink href="/dashboard/admin/tournaments/new">
+                Crear Primer Torneo
+              </AddButtonLink>
+            </div>
+          </Card>
+        )}
+
+        {tournaments.length > 0 && (
+          <div>
+            {tournaments.map((tournament) => (
+              <TournamentCard key={tournament.id} tournament={tournament} />
+            ))}
           </div>
-        </Card>
+        )}
       </div>
     </div>
   );

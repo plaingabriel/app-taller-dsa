@@ -4,7 +4,7 @@ import { Badge } from "../ui/badge";
 export default function FixtureBadge({
   fixtureType,
 }: {
-  fixtureType: FixtureType;
+  fixtureType: FixtureType | "mix";
 }) {
   if (fixtureType === "groups") {
     return <Badge className="bg-primary-600">Grupos</Badge>;
@@ -14,5 +14,9 @@ export default function FixtureBadge({
     return <Badge className="bg-tomato-600">Eliminatorias</Badge>;
   }
 
-  return <Badge className="bg-secondary-500">Grupos + Eliminatorias</Badge>;
+  if (fixtureType === "groups+playoffs") {
+    return <Badge className="bg-secondary-500">Grupos + Eliminatorias</Badge>;
+  }
+
+  return <Badge className="bg-success-600">Mixto</Badge>;
 }

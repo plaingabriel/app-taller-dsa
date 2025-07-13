@@ -1,4 +1,4 @@
-import TournamentCard from "@/components/cards/TournamentCard";
+import TournamentCard from "@/components/cards/ComingTournamentCard";
 import React from "react";
 
 export default async function page() {

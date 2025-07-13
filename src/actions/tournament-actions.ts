@@ -1,6 +1,6 @@
 "use server";
 
-import { postTournament } from "@/db/methods/tournament";
+import { deleteTournament, postTournament } from "@/db/methods/tournament";
 import { TournamentClient } from "@/shared/types";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -42,6 +42,12 @@ export async function createTournament(tournament: TournamentClient) {
   }
 
   await postTournament(tournament);
+
+  redirect("/dashboard/admin/tournaments");
+}
+
+export async function deleteTournamentById(id: number) {
+  await deleteTournament(id);
 
   redirect("/dashboard/admin/tournaments");
 }

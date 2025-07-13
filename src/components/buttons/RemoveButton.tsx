@@ -4,10 +4,14 @@ import { Button } from "../ui/button";
 export default function RemoveButton({
   handleRemove,
 }: {
-  handleRemove: () => void;
+  handleRemove: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }) {
   return (
-    <Button variant={"destructive"} size={"icon"} onClick={handleRemove}>
+    <Button
+      variant={"destructive"}
+      size={"icon"}
+      onClick={(e) => handleRemove(e)}
+    >
       <Trash />
     </Button>
   );

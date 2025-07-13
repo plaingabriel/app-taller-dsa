@@ -1,22 +1,74 @@
-import { Category, CategoryClient, Fixture } from "@/shared/types";
+import {
+  Category,
+  CategoryClient,
+  CategoryFixture,
+  Fixture,
+} from "@/shared/types";
+import { eq } from "drizzle-orm";
 import { db } from "..";
 import { categoryTable } from "../schemas";
-import { postFixture } from "./fixture";
+import { getFixtureByCategory, postFixture } from "./fixture";
 
-export async function getCategories(): Promise<Category[]> {
+export async function getCategoriesByTournament(
+  tournament_id: number
+): Promise<CategoryFixture[]> {
   try {
     const categories = (await db
       .select()
       .from(categoryTable)
+      .where(eq(categoryTable.tournament_id, tournament_id))
       .all()) as Category[];
 
-    return categories;
+    const categoriesFixtures = await Promise.all(
+      categories.map(async (category) => {
+        const fixture = await getFixtureByCategory(category.id);
+
+        // Return the category with the fixture and removing the id_tournament property
+        const categoryFixture: CategoryFixture = {
+          id: category.id,
+          name: category.name,
+          min_age: category.min_age,
+          max_age: category.max_age,
+          fixture,
+        };
+
+        return categoryFixture;
+      })
+    );
+
+    return categoriesFixtures;
   } catch (error) {
     console.log(error);
     throw new Error("Error al obtener categorías");
   }
 }
 
+export async function getCategoryById(
+  category_id: number
+): Promise<CategoryFixture> {
+  try {
+    const category = (await db
+      .select()
+      .from(categoryTable)
+      .where(eq(categoryTable.id, category_id))
+      .get()) as Category;
+
+    const fixture = await getFixtureByCategory(category.id);
+
+    const categoryFixture: CategoryFixture = {
+      id: category.id,
+      name: category.name,
+      min_age: category.min_age,
+      max_age: category.max_age,
+      fixture,
+    };
+
+    return categoryFixture;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error al obtener categoría");
+  }
+}
 export async function postCategory(
   category: CategoryClient,
   tournament_id: number
@@ -48,5 +100,14 @@ export async function postCategory(
   } catch (error) {
     console.log(error);
     throw new Error("Error al crear categoría");
+  }
+}
+
+export async function deleteCategory(id: Category["id"]) {
+  try {
+    await db.delete(categoryTable).where(eq(categoryTable.id, id));
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error al eliminar categorías");
   }
 }
