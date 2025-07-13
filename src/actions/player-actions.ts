@@ -1,6 +1,10 @@
 "use server";
 
-import { getPlayersByTeam, postPlayer } from "@/db/methods/player";
+import {
+  deletePlayerById,
+  getPlayersByTeam,
+  postPlayer,
+} from "@/db/methods/player";
 import { NewPlayerExcel } from "@/shared/types";
 import { revalidatePath } from "next/cache";
 
@@ -20,4 +24,8 @@ export async function createPlayerAction(
 
   Promise.all(newPlayers.map((player) => postPlayer(player)));
   revalidatePath("/");
+}
+
+export async function deletePlayerAction(player_id: number) {
+  await deletePlayerById(player_id);
 }

@@ -1,7 +1,7 @@
 import { deleteTeam } from "@/actions/team-action";
 import { getPlayersByTeam } from "@/db/methods/player";
 import { Team } from "@/shared/types";
-import { Trash, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import Image from "next/image";
 import ManagePlayerButton from "../buttons/ManagePlayersButton";
 import DeleteTeamForm from "../forms/DeleteTeamForm";

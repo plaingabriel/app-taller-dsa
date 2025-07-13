@@ -1,5 +1,5 @@
 import ReturnButton from "@/components/buttons/ReturnButton";
-import UploadPlayers from "@/components/cards/UploadPlayers";
+import PlayersSection from "@/components/sections/PlayersSection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPlayersByTeam } from "@/db/methods/player";
 import { getTeamById } from "@/db/methods/team";
@@ -61,8 +61,8 @@ export default async function PlayersPage({
           </CardContent>
         </Card>
 
-        {/* Upload Players */}
-        <UploadPlayers team={team} />
+        {/* Players Section */}
+        <PlayersSection team={team} players={players} />
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import { NewPlayerExcel, Player, Team } from "@/shared/types";
 import {
   AlertCircle,
   CheckCircle,
+  Download,
   FileSpreadsheet,
   Upload,
 } from "lucide-react";
@@ -113,6 +114,23 @@ export default function UploadPlayers({ team }: { team: Team }) {
     setValidationResult(null);
     fileInputRef.current!.value = "";
     button.disabled = false;
+    window.location.reload();
+  };
+
+  const downloadTemplate = () => {
+    const csvContent = `NOMBRE, POSICION, NUMERO_CAMISETA
+Juan Pérez,PORTERO,1
+Carlos López,DEFENSA,2
+Miguel Torres,MEDIOCAMPISTA,10
+Ana García,DELANTERO,9`;
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "plantilla_jugadores.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -127,6 +145,16 @@ export default function UploadPlayers({ team }: { team: Team }) {
 
       <CardContent className="-mt-2 space-y-6">
         <FormatPlayerCard />
+
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" onClick={downloadTemplate}>
+            <Download className="w-4 h-4 mr-2" />
+            Descargar Plantilla CSV
+          </Button>
+          <span className="text-sm text-gray-700">
+            Descarga una plantilla de ejemplo
+          </span>
+        </div>
 
         <FormField>
           <Label htmlFor="file">Seleccionar Archivo CSV</Label>

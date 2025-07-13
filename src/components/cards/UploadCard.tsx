@@ -137,6 +137,7 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
     setValidationResult(null);
     fileInputRef.current!.value = "";
     button.disabled = false;
+    window.location.reload();
   };
 
   useEffect(() => {

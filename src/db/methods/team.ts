@@ -3,7 +3,7 @@
 import { Category, NewTeam, Team } from "@/shared/types";
 import { eq } from "drizzle-orm";
 import { db } from "..";
-import { teamTable } from "../schemas";
+import { playerTable, teamTable } from "../schemas";
 
 export async function getTeamsByCategory(category_id: Category["id"]) {
   try {
@@ -46,6 +46,9 @@ export async function postTeam(team: NewTeam) {
 
 export async function deleteTeamById(team_id: Team["id"]) {
   try {
+    // Delete players
+    await db.delete(playerTable).where(eq(playerTable.team_id, team_id));
+    // Delete team
     await db.delete(teamTable).where(eq(teamTable.id, team_id));
   } catch (error) {
     console.log(error);

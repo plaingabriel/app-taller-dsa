@@ -66,7 +66,9 @@ export default async function TeamsPage({
         </Card>
 
         {/* Upload Teams */}
-        <UploadCard category={category} />
+        {teams.length < category.fixture.team_count && (
+          <UploadCard category={category} />
+        )}
 
         {/* Teams List */}
         {teams.length > 0 && <TeamList teams={teams} />}

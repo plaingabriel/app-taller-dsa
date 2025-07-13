@@ -5,17 +5,11 @@ import { playerTable } from "../schemas";
 
 export async function getPlayersByTeam(team_id: number) {
   try {
-    const players = await db
-      .select({
-        id: playerTable.id,
-        name: playerTable.name,
-        number: playerTable.number,
-        position: playerTable.position,
-        goalScored: playerTable.goalScored,
-      })
+    const players = (await db
+      .select()
       .from(playerTable)
       .where(eq(playerTable.team_id, team_id))
-      .all();
+      .all()) as Player[];
 
     return players;
   } catch (error) {
@@ -33,5 +27,14 @@ export async function postPlayer(
   } catch (error) {
     console.error(error);
     throw new Error("Error al crear el jugador");
+  }
+}
+
+export async function deletePlayerById(id: number) {
+  try {
+    await db.delete(playerTable).where(eq(playerTable.id, id)).run();
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error al eliminar el jugador");
   }
 }
