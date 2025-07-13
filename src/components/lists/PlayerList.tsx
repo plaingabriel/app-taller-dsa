@@ -5,13 +5,7 @@ import { Player } from "@/shared/types";
 import RemoveButton from "../buttons/RemoveButton";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
-export default function PlayerList({
-  players,
-  isTeamValid,
-}: {
-  players: Player[];
-  isTeamValid: boolean;
-}) {
+export default function PlayerList({ players }: { players: Player[] }) {
   const handleRemove = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     playerId: number
@@ -36,7 +30,7 @@ export default function PlayerList({
                 <th>Nombre</th>
                 <th>Posición</th>
                 <th>Número</th>
-                {!isTeamValid && <th>Acciones</th>}
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -49,15 +43,13 @@ export default function PlayerList({
                     <td>{player.name}</td>
                     <td>{player.position}</td>
                     <td>{player.number}</td>
-                    {!isTeamValid && (
-                      <td>
-                        <RemoveButton
-                          handleRemove={(e) => {
-                            handleRemove(e, player.id);
-                          }}
-                        />
-                      </td>
-                    )}
+                    <td>
+                      <RemoveButton
+                        handleRemove={(e) => {
+                          handleRemove(e, player.id);
+                        }}
+                      />
+                    </td>
                   </tr>
                 );
               })}

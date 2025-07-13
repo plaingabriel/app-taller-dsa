@@ -47,9 +47,7 @@ export default function PlayersSection({
       {players.length < team.players_count && <UploadPlayers team={team} />}
 
       {/* Players List */}
-      {players.length > 0 && (
-        <PlayerList players={players} isTeamValid={isTeamValid} />
-      )}
+      {players.length > 0 && <PlayerList players={players} />}
     </>
   );
 }
