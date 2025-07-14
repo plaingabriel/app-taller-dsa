@@ -95,7 +95,23 @@ export interface Match {
   date: string;
   location: string;
   day: number;
-  match_type?: "knockout" | "group";
+  match_type?: "group";
+}
+
+export interface PlayoffMatch {
+  id: number;
+  home_penalty_score?: number;
+  away_penalty_score?: number;
+  home_team?: Team["id"];
+  away_team?: Team["id"];
+  phase_id: Phase["id"];
+  fixture_id: Fixture["id"];
+  home_score?: number;
+  away_score?: number;
+  date: string;
+  location: string;
+  day: number;
+  next_match?: number;
 }
 
 export type Config = Pick<
@@ -137,3 +153,5 @@ export type TeamPlayers = Pick<
 export type NewPlayerExcel = Pick<Player, "name" | "number" | "position">;
 
 export type NewMatch = Omit<Match, "id">;
+
+export type NewPlayoffMatch = Omit<PlayoffMatch, "id">;

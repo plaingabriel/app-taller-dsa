@@ -1,10 +1,14 @@
 "use server";
 
-import { postMatch } from "@/db/methods/match";
+import { postMatch, postPlayoffMatches } from "@/db/methods/match";
 import { getPlayersByTeam } from "@/db/methods/player";
 import { validateTeam } from "@/lib/tournament-data";
-import { generateGroupStageMatches } from "@/lib/utils";
+import {
+  generateFullPlayoffBracket,
+  generateGroupStageMatches,
+} from "@/lib/utils";
 import { CategoryFixture, Fixture, Team } from "@/shared/types";
+import { revalidatePath } from "next/cache";
 
 async function validateTeams(teams: Team[]) {
   for (const team of teams) {
@@ -43,4 +47,16 @@ export async function createMatchesAction(
       await postMatch(match);
     }
   }
+
+  if (category.fixture.fixture_type === "playoffs") {
+    const matches = generateFullPlayoffBracket(teams, category.fixture.id);
+    await postPlayoffMatches(matches);
+  }
+
+  if (category.fixture.fixture_type === "groups+playoffs") {
+    const matches = generateFullPlayoffBracket(teams, category.fixture.id);
+    await postPlayoffMatches(matches);
+  }
+
+  revalidatePath("/");
 }

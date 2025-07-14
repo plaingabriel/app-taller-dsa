@@ -3,6 +3,7 @@ import {
   Fixture,
   FixtureType,
   NewMatch,
+  NewPlayoffMatch,
   Phase,
   Team,
 } from "@/shared/types";
@@ -320,10 +321,10 @@ export function generatePlayoffMatches(teams: Team[], fixtureId: number) {
 
   // 4. Generar partidos
   let day = 1;
-  const matches: NewMatch[] = [];
+  const matches: NewPlayoffMatch[] = [];
 
   for (let i = 0; i < shuffledTeams.length; i += 2) {
-    const newMatch: NewMatch = {
+    const newMatch: NewPlayoffMatch = {
       home_team: shuffledTeams[i].id,
       away_team: shuffledTeams[i + 1].id,
       phase_id: initialPhase,
@@ -331,13 +332,60 @@ export function generatePlayoffMatches(teams: Team[], fixtureId: number) {
       date: "",
       location: "",
       day: day,
-      match_type: "knockout",
     };
 
     matches.push(newMatch);
   }
 
   return matches;
+}
+
+export function generateFullPlayoffBracket(teams: Team[], fixtureId: number) {
+  // 1. Generar primera ronda
+  const firstRoundMatches = generatePlayoffMatches(teams, fixtureId);
+  const allMatches: NewPlayoffMatch[] = [...firstRoundMatches];
+
+  // 2. Determinar fases siguientes
+  const phases: Record<number, Phase["id"]> = {
+    4: 5, // semifinals → final
+    8: 4, // quarterfinals → semifinals
+    16: 3, // round_16 → quarterfinals
+  };
+
+  // 3. Calcular partidos para rondas posteriores
+  let currentMatches = firstRoundMatches.length;
+  let currentPhase = phases[teams.length];
+  let matchDay = 2;
+
+  while (currentMatches > 1) {
+    const roundMatches: NewMatch[] = [];
+
+    for (let i = 0; i < currentMatches; i += 2) {
+      roundMatches.push({
+        home_team: 0, // Se actualizará con los ganadores
+        away_team: 0,
+        phase_id: currentPhase,
+        fixture_id: fixtureId,
+        home_score: 0,
+        away_score: 0,
+        date: "",
+        location: "",
+        day: matchDay,
+      });
+    }
+
+    allMatches.push(...roundMatches);
+    currentMatches = roundMatches.length;
+    currentPhase =
+      currentPhase === 3
+        ? 4 // quarterfinals → semifinals
+        : currentPhase === 4
+        ? 5 // semifinals → final
+        : 5; // final (no debería ocurrir)
+    matchDay++;
+  }
+
+  return allMatches;
 }
 
 export function generateGroupStageMatches(fixture: Fixture, teams: number[]) {
@@ -444,7 +492,6 @@ export function generateGroupsPlayoffsFixture(
 
   // 4. Generar partidos de fase de grupos
   const groupMatches: NewMatch[] = [];
-  let matchId = 1; // ID temporal (se reemplazará al guardar en BD)
 
   groups.forEach((group) => {
     const groupMatchesForGroup = generateMatchesForGroup(

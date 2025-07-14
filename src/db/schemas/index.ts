@@ -117,13 +117,20 @@ export const matchTable = sqliteTable("Match", {
   match_type: text().notNull().default("group"),
 });
 
-export const knockoutMatchTable = sqliteTable("Knockout_Match", {
+export const playoffMatchTable = sqliteTable("Playoffs_Match", {
   id: int().primaryKey({ autoIncrement: true }),
-  match_id: int()
-    .notNull()
-    .references(() => matchTable.id),
   home_penalty_score: int().notNull().default(0),
   away_penalty_score: int().notNull().default(0),
+  home_team: int().default(0),
+  away_team: int().default(0),
+  phase_id: int().references(() => phaseTable.id),
+  fixture_id: int().references(() => fixture.id),
+  home_score: int().notNull().default(0),
+  away_score: int().notNull().default(0),
+  date: text().notNull(),
+  location: text().notNull(),
+  day: int().notNull(),
+  next_match: int().default(0),
 });
 
 export const historicalChampionsTable = sqliteTable("Historical_Champions", {

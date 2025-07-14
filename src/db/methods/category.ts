@@ -6,7 +6,7 @@ import {
 } from "@/shared/types";
 import { eq } from "drizzle-orm";
 import { db } from "..";
-import { categoryTable, matchTable, teamTable } from "../schemas";
+import { categoryTable, matchTable, playoffMatchTable } from "../schemas";
 import { getFixtureByCategory, postFixture } from "./fixture";
 
 export async function getCategoriesByTournament(
@@ -121,7 +121,13 @@ export async function categoryHasMatches(category_id: number) {
       .where(eq(matchTable.fixture_id, fixture.id))
       .all();
 
-    return matches.length > 0;
+    const playoffMatches = await db
+      .select()
+      .from(playoffMatchTable)
+      .where(eq(playoffMatchTable.fixture_id, fixture.id))
+      .all();
+
+    return matches.length > 0 || playoffMatches.length > 0;
   } catch (error) {
     console.log(error);
     throw new Error("Error al obtener categorías");
