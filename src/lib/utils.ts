@@ -1,4 +1,11 @@
-import { Config, Fixture, FixtureType, Phase } from "@/shared/types";
+import {
+  Config,
+  Fixture,
+  FixtureType,
+  NewMatch,
+  Phase,
+  Team,
+} from "@/shared/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -12,6 +19,16 @@ export function allEqual(arr: string[]): boolean {
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+// Función para mezclar array aleatoriamente (Fisher-Yates shuffle)
+export function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
 }
 
 export function getStartedPhaseByFixtureType(fixture: Fixture): Phase {
@@ -278,4 +295,165 @@ export function calculateGruposInfo(
         teams_qualified: 2,
       };
   }
+}
+
+export function generatePlayoffMatches(teams: Team[], fixtureId: number) {
+  // 1. Validar cantidad de equipos
+  const validSizes = [4, 8, 16];
+
+  if (!validSizes.includes(teams.length)) {
+    throw new Error(
+      `Cantidad inválida de equipos para playoffs: ${teams.length}. Debe ser 4, 8 o 16.`
+    );
+  }
+
+  // 2. Mezclar equipos aleatoriamente
+  const shuffledTeams = shuffleArray(teams);
+
+  // 3. Determinar fase inicial según cantidad de equipos
+  const initialPhase: Phase["id"] =
+    teams.length === 4
+      ? 4 // semifinals
+      : teams.length === 8
+      ? 3 // quarterfinals
+      : 2; // round_16
+
+  // 4. Generar partidos
+  let day = 1;
+  const matches: NewMatch[] = [];
+
+  for (let i = 0; i < shuffledTeams.length; i += 2) {
+    const newMatch: NewMatch = {
+      home_team: shuffledTeams[i].id,
+      away_team: shuffledTeams[i + 1].id,
+      phase_id: initialPhase,
+      fixture_id: fixtureId,
+      date: "",
+      location: "",
+      day: day,
+      match_type: "knockout",
+    };
+
+    matches.push(newMatch);
+  }
+
+  return matches;
+}
+
+export function generateGroupStageMatches(fixture: Fixture, teams: number[]) {
+  const phaseId = 1; // Fase de grupos (phase_id = 1)
+  const allMatches: NewMatch[] = [];
+
+  const groupMatches = generateMatchesForGroup(teams, fixture.id, phaseId);
+
+  allMatches.push(...groupMatches);
+
+  return allMatches;
+}
+
+function generateMatchesForGroup(
+  teams: number[],
+  fixtureId: number,
+  phaseId: Phase["id"]
+) {
+  const n = teams.length;
+  const totalRounds = n % 2 === 0 ? n - 1 : n;
+  const matchesPerRound = Math.floor(n / 2);
+
+  // Si es impar, agregar equipo ficticio (descanso)
+  let rotatingTeams = [...teams];
+
+  if (n % 2 !== 0) {
+    rotatingTeams.push(-1); // -1 = equipo ficticio
+  }
+
+  const matches: NewMatch[] = [];
+  let day = 1;
+
+  for (let round = 0; round < totalRounds; round++) {
+    // Generar partidos de esta jornada
+    for (let i = 0; i < matchesPerRound; i++) {
+      const home = rotatingTeams[i];
+      const away = rotatingTeams[rotatingTeams.length - 1 - i];
+
+      // Saltar si hay equipo ficticio
+      if (home === -1 || away === -1) continue;
+
+      matches.push({
+        home_team: home,
+        away_team: away,
+        home_score: undefined,
+        away_score: undefined,
+        date: "", // Asignar posteriormente
+        location: "", // Asignar posteriormente
+        day: day, // Jornada dentro del grupo
+        phase_id: phaseId,
+        fixture_id: fixtureId,
+        match_type: "group",
+      });
+    }
+
+    // Rotar equipos (excepto el primero)
+    const fixed = rotatingTeams[0];
+    const rest = rotatingTeams.slice(1);
+    const last = rest.pop()!;
+    rotatingTeams = [fixed, last, ...rest];
+
+    day++;
+  }
+
+  return matches;
+}
+
+export function generateGroupsPlayoffsFixture(
+  fixture: Fixture,
+  teams: Team[]
+): { groups: { name: string; teamIds: number[] }[]; matches: NewMatch[] } {
+  // Validar cantidad de equipos
+  if (teams.length !== fixture.team_count) {
+    throw new Error(
+      `Number of teams (${teams.length}) does not match fixture configuration (${fixture.team_count})`
+    );
+  }
+
+  // 1. Mezclar equipos aleatoriamente
+  const shuffledTeams = shuffleArray(teams);
+
+  // 2. Crear grupos
+  const groups: { name: string; teamIds: number[] }[] = [];
+  const teamsPerGroup = fixture.teams_per_group;
+  const groupCount = fixture.group_count;
+
+  for (let i = 0; i < groupCount; i++) {
+    groups.push({
+      name: `Group ${String.fromCharCode(65 + i)}`, // Grupo A, B, C, etc.
+      teamIds: [],
+    });
+  }
+
+  // 3. Distribuir equipos en grupos
+  let teamIndex = 0;
+  for (let i = 0; i < teamsPerGroup; i++) {
+    for (let j = 0; j < groupCount; j++) {
+      if (teamIndex < shuffledTeams.length) {
+        groups[j].teamIds.push(shuffledTeams[teamIndex].id);
+        teamIndex++;
+      }
+    }
+  }
+
+  // 4. Generar partidos de fase de grupos
+  const groupMatches: NewMatch[] = [];
+  let matchId = 1; // ID temporal (se reemplazará al guardar en BD)
+
+  groups.forEach((group) => {
+    const groupMatchesForGroup = generateMatchesForGroup(
+      group.teamIds,
+      fixture.id,
+      1 // phase_id = 1 (fase de grupos)
+    );
+    groupMatches.push(...groupMatchesForGroup);
+  });
+
+  return { groups, matches: groupMatches };
 }

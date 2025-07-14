@@ -4,6 +4,7 @@ import { Category, NewTeam, Team } from "@/shared/types";
 import { eq } from "drizzle-orm";
 import { db } from "..";
 import { playerTable, teamTable } from "../schemas";
+import { categoryHasMatches } from "./category";
 
 export async function getTeamsByCategory(category_id: Category["id"]) {
   try {
@@ -53,5 +54,24 @@ export async function deleteTeamById(team_id: Team["id"]) {
   } catch (error) {
     console.log(error);
     throw new Error("Error al eliminar equipo");
+  }
+}
+
+export async function teamHasMatches(team_id: Team["id"]) {
+  try {
+    // Get team category id
+    const { category_id } = (await db
+      .select({ category_id: teamTable.category_id })
+      .from(teamTable)
+      .where(eq(teamTable.id, team_id))
+      .get()) as { category_id: number };
+
+    // Get matches by category id
+    const hasMatches = await categoryHasMatches(category_id);
+
+    return hasMatches;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error al obtener equipos");
   }
 }

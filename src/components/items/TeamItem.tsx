@@ -1,4 +1,3 @@
-import { deleteTeam } from "@/actions/team-action";
 import { getPlayersByTeam } from "@/db/methods/player";
 import { Team } from "@/shared/types";
 import { Users } from "lucide-react";
@@ -6,12 +5,16 @@ import Image from "next/image";
 import ManagePlayerButton from "../buttons/ManagePlayersButton";
 import DeleteTeamForm from "../forms/DeleteTeamForm";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 import { Card, CardContent, CardTitle } from "../ui/card";
 
-export default async function TeamItem({ team }: { team: Team }) {
+export default async function TeamItem({
+  team,
+  hasMatches,
+}: {
+  team: Team;
+  hasMatches: boolean;
+}) {
   const players = await getPlayersByTeam(team.id);
-  const deleteTeamAction = deleteTeam.bind(null, team.id);
 
   return (
     <Card className="border-neutral-600">
@@ -49,9 +52,9 @@ export default async function TeamItem({ team }: { team: Team }) {
         </div>
 
         <div className="flex gap-x-4">
-          <ManagePlayerButton team_id={team.id} />
+          <ManagePlayerButton team_id={team.id} hasMatches={hasMatches} />
 
-          <DeleteTeamForm teamId={team.id} />
+          {!hasMatches && <DeleteTeamForm teamId={team.id} />}
         </div>
       </CardContent>
     </Card>

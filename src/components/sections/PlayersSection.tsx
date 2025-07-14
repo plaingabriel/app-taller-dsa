@@ -11,9 +11,11 @@ import { Button } from "../ui/button";
 export default function PlayersSection({
   team,
   players,
+  hasMatches,
 }: {
   team: Team;
   players: Player[];
+  hasMatches: boolean;
 }) {
   const [isTeamValid, setIsTeamValid] = useState(false);
 
@@ -22,7 +24,7 @@ export default function PlayersSection({
 
     if (validation.valid) {
       setIsTeamValid(true);
-      alert("Equipo validado con éxito. Ya no se puede editar este equipo.");
+      alert("Equipo validado con éxito.");
     } else {
       setIsTeamValid(false);
       alert(validation.errors?.join("\n"));
@@ -31,14 +33,14 @@ export default function PlayersSection({
   return (
     <>
       {/* Validate Players */}
-      {players.length === team.players_count && isTeamValid === false && (
+      {players.length === team.players_count && !hasMatches && (
         <div className="flex justify-end">
           <Button
             onClick={handleValidateTeam}
             className="bg-success-600 hover:bg-success-700"
           >
             <ShieldCheck className="w-4 h-4 mr-2" />
-            Validar Equipo
+            {isTeamValid ? "Equipo validado" : "Validar Equipo"}
           </Button>
         </div>
       )}
@@ -47,7 +49,9 @@ export default function PlayersSection({
       {players.length < team.players_count && <UploadPlayers team={team} />}
 
       {/* Players List */}
-      {players.length > 0 && <PlayerList players={players} />}
+      {players.length > 0 && (
+        <PlayerList players={players} hasMatches={hasMatches} />
+      )}
     </>
   );
 }

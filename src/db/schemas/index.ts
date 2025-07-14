@@ -113,8 +113,8 @@ export const matchTable = sqliteTable("Match", {
   away_score: int().notNull().default(0),
   date: text().notNull(),
   location: text().notNull(),
-  day: text().notNull(),
-  match_type: text().notNull(),
+  day: int().notNull(),
+  match_type: text().notNull().default("group"),
 });
 
 export const knockoutMatchTable = sqliteTable("Knockout_Match", {

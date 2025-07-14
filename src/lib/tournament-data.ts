@@ -1,4 +1,5 @@
-import { NewPlayerExcel, NewTeamExcel, Player } from "@/shared/types";
+import { getPlayersByTeam } from "@/db/methods/player";
+import { NewPlayerExcel, NewTeamExcel, Player, Team } from "@/shared/types";
 
 // Funciones de validación de datos
 export function validateEquiposData(data: NewTeamExcel[]): {
@@ -128,4 +129,16 @@ export function validateTeam(players: Player[]) {
   return {
     valid: true,
   };
+}
+
+export async function allTeamsCompleted(teams: Team[]) {
+  for (const team of teams) {
+    const players = await getPlayersByTeam(team.id);
+
+    if (players.length !== team.players_count) {
+      return false;
+    }
+  }
+
+  return true;
 }

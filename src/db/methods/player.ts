@@ -1,3 +1,5 @@
+"use server";
+
 import { NewPlayerExcel, Player } from "@/shared/types";
 import { eq } from "drizzle-orm";
 import { db } from "..";

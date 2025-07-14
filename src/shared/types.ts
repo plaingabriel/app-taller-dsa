@@ -27,6 +27,7 @@ export interface Category {
   max_age: number;
   tournament_id: Tournament["id"];
 }
+
 export type FixtureType = "groups" | "playoffs" | "groups+playoffs";
 
 export interface Fixture {
@@ -83,6 +84,20 @@ export interface Player {
   goalScored: number;
 }
 
+export interface Match {
+  id: number;
+  home_team: Team["id"];
+  away_team: Team["id"];
+  phase_id: Phase["id"];
+  fixture_id: Fixture["id"];
+  home_score?: number;
+  away_score?: number;
+  date: string;
+  location: string;
+  day: number;
+  match_type?: "knockout" | "group";
+}
+
 export type Config = Pick<
   Fixture,
   "group_count" | "teams_per_group" | "teams_qualified"
@@ -120,3 +135,5 @@ export type TeamPlayers = Pick<
 };
 
 export type NewPlayerExcel = Pick<Player, "name" | "number" | "position">;
+
+export type NewMatch = Omit<Match, "id">;

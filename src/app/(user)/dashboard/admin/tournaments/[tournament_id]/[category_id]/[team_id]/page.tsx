@@ -2,7 +2,7 @@ import ReturnButton from "@/components/buttons/ReturnButton";
 import PlayersSection from "@/components/sections/PlayersSection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPlayersByTeam } from "@/db/methods/player";
-import { getTeamById } from "@/db/methods/team";
+import { getTeamById, teamHasMatches } from "@/db/methods/team";
 import { Users } from "lucide-react";
 
 export default async function PlayersPage({
@@ -17,6 +17,7 @@ export default async function PlayersPage({
   const { tournament_id, category_id, team_id } = await params;
   const team = await getTeamById(parseInt(team_id));
   const players = await getPlayersByTeam(parseInt(team_id));
+  const hasMatches = await teamHasMatches(parseInt(team_id));
 
   return (
     <div className="pb-8">
@@ -62,7 +63,7 @@ export default async function PlayersPage({
         </Card>
 
         {/* Players Section */}
-        <PlayersSection team={team} players={players} />
+        <PlayersSection team={team} players={players} hasMatches={hasMatches} />
       </div>
     </div>
   );

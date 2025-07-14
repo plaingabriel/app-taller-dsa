@@ -6,13 +6,16 @@ import ButtonLink from "../ui/button-link";
 
 export default function ManagePlayerButton({
   team_id,
+  hasMatches,
 }: {
   team_id: Team["id"];
+  hasMatches: boolean;
 }) {
   const pathname = usePathname();
-  console.log(pathname);
 
   return (
-    <ButtonLink href={`${pathname}/${team_id}`}>Gestionar Jugadores</ButtonLink>
+    <ButtonLink href={`${pathname}/${team_id}`}>
+      {hasMatches ? "Ver jugadores" : "Gestionar jugadores"}
+    </ButtonLink>
   );
 }

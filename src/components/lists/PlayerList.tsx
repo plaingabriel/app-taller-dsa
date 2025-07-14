@@ -5,7 +5,13 @@ import { Player } from "@/shared/types";
 import RemoveButton from "../buttons/RemoveButton";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
-export default function PlayerList({ players }: { players: Player[] }) {
+export default function PlayerList({
+  players,
+  hasMatches,
+}: {
+  players: Player[];
+  hasMatches: boolean;
+}) {
   const handleRemove = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     playerId: number
@@ -30,7 +36,7 @@ export default function PlayerList({ players }: { players: Player[] }) {
                 <th>Nombre</th>
                 <th>Posición</th>
                 <th>Número</th>
-                <th>Acciones</th>
+                {!hasMatches && <th>Acciones</th>}
               </tr>
             </thead>
             <tbody>
@@ -43,13 +49,15 @@ export default function PlayerList({ players }: { players: Player[] }) {
                     <td>{player.name}</td>
                     <td>{player.position}</td>
                     <td>{player.number}</td>
-                    <td>
-                      <RemoveButton
-                        handleRemove={(e) => {
-                          handleRemove(e, player.id);
-                        }}
-                      />
-                    </td>
+                    {!hasMatches && (
+                      <td>
+                        <RemoveButton
+                          handleRemove={(e) => {
+                            handleRemove(e, player.id);
+                          }}
+                        />
+                      </td>
+                    )}
                   </tr>
                 );
               })}

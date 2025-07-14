@@ -6,7 +6,7 @@ import {
 } from "@/shared/types";
 import { eq } from "drizzle-orm";
 import { db } from "..";
-import { categoryTable } from "../schemas";
+import { categoryTable, matchTable, teamTable } from "../schemas";
 import { getFixtureByCategory, postFixture } from "./fixture";
 
 export async function getCategoriesByTournament(
@@ -109,5 +109,21 @@ export async function deleteCategory(id: Category["id"]) {
   } catch (error) {
     console.log(error);
     throw new Error("Error al eliminar categorías");
+  }
+}
+
+export async function categoryHasMatches(category_id: number) {
+  try {
+    const fixture = await getFixtureByCategory(category_id);
+    const matches = await db
+      .select()
+      .from(matchTable)
+      .where(eq(matchTable.fixture_id, fixture.id))
+      .all();
+
+    return matches.length > 0;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error al obtener categorías");
   }
 }

@@ -1,12 +1,15 @@
 import ReturnButton from "@/components/buttons/ReturnButton";
 import InstructionCard from "@/components/cards/InstructionCard";
 import UploadCard from "@/components/cards/UploadCard";
+import GenerateMatchesForm from "@/components/forms/GenerateMatchesForm";
 import TeamList from "@/components/lists/TeamList";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCategoryById } from "@/db/methods/category";
+import { categoryHasMatches, getCategoryById } from "@/db/methods/category";
 import { getTeamsByCategory } from "@/db/methods/team";
+import { allTeamsCompleted } from "@/lib/tournament-data";
 import { getTextByFixtureType } from "@/lib/utils";
-import { Users } from "lucide-react";
+import { Shuffle, Users } from "lucide-react";
 
 export default async function TeamsPage({
   params,
@@ -16,6 +19,8 @@ export default async function TeamsPage({
   const { tournament_id, category_id } = await params;
   const category = await getCategoryById(parseInt(category_id));
   const teams = await getTeamsByCategory(parseInt(category_id));
+  const teamsCompleted = await allTeamsCompleted(teams);
+  const hasMatches = await categoryHasMatches(parseInt(category_id));
 
   return (
     <div className="pb-8">
@@ -65,8 +70,17 @@ export default async function TeamsPage({
           </CardContent>
         </Card>
 
+        {/* Shuffle Teams */}
+        {teams.length === category.fixture.team_count && !hasMatches && (
+          <GenerateMatchesForm
+            teamsCompleted={teamsCompleted}
+            teams={teams}
+            category={category}
+          />
+        )}
+
         {/* Upload Teams */}
-        {teams.length < category.fixture.team_count && (
+        {teams.length < category.fixture.team_count && !hasMatches && (
           <UploadCard category={category} />
         )}
 
