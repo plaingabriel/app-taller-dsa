@@ -1,3 +1,4 @@
+import { categoryHasMatches } from "@/db/methods/category";
 import { getTeamsByCategory } from "@/db/methods/team";
 import { CategoryFixture } from "@/shared/types";
 import FixtureBadge from "../badges/FixtureBadge";
@@ -21,6 +22,7 @@ export default async function CategoryTournamentCard({
       : teams.length < category.fixture.team_count
       ? `Parcial (${teams.length}/${category.fixture.team_count})`
       : "Completa";
+  const hasMatches = await categoryHasMatches(category.id);
 
   return (
     <Card key={category.id} className="border-neutral-600">
@@ -51,7 +53,7 @@ export default async function CategoryTournamentCard({
           <ButtonLink
             href={`/dashboard/admin/tournaments/${tournament_id}/${category.id}`}
           >
-            Gestionar Equipos
+            {hasMatches ? "Ver" : "Gestionar"} Equipos
           </ButtonLink>
         </div>
       </CardContent>
