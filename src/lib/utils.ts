@@ -439,6 +439,8 @@ function generateMatchesForGroup(
         fixture_id: fixtureId,
         match_type: "group",
       });
+
+      i++;
     }
 
     // Rotar equipos (excepto el primero)
