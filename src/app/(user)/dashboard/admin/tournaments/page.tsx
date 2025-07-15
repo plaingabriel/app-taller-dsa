@@ -8,8 +8,8 @@ export default async function TournamentPage() {
   const tournaments = await getTournaments();
 
   return (
-    <div>
-      <div className="mx-auto px-4 md:px-8 max-w-7xl py-2 ">
+    <div className="pb-8">
+      <div className="mx-auto px-4 md:px-8 max-w-7xl py-2">
         <ReturnButton href="/dashboard/admin" />
         {/* Header */}
         <div className="flex items-center justify-between mb-8 mt-4">
