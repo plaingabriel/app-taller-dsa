@@ -77,7 +77,12 @@ export async function getMatchesByGroup(group_id: number) {
     }
     const sortedMatches = matches.sort((a, b) => a.day - b.day);
 
-    return sortedMatches;
+    // Remove duplicates
+    const uniqueMatches = sortedMatches.filter(
+      (match, index, self) => index === self.findIndex((m) => m.id === match.id)
+    );
+
+    return uniqueMatches;
   } catch (error) {
     console.error("Error al obtener los partidos del grupo:", error);
     throw error;
