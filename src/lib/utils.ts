@@ -420,9 +420,9 @@ function generateMatchesForGroup(
 
   for (let round = 0; round < totalRounds; round++) {
     // Generar partidos de esta jornada
-    for (let i = 0; i < matchesPerRound; i++) {
-      const home = rotatingTeams[i];
-      const away = rotatingTeams[rotatingTeams.length - 1 - i];
+    for (let j = 0, i = 0; i < matchesPerRound; i++) {
+      const home = rotatingTeams[j];
+      const away = rotatingTeams[rotatingTeams.length - 1 - j];
 
       // Saltar si hay equipo ficticio
       if (home === -1 || away === -1) continue;
