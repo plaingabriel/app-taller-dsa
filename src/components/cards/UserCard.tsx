@@ -40,9 +40,14 @@ export default function UserCard({ user, onDelete }: UserCardProps) {
             <Badge variant={variant}>{role}</Badge>
           </div>
 
-          <Button variant={"destructive"} onClick={(e) => onDelete(e, user.ci)}>
-            <Trash className="w-4 h-4" />
-          </Button>
+          {user.role !== "admin" && (
+            <Button
+              variant={"destructive"}
+              onClick={(e) => onDelete(e, user.ci)}
+            >
+              <Trash className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
