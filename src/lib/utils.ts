@@ -454,7 +454,7 @@ function generateMatchesForGroup(
 }
 
 export function generateGroupsPlayoffsFixture(
-  fixture: Fixture,
+  fixture: Omit<Fixture, "category_id">,
   teams: Team[]
 ): { groups: { name: string; teamIds: number[] }[]; matches: NewMatch[] } {
   // Validar cantidad de equipos
@@ -474,7 +474,7 @@ export function generateGroupsPlayoffsFixture(
 
   for (let i = 0; i < groupCount; i++) {
     groups.push({
-      name: `Group ${String.fromCharCode(65 + i)}`, // Grupo A, B, C, etc.
+      name: `Grupo ${String.fromCharCode(65 + i)}`, // Grupo A, B, C, etc.
       teamIds: [],
     });
   }
@@ -503,4 +503,37 @@ export function generateGroupsPlayoffsFixture(
   });
 
   return { groups, matches: groupMatches };
+}
+
+export function generateDraftTeamsForPlayoffBracket(
+  numberOfTeams: number,
+  category_id: number
+) {
+  const teams: Team[] = [];
+
+  // Set phase id by the number of teams
+  const phases: Record<number, Phase["id"]> = {
+    2: 5, // finals
+    4: 4, // semifinals
+    8: 3, // quarterfinals
+    16: 2, // round_16
+  };
+  const phaseId = phases[numberOfTeams];
+
+  for (let i = 1; i <= numberOfTeams; i++) {
+    teams.push({
+      id: 0,
+      name: "",
+      logo: "",
+      category_id: category_id,
+      phase_id: phaseId,
+      draws: 0,
+      wins: 0,
+      losses: 0,
+      matches_played: 0,
+      players_count: 0,
+    });
+  }
+
+  return teams;
 }

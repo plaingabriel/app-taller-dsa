@@ -1,6 +1,88 @@
-import { NewMatch, NewPlayoffMatch } from "@/shared/types";
+import { Match, NewMatch, NewPlayoffMatch } from "@/shared/types";
+import { eq, or } from "drizzle-orm";
 import { db } from "..";
-import { matchTable, playoffMatchTable } from "../schemas";
+import {
+  groupTable,
+  matchTable,
+  playoffMatchTable,
+  teamGroupTable,
+} from "../schemas";
+
+export async function getGroupMatchesByFixture(fixture_id: number) {
+  try {
+    const matches = await db
+      .select()
+      .from(matchTable)
+      .where(eq(matchTable.fixture_id, fixture_id));
+
+    return matches;
+  } catch (error) {
+    console.error("Error al obtener los partidos:", error);
+    throw error;
+  }
+}
+
+export async function getPlayoffMatchesByFixture(fixture_id: number) {
+  try {
+    const matches = await db
+      .select()
+      .from(playoffMatchTable)
+      .where(eq(playoffMatchTable.fixture_id, fixture_id));
+    return matches;
+  } catch (error) {
+    console.error("Error al obtener los partidos:", error);
+    throw error;
+  }
+}
+
+export async function getGroupsByFixture(fixture_id: number) {
+  try {
+    const groups = await db
+      .select()
+      .from(groupTable)
+      .where(eq(groupTable.fixture_id, fixture_id));
+
+    return groups;
+  } catch (error) {
+    console.error("Error al obtener los grupos:", error);
+    throw error;
+  }
+}
+
+export async function getMatchesByGroup(group_id: number) {
+  try {
+    // Select all teams in the group
+    const teamsInGroup = await db
+      .select()
+      .from(teamGroupTable)
+      .where(eq(teamGroupTable.group_id, group_id))
+      .all();
+
+    // Select all matches where the home_team or away_team is in the group
+    const matches: Match[] = [];
+
+    for (const team of teamsInGroup) {
+      const matchesInGroup = await db
+        .select()
+        .from(matchTable)
+        .where(
+          or(
+            eq(matchTable.home_team, team.team_id),
+            eq(matchTable.away_team, team.team_id)
+          )
+        )
+        .all();
+
+      matches.push(...(matchesInGroup as Match[]));
+    }
+    const sortedMatches = matches.sort((a, b) => a.day - b.day);
+
+    return sortedMatches;
+  } catch (error) {
+    console.error("Error al obtener los partidos del grupo:", error);
+    throw error;
+  }
+}
 
 export async function postMatch(match: NewMatch) {
   try {
@@ -97,6 +179,51 @@ export async function postPlayoffMatches(matches: NewPlayoffMatch[]) {
         // There is no need to get the ids of the inserted round_16 matches, so the code ends here
       }
     }
+  } catch (error) {
+    console.error("Error al insertar el partido:", error);
+    throw error;
+  }
+}
+
+interface GroupMatches {
+  groups: {
+    name: string;
+    teamIds: number[];
+  }[];
+  matches: NewMatch[];
+}
+
+export async function postGroupMatches(
+  groupMatches: GroupMatches,
+  fixture_id: number
+) {
+  try {
+    const { groups, matches } = groupMatches;
+
+    await Promise.all(
+      groups.map(async (group) => {
+        // Insert group
+        const groupId = await db
+          .insert(groupTable)
+          .values({
+            name: group.name,
+            fixture_id,
+          })
+          .returning({ id: groupTable.id });
+        const groupIdNumber = groupId[0].id;
+
+        // Insert teams in group
+        await db.insert(teamGroupTable).values(
+          group.teamIds.map((teamId) => ({
+            team_id: teamId,
+            group_id: groupIdNumber,
+          }))
+        );
+      })
+    );
+
+    // Insert matches
+    await db.insert(matchTable).values(matches);
   } catch (error) {
     console.error("Error al insertar el partido:", error);
     throw error;

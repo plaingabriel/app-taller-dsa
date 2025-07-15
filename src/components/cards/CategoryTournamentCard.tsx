@@ -49,12 +49,21 @@ export default async function CategoryTournamentCard({
           </div>
         </div>
 
-        <div>
+        <div className="flex gap-x-2">
           <ButtonLink
             href={`/dashboard/admin/tournaments/${tournament_id}/${category.id}`}
           >
             {hasMatches ? "Ver" : "Gestionar"} Equipos
           </ButtonLink>
+
+          {hasMatches && (
+            <ButtonLink
+              href={`/dashboard/admin/tournaments/${tournament_id}/${category.id}/matches`}
+              variant={"secondary"}
+            >
+              Ver Partidos
+            </ButtonLink>
+          )}
         </div>
       </CardContent>
     </Card>

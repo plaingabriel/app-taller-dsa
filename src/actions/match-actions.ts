@@ -1,11 +1,17 @@
 "use server";
 
-import { postMatch, postPlayoffMatches } from "@/db/methods/match";
+import {
+  postGroupMatches,
+  postMatch,
+  postPlayoffMatches,
+} from "@/db/methods/match";
 import { getPlayersByTeam } from "@/db/methods/player";
 import { validateTeam } from "@/lib/tournament-data";
 import {
+  generateDraftTeamsForPlayoffBracket,
   generateFullPlayoffBracket,
   generateGroupStageMatches,
+  generateGroupsPlayoffsFixture,
 } from "@/lib/utils";
 import { CategoryFixture, Fixture, Team } from "@/shared/types";
 import { revalidatePath } from "next/cache";
@@ -54,8 +60,20 @@ export async function createMatchesAction(
   }
 
   if (category.fixture.fixture_type === "groups+playoffs") {
-    const matches = generateFullPlayoffBracket(teams, category.fixture.id);
-    await postPlayoffMatches(matches);
+    const groupMatches = generateGroupsPlayoffsFixture(category.fixture, teams);
+    const teamsToClassifyCount =
+      category.fixture.teams_qualified * category.fixture.group_count;
+    const teamsDrafted = generateDraftTeamsForPlayoffBracket(
+      teamsToClassifyCount,
+      category.id
+    );
+    const playoffMatches = generateFullPlayoffBracket(
+      teamsDrafted,
+      category.fixture.id
+    );
+
+    await postGroupMatches(groupMatches, category.fixture.id);
+    await postPlayoffMatches(playoffMatches);
   }
 
   revalidatePath("/");
