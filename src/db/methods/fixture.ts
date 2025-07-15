@@ -1,7 +1,13 @@
 import { Category, Fixture } from "@/shared/types";
 import { eq } from "drizzle-orm";
 import { db } from "..";
-import { fixture as FixtureTable } from "../schemas";
+import {
+  fixture as FixtureTable,
+  groupTable,
+  matchTable,
+  playoffMatchTable,
+  teamGroupTable,
+} from "../schemas";
 
 export async function getFixtureByCategory(
   category_id: Fixture["category_id"]
@@ -38,6 +44,31 @@ export async function postFixture(fixture: Omit<Fixture, "id">) {
 
 export async function deleteFixtureByCategory(id: Category["id"]) {
   try {
+    // Delete matches by fixture
+    await db.delete(matchTable).where(eq(matchTable.fixture_id, id));
+    await db
+      .delete(playoffMatchTable)
+      .where(eq(playoffMatchTable.fixture_id, id));
+
+    // Delete groups by fixture
+    // Get groups by fixture
+    const groups = await db
+      .select()
+      .from(groupTable)
+      .where(eq(groupTable.fixture_id, id));
+
+    await Promise.all(
+      groups.map(async (group) => {
+        // Delete teams by group
+        await db
+          .delete(teamGroupTable)
+          .where(eq(teamGroupTable.group_id, group.id));
+
+        // Delete group
+        await db.delete(groupTable).where(eq(groupTable.id, group.id));
+      })
+    );
+
     await db.delete(FixtureTable).where(eq(FixtureTable.category_id, id));
   } catch (error) {
     console.log(error);

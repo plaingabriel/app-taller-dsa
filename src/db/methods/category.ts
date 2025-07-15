@@ -6,8 +6,14 @@ import {
 } from "@/shared/types";
 import { eq } from "drizzle-orm";
 import { db } from "..";
-import { categoryTable, matchTable, playoffMatchTable } from "../schemas";
+import {
+  categoryTable,
+  matchTable,
+  playoffMatchTable,
+  teamTable,
+} from "../schemas";
 import { getFixtureByCategory, postFixture } from "./fixture";
+import { deleteTeamById } from "./team";
 
 export async function getCategoriesByTournament(
   tournament_id: number
@@ -105,6 +111,14 @@ export async function postCategory(
 
 export async function deleteCategory(id: Category["id"]) {
   try {
+    // Get teams by category
+    const teams = await db
+      .select()
+      .from(teamTable)
+      .where(eq(teamTable.category_id, id));
+
+    await Promise.all(teams.map((team) => deleteTeamById(team.id)));
+
     await db.delete(categoryTable).where(eq(categoryTable.id, id));
   } catch (error) {
     console.log(error);

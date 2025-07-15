@@ -16,9 +16,11 @@ export default async function TournamentPage() {
           <h1 className="text-2xl font-semibold text-gray-900">
             Gestión de Torneos
           </h1>
-          <AddButtonLink href="/dashboard/admin/tournaments/new">
-            Nuevo Torneo
-          </AddButtonLink>
+          {tournaments.length < 3 && (
+            <AddButtonLink href="/dashboard/admin/tournaments/new">
+              Nuevo Torneo
+            </AddButtonLink>
+          )}
         </div>
 
         {/* Tournaments State */}
@@ -36,7 +38,7 @@ export default async function TournamentPage() {
         )}
 
         {tournaments.length > 0 && (
-          <div>
+          <div className="space-y-6">
             {tournaments.map((tournament) => (
               <TournamentCard key={tournament.id} tournament={tournament} />
             ))}

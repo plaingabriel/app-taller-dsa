@@ -1,7 +1,6 @@
 "use client";
 
 import { deleteTournamentById } from "@/actions/tournament-actions";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { allEqual, getTextByFixtureType } from "@/lib/utils";
 import { FixtureType, TournamentFixture } from "@/shared/types";
@@ -46,7 +45,19 @@ export default function TournamentCard({
   const handleRemoveTournament = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    console.log("Remove tournament");
+    const button = e.currentTarget;
+    button.disabled = true;
+
+    const confirmed = confirm(
+      "¿Estás seguro de que quieres eliminar este torneo?"
+    );
+
+    if (confirmed) {
+      await deleteTournamentById(tournament.id);
+      return;
+    }
+
+    button.disabled = false;
   };
 
   return (
