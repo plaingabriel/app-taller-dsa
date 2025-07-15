@@ -85,7 +85,7 @@ export async function deleteTournament(id: number) {
     );
 
     // Delete categories
-    Promise.all(
+    await Promise.all(
       categories.map(async (category) => {
         await deleteCategory(category.id);
       })
