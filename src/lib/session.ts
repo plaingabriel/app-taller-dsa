@@ -44,7 +44,7 @@ export async function decrypt(session: string | undefined = "") {
   }
 }
 
-export async function getUserCI() {
+export async function getUserSession() {
   const session = await decrypt((await cookies()).get("session")?.value);
   return session?.userCI as number;
 }

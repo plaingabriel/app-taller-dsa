@@ -1,7 +1,7 @@
+import { fetchUser } from "@/lib/data";
 import { decrypt } from "@/lib/session";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getUserByCI } from "./db/methods/user";
 
 const protectedPrefix = "/dashboard";
 const publicRoutes = ["/login"];
@@ -28,7 +28,7 @@ export default async function middleware(req: NextRequest) {
 
   // 3. Verificar permisos de rol en rutas protegidas (excepto ruta común)
   if (isProtectedRoute && session?.userCI && !isCommonRoute) {
-    const user = await getUserByCI(session.userCI as number);
+    const user = await fetchUser(session.userCI as number);
 
     if (!user) {
       return NextResponse.redirect(new URL("/login", req.nextUrl));
@@ -51,7 +51,7 @@ export default async function middleware(req: NextRequest) {
 
 // Función auxiliar para redireccionar según rol
 async function redirectByRole(userCI: number, baseUrl: URL) {
-  const user = await getUserByCI(userCI);
+  const user = await fetchUser(userCI);
 
   if (!user) {
     throw new Error("Usuario no encontrado");

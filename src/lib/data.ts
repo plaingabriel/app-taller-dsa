@@ -1,10 +1,33 @@
 // File to store the fetching functions
 import { db } from "@/db";
 import { User } from "./definitions";
+import { getUserSession } from "./session";
+
+export async function fetchAuthUser() {
+  const userCI = await getUserSession();
+
+  if (!userCI) {
+    return undefined;
+  }
+
+  const user = await db.query.usersTable.findFirst({
+    where: (user, { eq }) => eq(user.ci, userCI),
+  });
+
+  return user;
+}
 
 export async function fetchUsers(): Promise<User[]> {
   const users = await db.query.usersTable.findMany();
   return users;
+}
+
+export async function fetchUser(ci: number) {
+  const user = await db.query.usersTable.findFirst({
+    where: (user, { eq }) => eq(user.ci, ci),
+  });
+
+  return user;
 }
 
 export async function fetchTournaments() {
