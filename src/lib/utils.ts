@@ -32,6 +32,57 @@ export function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+export function generateID(tableName: string): string {
+  const PREFIX_MAP: Record<string, string> = {
+    Tournament: "trn",
+    Category: "cat",
+    Match: "mtc",
+    Team: "tem",
+    Player: "ply",
+  };
+
+  const CHAR_SET = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+  function toBase36(num: number, length: number): string {
+    let result = "";
+    while (num > 0 || result.length < length) {
+      result = CHAR_SET[num % 36] + result;
+      num = Math.floor(num / 36);
+    }
+    return result.slice(0, length);
+  }
+
+  function computeChecksum(data: string): string {
+    let sum = 0;
+    let weight = 1;
+
+    for (let i = 0; i < data.length; i++) {
+      const code = data.charCodeAt(i) * weight;
+      sum = (sum + code) % 46656; // 36^3
+      weight = (weight * 31) % 467; // Prime modulus
+    }
+
+    return toBase36(sum, 3);
+  }
+
+  const prefix = PREFIX_MAP[tableName];
+  if (!prefix) throw new Error(`Invalid table name: ${tableName}`);
+
+  // 41-bit timestamp (milliseconds until ~2088)
+  const timestamp = Date.now();
+  const timestampPart = toBase36(timestamp, 7);
+
+  // 17-bit random value (131k possibilities)
+  const randomValue = Math.floor(Math.random() * 131072);
+  const randomPart = toBase36(randomValue, 3);
+
+  // Combine components
+  const rawId = prefix + timestampPart + randomPart;
+  const checksum = computeChecksum(rawId);
+
+  return `${prefix}_${timestampPart}_${randomPart}_${checksum}`;
+}
+
 export function getStartedPhaseByFixtureType(fixture: Fixture): Phase {
   switch (fixture.fixture_type) {
     case "playoffs":
