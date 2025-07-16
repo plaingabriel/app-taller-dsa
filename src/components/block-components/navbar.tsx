@@ -1,16 +1,19 @@
 "use client";
 
+import { UserClient } from "@/shared/client-types";
+import { LogIn } from "lucide-react";
 import { usePathname } from "next/navigation";
-import LoginButton from "../buttons/LoginButton";
-import NavBarWrapper from "./NavBarWrapper";
-import NavLinkLogo from "./NavLinkLogo";
+import { ButtonLink } from "../atomic-components/button-link";
+import { NavbarWrapper, NavLogo } from "../navbar";
+import { MenuUser } from "./menu";
 
-export default function NavBar() {
+export function NavHome() {
   const pathname = usePathname();
 
   return (
-    <NavBarWrapper>
-      <NavLinkLogo />
+    <NavbarWrapper>
+      <NavLogo />
+
       {/* <li>
           <NavLink href="/" pathname={pathname === "/"}>
             Inicio
@@ -37,7 +40,22 @@ export default function NavBar() {
           </NavLink>
         </li> */}
 
-      {pathname === "/" && <LoginButton>Iniciar sesión</LoginButton>}
-    </NavBarWrapper>
+      {pathname === "/" && (
+        <ButtonLink href="/login">
+          <LogIn />
+          Iniciar Sesión
+        </ButtonLink>
+      )}
+    </NavbarWrapper>
+  );
+}
+
+export function NavUser({ user }: { user: UserClient }) {
+  return (
+    <NavbarWrapper>
+      <NavLogo />
+
+      <MenuUser user={user} />
+    </NavbarWrapper>
   );
 }

@@ -44,6 +44,8 @@ export async function decrypt(session: string | undefined = "") {
   }
 }
 
+// Get the user CI from the session cookie
+// Always return a number, even if the session is invalid because the middleware will redirect to the login page if the session is invalid
 export async function getUserSession() {
   const session = await decrypt((await cookies()).get("session")?.value);
   return session?.userCI as number;

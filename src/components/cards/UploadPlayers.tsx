@@ -15,9 +15,9 @@ import {
   Upload,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import FormField from "../atomic-components/form-field";
 import { Button } from "../shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
-import FormField from "../shadcn-ui/form-field";
 import { Input } from "../shadcn-ui/input";
 import { Label } from "../shadcn-ui/label";
 import FormatPlayerCard from "./FormatPlayersCard";

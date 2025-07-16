@@ -1,9 +1,9 @@
 import { categoryHasMatches } from "@/db/methods/category";
 import { getTeamsByCategory } from "@/db/methods/team";
 import { CategoryFixture } from "@/shared/types";
+import ButtonLink from "../atomic-components/button-link";
 import FixtureBadge from "../badges/FixtureBadge";
 import { Badge } from "../shadcn-ui/badge";
-import ButtonLink from "../shadcn-ui/button-link";
 import { Card, CardContent } from "../shadcn-ui/card";
 
 type CategoryTournamentCardProps = {

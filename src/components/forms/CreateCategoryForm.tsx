@@ -8,10 +8,11 @@ import {
 } from "@/lib/utils";
 import { CategoryClient, Fixture, FixtureType } from "@/shared/types";
 import { useState } from "react";
+import FormField from "../atomic-components/form-field";
+import SelectFixture from "../atomic-components/select-fixture";
 import AddButton from "../buttons/AddButton";
 import InfoCardCategoryForm from "../cards/InfoCardCategoryForm";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
-import FormField from "../shadcn-ui/form-field";
 import { Input } from "../shadcn-ui/input";
 import { Label } from "../shadcn-ui/label";
 import {
@@ -21,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../shadcn-ui/select";
-import SelectFixture from "../shadcn-ui/select-fixture";
 
 type CreateCategoryFormProps = {
   categoriesClient: CategoryClient[];

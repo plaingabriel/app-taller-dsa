@@ -19,8 +19,8 @@ import {
   SelectValue,
 } from "@/components/shadcn-ui/select";
 import { useActionState } from "react";
-import ButtonLink from "../shadcn-ui/button-link";
-import FormField from "../shadcn-ui/form-field";
+import ButtonLink from "../atomic-components/button-link";
+import FormField from "../atomic-components/form-field";
 import PasswordInput from "../shadcn-ui/password-input";
 
 export default function CreateUserForm() {

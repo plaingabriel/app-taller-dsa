@@ -3,14 +3,11 @@
 import { cn } from "@/lib/utils";
 import { Eye, EyeClosed } from "lucide-react";
 import { type ComponentProps, useState } from "react";
-import { Input } from "./input";
+import { Input } from "../shadcn-ui/input";
 
 type PasswordInputProps = Omit<ComponentProps<"input">, "type">;
 
-export default function PasswordInput({
-  className,
-  ...props
-}: PasswordInputProps) {
+export function PasswordInput({ className, ...props }: PasswordInputProps) {
   const [visibility, setVisibility] = useState(false);
 
   const type = visibility ? "text" : "password";
@@ -26,7 +23,7 @@ export default function PasswordInput({
         onClick={toggleVisibility}
         className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
       >
-        <Icon className="text-secondary-200" />
+        <Icon className="text-accent-foreground" />
       </button>
     </div>
   );

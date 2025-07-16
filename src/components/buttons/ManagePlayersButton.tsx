@@ -2,7 +2,7 @@
 
 import { Team } from "@/shared/types";
 import { usePathname } from "next/navigation";
-import ButtonLink from "../shadcn-ui/button-link";
+import ButtonLink from "../atomic-components/button-link";
 
 export default function ManagePlayerButton({
   team_id,

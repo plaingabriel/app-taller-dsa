@@ -1,31 +1,31 @@
 // File to store the fetching functions
 import { db } from "@/db";
+import { UserClient } from "@/shared/client-types";
+import { redirect } from "next/navigation";
 import { User } from "./definitions";
 import { getUserSession } from "./session";
-
-export async function fetchAuthUser() {
-  const userCI = await getUserSession();
-
-  if (!userCI) {
-    return undefined;
-  }
-
-  const user = await db.query.usersTable.findFirst({
-    where: (user, { eq }) => eq(user.ci, userCI),
-  });
-
-  return user;
-}
 
 export async function fetchUsers(): Promise<User[]> {
   const users = await db.query.usersTable.findMany();
   return users;
 }
 
-export async function fetchUser(ci: number) {
+export async function fetchUser(ci: number): Promise<UserClient | undefined> {
   const user = await db.query.usersTable.findFirst({
+    columns: {
+      ci: true,
+      name: true,
+      role: true,
+    },
     where: (user, { eq }) => eq(user.ci, ci),
   });
+
+  return user;
+}
+
+export async function fetchAuthUser(): Promise<UserClient | undefined> {
+  const userCI = await getUserSession();
+  const user = fetchUser(userCI);
 
   return user;
 }

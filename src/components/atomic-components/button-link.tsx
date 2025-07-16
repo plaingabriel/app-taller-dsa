@@ -1,13 +1,13 @@
 import { VariantProps } from "class-variance-authority";
 import Link from "next/link";
-import { Button, buttonVariants } from "./button";
+import { Button, buttonVariants } from "../shadcn-ui/button";
 
 type ButtonLinkProps = {
   href: string;
 } & VariantProps<typeof buttonVariants> &
   React.ComponentProps<"button">;
 
-export default function ButtonLink({
+export function ButtonLink({
   className,
   variant,
   size,

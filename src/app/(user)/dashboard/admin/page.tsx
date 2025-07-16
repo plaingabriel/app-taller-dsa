@@ -1,4 +1,4 @@
-import { AdminOptionLink } from "@/components/links/AdminOptionLink.";
+import { OptionLink } from "@/components/admin/option-link";
 
 export default function AdminPage() {
   return (
@@ -13,14 +13,14 @@ export default function AdminPage() {
 
         <div className="mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
-            <AdminOptionLink
+            <OptionLink
               href="/dashboard/admin/users"
               iconType="users"
               title="Gestionar Usuarios"
               description="Gestiona los usuarios del sistema"
             />
 
-            <AdminOptionLink
+            <OptionLink
               href="/dashboard/admin/tournaments"
               iconType="tournament"
               title="Gestionar Torneos"

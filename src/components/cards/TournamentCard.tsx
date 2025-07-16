@@ -10,10 +10,10 @@ import {
 import { allEqual, getTextByFixtureType } from "@/lib/utils";
 import { FixtureType, TournamentFixture } from "@/shared/types";
 import { Settings } from "lucide-react";
+import ButtonLink from "../atomic-components/button-link";
 import FixtureBadge from "../badges/FixtureBadge";
 import InfoBadge from "../badges/InfoBadge";
 import RemoveButton from "../buttons/RemoveButton";
-import ButtonLink from "../shadcn-ui/button-link";
 
 type TournamentType = FixtureType | "mix";
 

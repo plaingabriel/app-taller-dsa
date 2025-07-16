@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import ButtonLink from "../shadcn-ui/button-link";
+import ButtonLink from "../atomic-components/button-link";
 
 export default function AddButtonLink({
   children,

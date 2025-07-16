@@ -12,7 +12,8 @@
   --color-neutral-500: #827c8d;
   --color-neutral-600: #635f6d;
   --color-neutral-700: #4f4c57;
-  --color-neutral-800: #3b3941;
+  --color-neutral-800: #322f37;
+  --color-neutral-850: #1e1c21;
   --color-neutral-900: #141316;
   --color-neutral-950: #0a090b;
 
@@ -115,7 +116,7 @@
   --font-sans: Inter, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
-  --radius: 1.125rem;
+  --radius: 0.78rem;
   --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
   --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
   --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
@@ -129,7 +130,7 @@
   --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
     0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0);
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
-  --tracking-normal: 0.05em;
+  --tracking-normal: 0.02em;
   --spacing: 0.26rem;
 }
 

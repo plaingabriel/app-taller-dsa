@@ -8,7 +8,7 @@ import {
 } from "@/components/shadcn-ui/card";
 import { Input } from "@/components/shadcn-ui/input";
 import { Label } from "@/components/shadcn-ui/label";
-import FormField from "../shadcn-ui/form-field";
+import FormField from "../atomic-components/form-field";
 
 type CreateTournamentFormProps = {
   handleName: (e: React.ChangeEvent<HTMLInputElement>) => void;

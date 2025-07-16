@@ -17,7 +17,7 @@ interface Props {
   user: UserClient;
 }
 
-export default function UserMenu({ user }: Props) {
+export function MenuUser({ user }: Props) {
   const pathname = usePathname();
   const role =
     user.role === "admin"

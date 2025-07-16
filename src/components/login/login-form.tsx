@@ -13,8 +13,8 @@ import { Input } from "@/components/shadcn-ui/input";
 import { Label } from "@/components/shadcn-ui/label";
 import { cn } from "@/lib/utils";
 import { useActionState } from "react";
-import FormField from "../shadcn-ui/form-field";
-import PasswordInput from "../shadcn-ui/password-input";
+import { FormField } from "../atomic-components/form-field";
+import { PasswordInput } from "../atomic-components/password-input";
 
 export function LoginForm({
   className,
