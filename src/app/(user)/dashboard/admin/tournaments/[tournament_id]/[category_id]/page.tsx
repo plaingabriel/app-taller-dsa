@@ -3,8 +3,13 @@ import InstructionCard from "@/components/cards/InstructionCard";
 import UploadCard from "@/components/cards/UploadCard";
 import GenerateMatchesForm from "@/components/forms/GenerateMatchesForm";
 import TeamList from "@/components/lists/TeamList";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/shadcn-ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/shadcn-ui/card";
 import { categoryHasMatches, getCategoryById } from "@/db/methods/category";
 import { getTeamsByCategory } from "@/db/methods/team";
 import { allTeamsCompleted } from "@/lib/tournament-data";

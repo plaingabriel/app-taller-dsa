@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteTeam } from "@/actions/team-action";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn-ui/button";
 import { Team } from "@/shared/types";
 import { Trash } from "lucide-react";
 import { useActionState } from "react";

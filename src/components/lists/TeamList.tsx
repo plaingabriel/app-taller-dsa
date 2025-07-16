@@ -1,7 +1,7 @@
 import { teamHasMatches } from "@/db/methods/team";
 import { Team } from "@/shared/types";
 import TeamItem from "../items/TeamItem";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 
 export default async function TeamList({ teams }: { teams: Team[] }) {
   // If the first team has matches, then all teams have matches

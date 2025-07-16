@@ -1,6 +1,6 @@
 import { getTeamById } from "@/db/methods/team";
 import { PlayoffMatch as match } from "@/shared/types";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "../shadcn-ui/card";
 
 export default async function PlayoffMatch({ match }: { match: match }) {
   const { home_team, away_team } = match;

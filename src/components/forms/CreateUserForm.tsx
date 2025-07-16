@@ -1,27 +1,27 @@
 "use client";
 
 import { createUser } from "@/actions/user-actions";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/shadcn-ui/card";
+import { Input } from "@/components/shadcn-ui/input";
+import { Label } from "@/components/shadcn-ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/shadcn-ui/select";
 import { useActionState } from "react";
-import ButtonLink from "../ui/button-link";
-import FormField from "../ui/form-field";
-import PasswordInput from "../ui/password-input";
+import ButtonLink from "../shadcn-ui/button-link";
+import FormField from "../shadcn-ui/form-field";
+import PasswordInput from "../shadcn-ui/password-input";
 
 export default function CreateUserForm() {
   const [state, createUserAction, pending] = useActionState(

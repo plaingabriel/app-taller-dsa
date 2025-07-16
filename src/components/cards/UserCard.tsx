@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/shadcn-ui/card";
 import { UserClient } from "@/shared/types";
 import { Trash, User } from "lucide-react";
 import React from "react";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+import { Badge } from "../shadcn-ui/badge";
+import { Button } from "../shadcn-ui/button";
 
 type UserCardProps = {
   user: UserClient;

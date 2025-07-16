@@ -7,11 +7,11 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/shadcn-ui/dropdown-menu";
 import { UserClient } from "@/shared/types";
 import { CircleUserRound } from "lucide-react";
 import { redirect, usePathname } from "next/navigation";
-import { Button } from "../ui/button";
+import { Button } from "../shadcn-ui/button";
 
 interface Props {
   user: UserClient;

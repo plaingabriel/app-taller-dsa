@@ -1,6 +1,6 @@
 import { MoveLeft } from "lucide-react";
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { Button } from "../shadcn-ui/button";
 
 export default function ReturnButton({ href }: { href: string }) {
   return (

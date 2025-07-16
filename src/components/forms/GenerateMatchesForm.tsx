@@ -4,7 +4,7 @@ import { createMatchesAction } from "@/actions/match-actions";
 import { CategoryFixture, Team } from "@/shared/types";
 import { Shuffle } from "lucide-react";
 import { useActionState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../shadcn-ui/button";
 
 export default function GenerateMatchesForm({
   teamsCompleted,

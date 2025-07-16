@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/shadcn-ui/card";
 import { Trophy } from "lucide-react";
 
 export default function ComingTournamentCard({ number }: { number: number }) {

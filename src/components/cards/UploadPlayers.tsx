@@ -15,11 +15,11 @@ import {
   Upload,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import FormField from "../ui/form-field";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import { Button } from "../shadcn-ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
+import FormField from "../shadcn-ui/form-field";
+import { Input } from "../shadcn-ui/input";
+import { Label } from "../shadcn-ui/label";
 import FormatPlayerCard from "./FormatPlayersCard";
 
 export default function UploadPlayers({ team }: { team: Team }) {

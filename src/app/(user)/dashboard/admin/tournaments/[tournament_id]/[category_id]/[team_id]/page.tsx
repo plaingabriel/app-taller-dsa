@@ -1,6 +1,11 @@
 import ReturnButton from "@/components/buttons/ReturnButton";
 import PlayersSection from "@/components/sections/PlayersSection";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/shadcn-ui/card";
 import { getPlayersByTeam } from "@/db/methods/player";
 import { getTeamById, teamHasMatches } from "@/db/methods/team";
 import { Users } from "lucide-react";

@@ -1,5 +1,5 @@
 import { FixtureType } from "@/shared/types";
-import { Badge } from "../ui/badge";
+import { Badge } from "../shadcn-ui/badge";
 
 export default function FixtureBadge({
   fixtureType,

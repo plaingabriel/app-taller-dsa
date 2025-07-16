@@ -3,7 +3,7 @@
 import { deletePlayerAction } from "@/actions/player-actions";
 import { Player } from "@/shared/types";
 import RemoveButton from "../buttons/RemoveButton";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 
 export default function PlayerList({
   players,

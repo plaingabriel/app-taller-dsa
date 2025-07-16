@@ -1,5 +1,5 @@
 import { Trash } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "../shadcn-ui/button";
 
 export default function RemoveButton({
   handleRemove,

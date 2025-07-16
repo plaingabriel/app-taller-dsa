@@ -1,9 +1,14 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import FormField from "../ui/form-field";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/shadcn-ui/card";
+import { Input } from "@/components/shadcn-ui/input";
+import { Label } from "@/components/shadcn-ui/label";
+import FormField from "../shadcn-ui/form-field";
 
 type CreateTournamentFormProps = {
   handleName: (e: React.ChangeEvent<HTMLInputElement>) => void;

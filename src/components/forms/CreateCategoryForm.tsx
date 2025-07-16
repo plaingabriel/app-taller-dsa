@@ -10,18 +10,18 @@ import { CategoryClient, Fixture, FixtureType } from "@/shared/types";
 import { useState } from "react";
 import AddButton from "../buttons/AddButton";
 import InfoCardCategoryForm from "../cards/InfoCardCategoryForm";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import FormField from "../ui/form-field";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
+import FormField from "../shadcn-ui/form-field";
+import { Input } from "../shadcn-ui/input";
+import { Label } from "../shadcn-ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import SelectFixture from "../ui/select-fixture";
+} from "../shadcn-ui/select";
+import SelectFixture from "../shadcn-ui/select-fixture";
 
 type CreateCategoryFormProps = {
   categoriesClient: CategoryClient[];

@@ -2,7 +2,12 @@ import StatusBadge from "@/components/badges/StatusBadge";
 import ReturnButton from "@/components/buttons/ReturnButton";
 import CategoryTournamentCard from "@/components/cards/CategoryTournamentCard";
 import WorkflowCard from "@/components/cards/WorkFlowCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/shadcn-ui/card";
 import { getTournamentById } from "@/db/methods/tournament";
 import { Trophy, Users } from "lucide-react";
 

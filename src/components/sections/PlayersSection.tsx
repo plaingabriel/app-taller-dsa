@@ -6,7 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import UploadPlayers from "../cards/UploadPlayers";
 import PlayerList from "../lists/PlayerList";
-import { Button } from "../ui/button";
+import { Button } from "../shadcn-ui/button";
 
 export default function PlayersSection({
   team,

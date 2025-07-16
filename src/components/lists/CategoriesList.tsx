@@ -1,6 +1,6 @@
 import { CategoryClient } from "@/shared/types";
 import CategoryClientCard from "../cards/CategoryClientCard";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 
 export default function CategoriesList({
   categoriesClient,

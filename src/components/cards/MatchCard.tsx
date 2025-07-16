@@ -1,6 +1,6 @@
 import { getTeamById } from "@/db/methods/team";
 import { Match } from "@/shared/types";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "../shadcn-ui/card";
 
 interface MatchCardProps {
   match: Match;

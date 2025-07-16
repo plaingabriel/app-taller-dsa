@@ -1,5 +1,5 @@
 import { Info } from "lucide-react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "../shadcn-ui/card";
 
 export default function FormatPlayerCard() {
   return (

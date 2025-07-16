@@ -1,6 +1,6 @@
 import { type VariantProps } from "class-variance-authority";
 import { Plus } from "lucide-react";
-import { Button, buttonVariants } from "../ui/button";
+import { Button, buttonVariants } from "../shadcn-ui/button";
 
 type AddButtonProps = {
   children: React.ReactNode;

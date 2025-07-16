@@ -1,5 +1,5 @@
 import { Tournament } from "@/shared/types";
-import { Badge } from "../ui/badge";
+import { Badge } from "../shadcn-ui/badge";
 
 interface StatusBadgeProps {
   status: Tournament["status"];

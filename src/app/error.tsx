@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/shadcn-ui/button";
+import { Card, CardTitle } from "@/components/shadcn-ui/card";
 import { useEffect } from "react";
 
 export default function Error({

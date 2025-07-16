@@ -4,8 +4,8 @@ import { Users } from "lucide-react";
 import Image from "next/image";
 import ManagePlayerButton from "../buttons/ManagePlayersButton";
 import DeleteTeamForm from "../forms/DeleteTeamForm";
-import { Badge } from "../ui/badge";
-import { Card, CardContent, CardTitle } from "../ui/card";
+import { Badge } from "../shadcn-ui/badge";
+import { Card, CardContent, CardTitle } from "../shadcn-ui/card";
 
 export default async function TeamItem({
   team,

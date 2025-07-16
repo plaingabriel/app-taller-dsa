@@ -1,7 +1,7 @@
 import { CategoryClient } from "@/shared/types";
 import FixtureBadge from "../badges/FixtureBadge";
 import RemoveButton from "../buttons/RemoveButton";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "../shadcn-ui/card";
 
 type CategoryClientCardProps = {
   category: CategoryClient;

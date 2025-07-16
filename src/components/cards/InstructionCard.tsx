@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/shadcn-ui/card";
 import { FileSpreadsheet, FileText } from "lucide-react";
 
 export default function InstructionCard() {

@@ -1,14 +1,19 @@
 "use client";
 
 import { deleteTournamentById } from "@/actions/tournament-actions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/shadcn-ui/card";
 import { allEqual, getTextByFixtureType } from "@/lib/utils";
 import { FixtureType, TournamentFixture } from "@/shared/types";
 import { Settings } from "lucide-react";
 import FixtureBadge from "../badges/FixtureBadge";
 import InfoBadge from "../badges/InfoBadge";
 import RemoveButton from "../buttons/RemoveButton";
-import ButtonLink from "../ui/button-link";
+import ButtonLink from "../shadcn-ui/button-link";
 
 type TournamentType = FixtureType | "mix";
 

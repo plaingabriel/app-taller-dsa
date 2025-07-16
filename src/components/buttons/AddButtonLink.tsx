@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import ButtonLink from "../ui/button-link";
+import ButtonLink from "../shadcn-ui/button-link";
 
 export default function AddButtonLink({
   children,

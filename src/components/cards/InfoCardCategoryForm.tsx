@@ -1,6 +1,6 @@
 import { getInfoConfig } from "@/lib/utils";
 import { FixtureType } from "@/shared/types";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 
 interface InfoCardCategoryFormProps {
   fixtureType: FixtureType;
