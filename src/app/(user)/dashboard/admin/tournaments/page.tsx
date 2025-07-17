@@ -1,7 +1,10 @@
 import { ButtonLink } from "@/components/atomic-components/button-link";
 import { ReturnButton } from "@/components/atomic-components/return-button";
+import { TableSkeleton } from "@/components/skeletons";
+import { TournamentTable } from "@/components/tournament/table";
 import { fetchTournaments } from "@/lib/data";
 import { Plus } from "lucide-react";
+import { Suspense } from "react";
 
 export default async function TournamentPage() {
   const tournaments = fetchTournaments();
@@ -18,6 +21,11 @@ export default async function TournamentPage() {
             <span>Nuevo Torneo</span>
           </ButtonLink>
         </div>
+
+        {/* Table */}
+        <Suspense fallback={<TableSkeleton />}>
+          <TournamentTable tournaments={tournaments} />
+        </Suspense>
       </div>
     </div>
   );

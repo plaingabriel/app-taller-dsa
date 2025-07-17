@@ -1,13 +1,19 @@
 "use client";
 
+import { Category, Tournament } from "@/lib/definitions";
 import { use } from "react";
+import { DataTable } from "../block-components/data-table";
 
-// export function TournamentTable({
-//   tournaments,
-// }: {
-//   tournaments: Promise<TournamentClient[]>;
-// }) {
-//   const allTournaments = use(tournaments);
+type TournamentClient = Tournament & {
+  categories: Category[];
+};
 
-//   return <div>TournamentTable</div>;
-// }
+export function TournamentTable({
+  tournaments,
+}: {
+  tournaments: Promise<TournamentClient[]>;
+}) {
+  const allTournaments = use(tournaments);
+
+  return <div>TournamentTable</div>;
+}
