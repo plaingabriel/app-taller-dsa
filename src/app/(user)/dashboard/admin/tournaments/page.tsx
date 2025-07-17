@@ -1,10 +1,8 @@
-import { ButtonLink } from "@/components/atomic-components/button-link";
 import { ReturnButton } from "@/components/atomic-components/return-button";
 import { TableSkeleton } from "@/components/skeletons";
 import { AddButton } from "@/components/tournaments/add-button";
 import { TournamentTable } from "@/components/tournaments/table";
 import { fetchTournaments } from "@/lib/data";
-import { Plus } from "lucide-react";
 import { Suspense } from "react";
 
 export default async function TournamentPage() {
