@@ -1,4 +1,4 @@
-import ReturnButton from "@/components/buttons/ReturnButton";
+import ReturnButton from "@/components/atomic-components/return-button";
 import PlayersSection from "@/components/sections/PlayersSection";
 import {
   Card,

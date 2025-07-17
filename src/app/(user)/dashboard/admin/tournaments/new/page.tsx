@@ -2,8 +2,8 @@
 
 import { createTournament } from "@/actions/tournament-actions";
 import ButtonLink from "@/components/atomic-components/button-link";
+import ReturnButton from "@/components/atomic-components/return-button";
 import AddButton from "@/components/buttons/AddButton";
-import ReturnButton from "@/components/buttons/ReturnButton";
 import CreateCategoryForm from "@/components/forms/CreateCategoryForm";
 import CreateTournamentForm from "@/components/forms/CreateTournamentForm";
 import CategoriesList from "@/components/lists/CategoriesList";

@@ -1,4 +1,4 @@
-import ReturnButton from "@/components/buttons/ReturnButton";
+import ReturnButton from "@/components/atomic-components/return-button";
 import DisplayGroupMatches from "@/components/display-matches/DisplayGroupMatches";
 import GroupPlayoffsMatches from "@/components/display-matches/GroupPlayoffsMatches";
 import PlayOffsMatches from "@/components/display-matches/PlayOffsMatches";

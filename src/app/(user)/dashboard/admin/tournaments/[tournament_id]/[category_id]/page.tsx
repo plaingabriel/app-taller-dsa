@@ -1,4 +1,4 @@
-import ReturnButton from "@/components/buttons/ReturnButton";
+import ReturnButton from "@/components/atomic-components/return-button";
 import InstructionCard from "@/components/cards/InstructionCard";
 import UploadCard from "@/components/cards/UploadCard";
 import GenerateMatchesForm from "@/components/forms/GenerateMatchesForm";

@@ -1,5 +1,5 @@
+import ReturnButton from "@/components/atomic-components/return-button";
 import AddButtonLink from "@/components/buttons/AddButtonLink";
-import ReturnButton from "@/components/buttons/ReturnButton";
 import TournamentCard from "@/components/cards/TournamentCard";
 import { Card } from "@/components/shadcn-ui/card";
 import { getTournaments } from "@/db/methods/tournament";

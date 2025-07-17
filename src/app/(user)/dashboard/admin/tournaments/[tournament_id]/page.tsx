@@ -1,5 +1,5 @@
+import ReturnButton from "@/components/atomic-components/return-button";
 import StatusBadge from "@/components/badges/StatusBadge";
-import ReturnButton from "@/components/buttons/ReturnButton";
 import CategoryTournamentCard from "@/components/cards/CategoryTournamentCard";
 import WorkflowCard from "@/components/cards/WorkFlowCard";
 import {
