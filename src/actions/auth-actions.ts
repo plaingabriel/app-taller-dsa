@@ -50,7 +50,7 @@ export async function login(prevState: any, formData: FormData) {
     };
   }
 
-  await createSession(user.ci);
+  await createSession(user.ci, user.role);
 
   switch (user.role) {
     case "admin":

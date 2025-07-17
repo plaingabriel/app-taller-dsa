@@ -1,15 +1,14 @@
 "use client";
 
-import { validateCategory } from "@/actions/category-actions";
+import { Category } from "@/lib/definitions";
 import {
   calculateGruposInfo,
   getAvailableConfigurations,
   getValidEquiposCounts,
 } from "@/lib/utils";
-import { CategoryClient, Fixture, FixtureType } from "@/shared/types";
 import { useState } from "react";
-import FormField from "../atomic-components/form-field";
-import SelectFixture from "../atomic-components/select-fixture";
+import { FormField } from "../atomic-components/form-field";
+import { SelectFixture } from "../atomic-components/select-fixture";
 import AddButton from "../buttons/AddButton";
 import InfoCardCategoryForm from "../cards/InfoCardCategoryForm";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
@@ -23,17 +22,11 @@ import {
   SelectValue,
 } from "../shadcn-ui/select";
 
-type CreateCategoryFormProps = {
-  categoriesClient: CategoryClient[];
-  setCategoriesClient: React.Dispatch<React.SetStateAction<CategoryClient[]>>;
-  initialCategory: CategoryClient;
-};
-
 export default function CreateCategoryForm({
-  categoriesClient,
-  setCategoriesClient,
-  initialCategory,
-}: CreateCategoryFormProps) {
+  categories,
+}: {
+  categories: Category[];
+}) {
   const [currentCategory, setCurrentCategory] = useState(initialCategory);
 
   const [configurationGroups, setConfigurationGroups] =
@@ -125,6 +118,7 @@ export default function CreateCategoryForm({
                     name: e.target.value,
                   })
                 }
+                required
               />
             </FormField>
 
@@ -133,6 +127,7 @@ export default function CreateCategoryForm({
               <Select
                 value={currentCategory.fixture_type}
                 onValueChange={handleFormatoChange}
+                required
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -164,6 +159,7 @@ export default function CreateCategoryForm({
                     teams_per_group: parseInt(value),
                   })
                 }
+                required
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -194,6 +190,7 @@ export default function CreateCategoryForm({
                     })
                   }
                   placeholder="Min"
+                  required
                 />
                 <Input
                   type="number"
@@ -207,6 +204,7 @@ export default function CreateCategoryForm({
                     })
                   }
                   placeholder="Max"
+                  required
                 />
               </div>
             </FormField>
@@ -222,6 +220,7 @@ export default function CreateCategoryForm({
                 <Select
                   value={configurationGroups}
                   onValueChange={(value) => setConfigurationGroups(value)}
+                  required
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />

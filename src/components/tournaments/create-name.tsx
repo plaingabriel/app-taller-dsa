@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Card,
   CardContent,
@@ -8,13 +6,13 @@ import {
 } from "@/components/shadcn-ui/card";
 import { Input } from "@/components/shadcn-ui/input";
 import { Label } from "@/components/shadcn-ui/label";
-import FormField from "../atomic-components/form-field";
+import { FormField } from "../atomic-components/form-field";
 
 type CreateTournamentFormProps = {
   handleName: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export default function CreateTournamentForm({
+export function CreateTournamentNameForm({
   handleName,
 }: CreateTournamentFormProps) {
   return (

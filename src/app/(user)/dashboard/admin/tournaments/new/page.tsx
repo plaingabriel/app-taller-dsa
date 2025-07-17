@@ -1,51 +1,17 @@
 "use client";
 
-import { createTournament } from "@/actions/tournament-actions";
-import ButtonLink from "@/components/atomic-components/button-link";
-import ReturnButton from "@/components/atomic-components/return-button";
-import AddButton from "@/components/buttons/AddButton";
-import CreateCategoryForm from "@/components/forms/CreateCategoryForm";
-import CreateTournamentForm from "@/components/forms/CreateTournamentForm";
-import CategoriesList from "@/components/lists/CategoriesList";
-import { CategoryClient, TournamentClient } from "@/shared/types";
+import { ButtonLink } from "@/components/atomic-components/button-link";
+import { ReturnButton } from "@/components/atomic-components/return-button";
+import { Button } from "@/components/shadcn-ui/button";
+import { CreateTournamentNameForm } from "@/components/tournaments/create-name";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 
-const initialCategory: CategoryClient = {
-  name: "",
-  min_age: 6,
-  max_age: 99,
-  team_count: 4,
-  fixture_type: "groups",
-  group_count: 1,
-  teams_per_group: 4,
-  teams_qualified: 0,
-};
-
-export default function NewTournamentPage() {
+export default function CreateTournamentPage() {
   const [tournamentName, setTournamentName] = useState("");
-  const [categoriesClient, setCategoriesClient] = useState<CategoryClient[]>(
-    []
-  );
 
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTournamentName(e.target.value);
-  };
-
-  const handleAddTournament = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-
-    const tournament: TournamentClient = {
-      name: tournamentName,
-      categories: categoriesClient,
-    };
-
-    const resultError = await createTournament(tournament);
-
-    if (resultError) {
-      alert("Por favor rellene todos los campos correctamente");
-    }
   };
 
   return (
@@ -56,20 +22,20 @@ export default function NewTournamentPage() {
         <h1 className="font-bold text-3xl">Crear Nuevo Torneo</h1>
 
         <div className="space-y-6">
-          <CreateTournamentForm handleName={handleName} />
+          <CreateTournamentNameForm handleName={handleName} />
 
-          <CreateCategoryForm
+          {/* <CreateCategoryForm
             categoriesClient={categoriesClient}
             setCategoriesClient={setCategoriesClient}
             initialCategory={initialCategory}
-          />
+          /> */}
 
-          {categoriesClient.length > 0 && (
+          {/* {categoriesClient.length > 0 && (
             <CategoriesList
               categoriesClient={categoriesClient}
               setCategoriesClient={setCategoriesClient}
             />
-          )}
+          )} */}
 
           <div className="flex justify-end mt-6">
             <div className="flex gap-x-6">
@@ -80,9 +46,10 @@ export default function NewTournamentPage() {
                 Cancelar
               </ButtonLink>
 
-              <AddButton onClick={(e) => handleAddTournament(e)}>
-                Agregar Torneo
-              </AddButton>
+              <Button>
+                <Plus />
+                <span>Crear Torneo</span>
+              </Button>
             </div>
           </div>
         </div>

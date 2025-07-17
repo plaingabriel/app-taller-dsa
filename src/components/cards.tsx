@@ -7,7 +7,7 @@ import {
 } from "@/components/shadcn-ui/card";
 import { Trophy } from "lucide-react";
 
-export default function ComingTournamentCard({ number }: { number: number }) {
+export function ComingTournamentCard({ number }: { number: number }) {
   return (
     <Card>
       <div className="text-center py-10">
