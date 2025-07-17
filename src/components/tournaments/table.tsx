@@ -3,7 +3,7 @@
 import { deleteTournament } from "@/actions/tournament-actions";
 import { Category, Tournament } from "@/lib/definitions";
 import { allEqual, getTextByFixtureType } from "@/lib/utils";
-import { Settings } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import { use } from "react";
 import { ButtonLink } from "../atomic-components/button-link";
 import { RemoveSubmit } from "../atomic-components/remove-submit";
@@ -21,8 +21,22 @@ export function TournamentTable({
 }) {
   const allTournaments = use(tournaments);
 
+  if (allTournaments.length === 0) {
+    return (
+      <Card className="border-2 border-dashed border-neutral-300 bg-neutral-50">
+        <div className="flex flex-col items-center justify-center py-16 px-8">
+          <p className="text-gray-500 text-lg mb-6">No hay torneos creados</p>
+          <ButtonLink href="/dashboard/admin/tournaments/new">
+            <Plus />
+            <span>Crear Primer Torneo</span>
+          </ButtonLink>
+        </div>
+      </Card>
+    );
+  }
+
   return (
-    <div>
+    <div className="space-y-6">
       {allTournaments.map((tournament) => {
         const categoriesFixtureType = tournament.categories.map(
           (category) => category.fixture_type

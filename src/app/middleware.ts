@@ -7,6 +7,8 @@ const protectedPrefix = "/dashboard";
 const publicRoutes = ["/login"];
 const commonRoute = "/dashboard/account"; // Ruta común para todos los roles
 
+console.log("Middleware ejecutado");
+
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const isProtectedRoute = path.startsWith(protectedPrefix);
