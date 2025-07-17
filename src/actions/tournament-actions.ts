@@ -1,7 +1,5 @@
 "use server";
 
-import { deleteTournament, postTournament } from "@/db/methods/tournament";
-import { TournamentClient } from "@/shared/types";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -29,25 +27,8 @@ const createTournamentSchema = z.object({
   ),
 });
 
-export async function createTournament(tournament: TournamentClient) {
-  const validation = createTournamentSchema.safeParse(tournament);
-
-  if (!validation.success) {
-    console.log(validation.error.flatten().fieldErrors);
-
-    return {
-      success: false,
-      errors: "Por favor rellene todos los campos correctamente",
-    };
-  }
-
-  await postTournament(tournament);
-
-  redirect("/dashboard/admin/tournaments");
-}
-
-export async function deleteTournamentById(id: number) {
-  await deleteTournament(id);
-
-  redirect("/dashboard/admin/tournaments");
+export async function deleteTournament(id: string) {
+  // TODO: Implementar la lógica para eliminar un torneo
+  // await deleteTournament(id);
+  // redirect("/dashboard/admin/tournaments");
 }

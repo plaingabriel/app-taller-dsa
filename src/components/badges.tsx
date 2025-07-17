@@ -1,7 +1,9 @@
-import { FixtureType } from "@/shared/types";
-import { Badge } from "../shadcn-ui/badge";
+import { Category } from "@/lib/definitions";
+import { Badge } from "./shadcn-ui/badge";
 
-export default function FixtureBadge({
+type FixtureType = Category["fixture_type"];
+
+export function FixtureBadge({
   fixtureType,
 }: {
   fixtureType: FixtureType | "mix";
@@ -19,4 +21,8 @@ export default function FixtureBadge({
   }
 
   return <Badge className="bg-success-600">Mixto</Badge>;
+}
+
+export function InfoBadge({ children }: { children: React.ReactNode }) {
+  return <Badge className="bg-neutral-800">{children}</Badge>;
 }

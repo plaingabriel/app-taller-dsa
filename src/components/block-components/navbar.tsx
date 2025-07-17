@@ -1,6 +1,6 @@
 "use client";
 
-import { UserClient } from "@/shared/client-types";
+import { User } from "@/lib/definitions";
 import { LogIn } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { ButtonLink } from "../atomic-components/button-link";
@@ -50,7 +50,7 @@ export function NavHome() {
   );
 }
 
-export function NavUser({ user }: { user: UserClient }) {
+export function NavUser({ user }: { user: User }) {
   return (
     <NavbarWrapper>
       <NavLogo />

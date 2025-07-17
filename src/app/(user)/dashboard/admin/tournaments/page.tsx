@@ -1,7 +1,8 @@
 import { ButtonLink } from "@/components/atomic-components/button-link";
 import { ReturnButton } from "@/components/atomic-components/return-button";
 import { TableSkeleton } from "@/components/skeletons";
-import { TournamentTable } from "@/components/tournament/table";
+import { AddButton } from "@/components/tournaments/add-button";
+import { TournamentTable } from "@/components/tournaments/table";
 import { fetchTournaments } from "@/lib/data";
 import { Plus } from "lucide-react";
 import { Suspense } from "react";
@@ -16,10 +17,7 @@ export default async function TournamentPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8 mt-4">
           <h1 className="text-2xl font-semibold">Gestión de Torneos</h1>
-          <ButtonLink href="/dashboard/admin/tournaments/new">
-            <Plus />
-            <span>Nuevo Torneo</span>
-          </ButtonLink>
+          <AddButton array={tournaments} />
         </div>
 
         {/* Table */}
