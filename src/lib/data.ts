@@ -34,6 +34,11 @@ export async function fetchTournaments() {
 export async function fetchTournament(id: string) {
   const tournament = await db.query.tournamentTable.findFirst({
     where: (tournament, { eq }) => eq(tournament.id, id),
+    with: {
+      categories: {
+        with: { teams: true },
+      },
+    },
   });
 
   return tournament;

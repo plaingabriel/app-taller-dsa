@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/shadcn-ui/card";
 import { Calendar } from "lucide-react";
 
-export default function WorkflowCard() {
+export function WorkflowCategory() {
   const workflowSteps = [
     {
       number: 1,

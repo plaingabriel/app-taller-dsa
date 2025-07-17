@@ -1,7 +1,10 @@
 "use client";
 
+import { createTournament } from "@/actions/tournament-actions";
 import { ButtonLink } from "@/components/atomic-components/button-link";
 import { ReturnButton } from "@/components/atomic-components/return-button";
+import { CreateCategoriesForm } from "@/components/categories/create-form";
+import { CategoriesTable } from "@/components/categories/table";
 import { Button } from "@/components/shadcn-ui/button";
 import { CreateTournamentNameForm } from "@/components/tournaments/create-name";
 import { NewCategory } from "@/lib/definitions";
@@ -21,9 +24,24 @@ const initialCategory: NewCategory = {
 
 export default function CreateTournamentPage() {
   const [tournamentName, setTournamentName] = useState("");
+  const [categories, setCategories] = useState<NewCategory[]>([]);
 
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTournamentName(e.target.value);
+  };
+
+  const handleSubmit = async () => {
+    const button = document.getElementById(
+      "create-tournament-button"
+    ) as HTMLButtonElement;
+    button.disabled = true;
+
+    const result = await createTournament({ name: tournamentName, categories });
+
+    if (result.errors) {
+      alert("Por favor, ingrese los datos correctamente.");
+      button.disabled = false;
+    }
   };
 
   return (
@@ -36,18 +54,18 @@ export default function CreateTournamentPage() {
         <div className="space-y-6">
           <CreateTournamentNameForm handleName={handleName} />
 
-          {/* <CreateCategoryForm
-            categoriesClient={categoriesClient}
-            setCategoriesClient={setCategoriesClient}
+          <CreateCategoriesForm
+            categories={categories}
+            setCategories={setCategories}
             initialCategory={initialCategory}
-          /> */}
+          />
 
-          {/* {categoriesClient.length > 0 && (
-            <CategoriesList
-              categoriesClient={categoriesClient}
-              setCategoriesClient={setCategoriesClient}
+          {categories.length > 0 && (
+            <CategoriesTable
+              categories={categories}
+              setCategories={setCategories}
             />
-          )} */}
+          )}
 
           <div className="flex justify-end mt-6">
             <div className="flex gap-x-6">
@@ -58,7 +76,13 @@ export default function CreateTournamentPage() {
                 Cancelar
               </ButtonLink>
 
-              <Button>
+              <Button
+                id="create-tournament-button"
+                disabled={
+                  tournamentName.length === 0 || categories.length === 0
+                }
+                onClick={handleSubmit}
+              >
                 <Plus />
                 <span>Crear Torneo</span>
               </Button>

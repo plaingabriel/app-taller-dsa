@@ -1,16 +1,15 @@
-"use client";
-
-import { Category } from "@/lib/definitions";
+import { FixtureType, NewCategory } from "@/lib/definitions";
 import {
   calculateGruposInfo,
   getAvailableConfigurations,
   getValidEquiposCounts,
 } from "@/lib/utils";
-import { useState } from "react";
+import { Plus } from "lucide-react";
+import React, { useState } from "react";
 import { FormField } from "../atomic-components/form-field";
 import { SelectFixture } from "../atomic-components/select-fixture";
-import AddButton from "../buttons/AddButton";
-import InfoCardCategoryForm from "../cards/InfoCardCategoryForm";
+import { InfoCardCategoryForm } from "../cards";
+import { Button } from "../shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 import { Input } from "../shadcn-ui/input";
 import { Label } from "../shadcn-ui/label";
@@ -22,12 +21,25 @@ import {
   SelectValue,
 } from "../shadcn-ui/select";
 
-export default function CreateCategoryForm({
+interface ObjectWithState<T> {
+  categories: T[];
+  setCategories: React.Dispatch<React.SetStateAction<T[]>>;
+  initialCategory: T;
+}
+
+type CategoryProps = ObjectWithState<NewCategory>;
+
+type Props = {
+  [property in keyof CategoryProps]: CategoryProps[property];
+};
+
+export function CreateCategoriesForm({
   categories,
-}: {
-  categories: Category[];
-}) {
-  const [currentCategory, setCurrentCategory] = useState(initialCategory);
+  setCategories,
+  initialCategory,
+}: Props) {
+  const [currentCategory, setCurrentCategory] =
+    useState<NewCategory>(initialCategory);
 
   const [configurationGroups, setConfigurationGroups] =
     useState<string>("option-1");
@@ -38,7 +50,7 @@ export default function CreateCategoryForm({
       ? currentCategory.team_count
       : validCounts[0];
 
-    const fixtureData: Pick<Fixture, "fixture_type" | "team_count"> = {
+    const fixtureData: Pick<NewCategory, "fixture_type" | "team_count"> = {
       fixture_type: format,
       team_count: newCantidad,
     };
@@ -49,37 +61,23 @@ export default function CreateCategoryForm({
     });
   };
 
-  const addCategory = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-
-    const validation = await validateCategory(
-      currentCategory,
-      categoriesClient
-    );
-
-    if (!validation.success) {
-      alert(validation.error);
-      return;
-    }
-
+  const addCategory = () => {
     if (currentCategory.fixture_type === "groups+playoffs") {
       const fixtureConfig = calculateGruposInfo(
         currentCategory.team_count,
         configurationGroups
       );
 
-      setCategoriesClient([
-        ...categoriesClient,
+      setCategories([
+        ...categories,
         {
           ...currentCategory,
           ...fixtureConfig,
         },
       ]);
     } else {
-      setCategoriesClient([
-        ...categoriesClient,
+      setCategories([
+        ...categories,
         {
           ...currentCategory,
           group_count: 1,
@@ -112,12 +110,12 @@ export default function CreateCategoryForm({
                 id="category-name"
                 placeholder="Ej: Sub-15, Juvenil, Senior"
                 value={currentCategory.name}
-                onChange={(e) =>
+                onChange={(e) => {
                   setCurrentCategory({
                     ...currentCategory,
                     name: e.target.value,
-                  })
-                }
+                  });
+                }}
                 required
               />
             </FormField>
@@ -244,14 +242,16 @@ export default function CreateCategoryForm({
             groups_config={configurationGroups}
           />
 
-          <AddButton
+          <Button
             type="submit"
-            onClick={(e) => addCategory(e)}
+            onClick={addCategory}
             className="w-full"
             variant={"secondary"}
+            disabled={!currentCategory.name}
           >
-            Agregar Categoría
-          </AddButton>
+            <Plus />
+            <span>Agregar Categoría</span>
+          </Button>
         </form>
       </CardContent>
     </Card>

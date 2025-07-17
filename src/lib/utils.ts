@@ -32,14 +32,23 @@ export function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-export function generateID(tableName: string): string {
-  const PREFIX_MAP: Record<string, string> = {
-    Tournament: "trn",
-    Category: "cat",
-    Match: "mtc",
-    Team: "tem",
-    Player: "ply",
-    Historical: "hst",
+type TableNames =
+  | "tournament"
+  | "category"
+  | "match"
+  | "team"
+  | "player"
+  | "historical";
+type TableValues = "trn" | "cat" | "mtc" | "tem" | "ply" | "hst";
+
+export function generateID(tableName: TableNames): string {
+  const PREFIX_MAP: Record<TableNames, TableValues> = {
+    tournament: "trn",
+    category: "cat",
+    match: "mtc",
+    team: "tem",
+    player: "ply",
+    historical: "hst",
   };
 
   const CHAR_SET = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -67,7 +76,6 @@ export function generateID(tableName: string): string {
   }
 
   const prefix = PREFIX_MAP[tableName];
-  if (!prefix) throw new Error(`Invalid table name: ${tableName}`);
 
   // 41-bit timestamp (milliseconds until ~2088)
   const timestamp = Date.now();

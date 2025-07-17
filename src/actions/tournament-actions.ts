@@ -1,5 +1,9 @@
 "use server";
 
+import { db } from "@/db";
+import { categoryTable, tournamentTable } from "@/db/schemas";
+import { NewCategory, Tournament } from "@/lib/definitions";
+import { generateID } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -26,6 +30,38 @@ const createTournamentSchema = z.object({
     })
   ),
 });
+
+export async function createTournament(tournament: {
+  name: Tournament["name"];
+  categories: NewCategory[];
+}) {
+  const parsedTournament = createTournamentSchema.safeParse(tournament);
+
+  if (!parsedTournament.success) {
+    return parsedTournament.error;
+  }
+
+  const { name: tournamentName } = parsedTournament.data;
+  const categories = parsedTournament.data.categories;
+
+  const tournament_id = generateID("tournament");
+
+  await db.insert(tournamentTable).values({
+    id: tournament_id,
+    name: tournamentName,
+    creation_date: new Date().toISOString(),
+  });
+
+  await db.insert(categoryTable).values(
+    categories.map((category) => ({
+      ...category,
+      tournament_id,
+      id: generateID("category"),
+    }))
+  );
+
+  redirect("/dashboard/admin/tournaments");
+}
 
 export async function deleteTournament(id: string) {
   // TODO: Implementar la lógica para eliminar un torneo

@@ -1,4 +1,4 @@
-import { FixtureType } from "@/lib/definitions";
+import { FixtureType, Tournament } from "@/lib/definitions";
 import { Badge } from "./shadcn-ui/badge";
 
 export function FixtureBadge({
@@ -23,4 +23,17 @@ export function FixtureBadge({
 
 export function InfoBadge({ children }: { children: React.ReactNode }) {
   return <Badge className="bg-neutral-800">{children}</Badge>;
+}
+
+export function StatusBadge({ status }: { status: Tournament["status"] }) {
+  switch (status) {
+    case "created":
+      return <Badge className="bg-neutral-700">Creado</Badge>;
+
+    case "started":
+      return <Badge className="bg-success-400">Iniciado</Badge>;
+
+    default:
+      return <Badge className="bg-tomato-500">Finalizado</Badge>;
+  }
 }
