@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserByCI } from "@/db/methods/user";
+import { db } from "@/db";
 import { createSession, deleteSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -30,7 +30,9 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   const { ci, password } = result.data;
-  const user = await getUserByCI(ci);
+  const user = await db.query.usersTable.findFirst({
+    where: (users, { eq }) => eq(users.ci, ci),
+  });
 
   if (!user) {
     return {
@@ -58,7 +60,7 @@ export async function login(prevState: any, formData: FormData) {
     case "operator":
       redirect("/dashboard/operator");
     default:
-      throw new Error("Ha ocurrido un error inesperado");
+      redirect("/login");
   }
 }
 

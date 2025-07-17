@@ -1,5 +1,6 @@
 import { ButtonLink } from "@/components/atomic-components/button-link";
 import { ReturnButton } from "@/components/atomic-components/return-button";
+import { TableSkeleton } from "@/components/skeletons";
 import { UsersTable } from "@/components/users/table";
 import { fetchUsers } from "@/lib/data";
 import { Plus } from "lucide-react";
@@ -21,7 +22,7 @@ export default async function AdminUsersPage() {
           </ButtonLink>
         </div>
 
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<TableSkeleton />}>
           <UsersTable users={users} />
         </Suspense>
       </div>

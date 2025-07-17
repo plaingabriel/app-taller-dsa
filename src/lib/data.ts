@@ -1,11 +1,13 @@
 // File to store the fetching functions
 import { db } from "@/db";
 import { UserClient } from "@/shared/client-types";
-import { redirect } from "next/navigation";
 import { User } from "./definitions";
 import { getUserSession } from "./session";
 
 export async function fetchUsers(): Promise<User[]> {
+  // SetTimeout to simulate a slow network
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+
   const users = await db.query.usersTable.findMany();
   return users;
 }

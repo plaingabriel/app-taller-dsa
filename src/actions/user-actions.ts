@@ -1,10 +1,10 @@
 "use server";
 import { db } from "@/db";
-import { getUserByCI, postUser, removeUser } from "@/db/methods/user";
 import { usersTable } from "@/db/schemas";
 import { fetchAuthUser } from "@/lib/data";
 import { User } from "@/shared/types";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -12,6 +12,7 @@ const nameSchema = z
   .string()
   .min(1, "El nombre es requerido")
   .max(30, "Máximo 30 caracteres por nombre");
+
 const passwordSchema = z
   .string()
   .min(8, "La contraseña debe tener al menos 8 caracteres");
@@ -77,9 +78,11 @@ export async function createUser(prevState: any, formData: FormData) {
     };
   }
 
-  const existingUser = await getUserByCI(newUser.ci);
+  const existingUser = await db.query.usersTable.findFirst({
+    where: eq(usersTable.ci, parseInt(result.data.ci)),
+  });
 
-  if (existingUser !== null) {
+  if (existingUser) {
     return {
       errors: {
         ci: ["Cédula ya registrada"],
@@ -87,7 +90,7 @@ export async function createUser(prevState: any, formData: FormData) {
     };
   }
 
-  await postUser(newUser);
+  await db.insert(usersTable).values(newUser);
 
   redirect("/dashboard/admin/users");
 }
@@ -148,10 +151,6 @@ export async function updatePassword(prevState: any, formData: FormData) {
 }
 
 export async function deleteUser(ci: number) {
-  try {
-    await removeUser(ci);
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    throw error;
-  }
+  await db.delete(usersTable).where(eq(usersTable.ci, ci));
+  revalidatePath("/dashboard/admin/users");
 }
