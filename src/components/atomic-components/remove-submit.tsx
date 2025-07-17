@@ -19,6 +19,7 @@ export function RemoveSubmit({
       <Button
         type="submit"
         variant={"destructive"}
+        size={"icon"}
         disabled={pending}
         className="cursor-pointer"
       >
