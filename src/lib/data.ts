@@ -1,7 +1,6 @@
 // File to store the fetching functions
 import { db } from "@/db";
-import { UserClient } from "@/shared/client-types";
-import { User } from "./definitions";
+import { Tournament, User } from "./definitions";
 import { getUserSession } from "./session";
 
 export async function fetchUsers(): Promise<User[]> {
@@ -12,20 +11,15 @@ export async function fetchUsers(): Promise<User[]> {
   return users;
 }
 
-export async function fetchUser(ci: number): Promise<UserClient | undefined> {
+export async function fetchUser(ci: number): Promise<User | undefined> {
   const user = await db.query.usersTable.findFirst({
-    columns: {
-      ci: true,
-      name: true,
-      role: true,
-    },
     where: (user, { eq }) => eq(user.ci, ci),
   });
 
   return user;
 }
 
-export async function fetchAuthUser(): Promise<UserClient | undefined> {
+export async function fetchAuthUser(): Promise<User | undefined> {
   const userCI = await getUserSession();
   const user = fetchUser(userCI);
 
@@ -33,7 +27,10 @@ export async function fetchAuthUser(): Promise<UserClient | undefined> {
 }
 
 export async function fetchTournaments() {
-  const tournaments = await db.query.tournamentTable.findMany();
+  const tournaments = await db.query.tournamentTable.findMany({
+    with: { categories: true },
+  });
+
   return tournaments;
 }
 

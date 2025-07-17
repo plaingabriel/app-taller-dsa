@@ -5,6 +5,7 @@ import {
   Tournament,
   User,
 } from "@/lib/definitions";
+import { relations } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const usersTable = sqliteTable("Users", {
@@ -20,6 +21,10 @@ export const tournamentTable = sqliteTable("Tournament", {
   status: text().notNull().$type<Tournament["status"]>().default("created"),
   creation_date: text().notNull(),
 });
+
+export const tournamentRelations = relations(tournamentTable, ({ many }) => ({
+  categories: many(categoryTable),
+}));
 
 export const categoryTable = sqliteTable("Category", {
   id: text().primaryKey(),
@@ -41,11 +46,30 @@ export const categoryTable = sqliteTable("Category", {
     .default(false),
 });
 
+export const categoryRelations = relations(categoryTable, ({ one, many }) => ({
+  tournament: one(tournamentTable, {
+    fields: [categoryTable.tournament_id],
+    references: [tournamentTable.id],
+  }),
+  teams: many(teamTable),
+  matches: many(matchTable),
+  groups: many(groupTable),
+}));
+
 export const groupTable = sqliteTable("Group", {
   id: text().primaryKey(),
   name: text().notNull(),
   category_id: text().references(() => categoryTable.id),
 });
+
+export const groupRelations = relations(groupTable, ({ one, many }) => ({
+  category: one(categoryTable, {
+    fields: [groupTable.category_id],
+    references: [categoryTable.id],
+  }),
+  teams: many(teamTable),
+  matches: many(matchTable),
+}));
 
 export const teamTable = sqliteTable("Team", {
   id: text().primaryKey(),
@@ -70,6 +94,24 @@ export const teamTable = sqliteTable("Team", {
   phase: text().$type<Phase>().default("groups"),
 });
 
+export const teamRelations = relations(teamTable, ({ one, many }) => ({
+  category: one(categoryTable, {
+    fields: [teamTable.category_id],
+    references: [categoryTable.id],
+  }),
+  players: many(playerTable),
+  group: one(groupTable, {
+    fields: [teamTable.group],
+    references: [groupTable.id],
+  }),
+  home_team: many(matchTable, {
+    relationName: "home_team",
+  }),
+  away_team: many(matchTable, {
+    relationName: "away_team",
+  }),
+}));
+
 export const playerTable = sqliteTable("Player", {
   ci: int().primaryKey(),
   team_id: text()
@@ -82,47 +124,58 @@ export const playerTable = sqliteTable("Player", {
   age: int().notNull(),
 });
 
+export const playerRelations = relations(playerTable, ({ one }) => ({
+  team: one(teamTable, {
+    fields: [playerTable.team_id],
+    references: [teamTable.id],
+  }),
+}));
+
 export const matchTable = sqliteTable("Match", {
   id: text().primaryKey(),
   category_id: text()
     .notNull()
     .references(() => categoryTable.id),
-  home_team: text().default(""),
-  away_team: text().default(""),
-  home_score: int().notNull().default(0),
-  away_score: int().notNull().default(0),
-  date: text().notNull().default(new Date().toISOString()),
-});
-
-export const groupMatchTable = sqliteTable("Group_Match", {
-  id: text()
-    .primaryKey()
-    .references(() => matchTable.id),
-  group_id: text()
+  group: text()
     .notNull()
     .references(() => groupTable.id),
+  home_team: text().references(() => teamTable.id),
+  away_team: text().references(() => teamTable.id),
+  home_score: int().notNull().default(0),
+  away_score: int().notNull().default(0),
+  date: text().notNull(),
+  phase: text().$type<Phase>().notNull(),
+  penalties_home_team: int().notNull().default(0),
+  penalties_away_team: int().notNull().default(0),
+  next_match: text().default(""),
+  day: int().notNull(),
+  status: text().$type<"pending" | "finished">().default("pending"),
 });
 
-export const playoffMatch = sqliteTable("Playoff_Match", {
-  id: text()
-    .primaryKey()
-    .references(() => matchTable.id),
-  phase: text().$type<Phase>().notNull(),
-  home_penalty_score: int().notNull().default(0),
-  away_penalty_score: int().notNull().default(0),
-  next_match: text().references(() => matchTable.id),
-});
+export const matchRelations = relations(matchTable, ({ one, many }) => ({
+  category: one(categoryTable, {
+    fields: [matchTable.category_id],
+    references: [categoryTable.id],
+  }),
+  group: one(groupTable, {
+    fields: [matchTable.group],
+    references: [groupTable.id],
+  }),
+  home_team: one(teamTable, {
+    fields: [matchTable.home_team],
+    references: [teamTable.id],
+    relationName: "home_team",
+  }),
+  away_team: one(teamTable, {
+    fields: [matchTable.away_team],
+    references: [teamTable.id],
+    relationName: "away_team",
+  }),
+}));
 
 export const historicalChampionsTable = sqliteTable("Historical_Champions", {
   id: text().primaryKey(),
-  team_id: text()
-    .notNull()
-    .references(() => teamTable.id),
-  tournament_id: text()
-    .notNull()
-    .references(() => tournamentTable.id),
-  category_id: text()
-    .notNull()
-    .references(() => categoryTable.id),
-  date: text().notNull(),
+  tournament_name: text().notNull(),
+  category_name: text().notNull(),
+  champion_team_name: text().notNull(),
 });

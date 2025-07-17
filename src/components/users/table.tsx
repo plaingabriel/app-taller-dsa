@@ -1,14 +1,14 @@
 "use client";
 
 import { deleteUser } from "@/actions/user-actions";
-import { UserClient } from "@/shared/client-types";
+import { User } from "@/lib/definitions";
 import { ColumnDef } from "@tanstack/react-table";
 import { LockKeyhole } from "lucide-react";
 import { use } from "react";
 import { RemoveSubmit } from "../atomic-components/remove-submit";
 import { DataTable } from "../block-components/data-table";
 
-const columns: ColumnDef<UserClient>[] = [
+const columns: ColumnDef<User>[] = [
   {
     accessorKey: "ci",
     header: "Cédula",
@@ -21,7 +21,7 @@ const columns: ColumnDef<UserClient>[] = [
     accessorKey: "role",
     header: "Rol",
     cell: ({ row }) => {
-      const role = row.getValue("role") as UserClient["role"];
+      const role = row.getValue("role") as User["role"];
       const roles = {
         admin: "Administrador",
         editor: "Editor",
@@ -49,7 +49,7 @@ const columns: ColumnDef<UserClient>[] = [
   },
 ];
 
-export function UsersTable({ users }: { users: Promise<UserClient[]> }) {
+export function UsersTable({ users }: { users: Promise<User[]> }) {
   const allUsers = use(users);
 
   return <DataTable columns={columns} data={allUsers} />;

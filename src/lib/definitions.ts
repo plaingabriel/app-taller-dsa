@@ -72,6 +72,7 @@ export interface Match {
   home_score?: number;
   away_score?: number;
   date?: string;
+  status?: "pending" | "finished";
 }
 
 export type PlayoffMatch = Match & {

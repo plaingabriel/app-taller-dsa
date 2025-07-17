@@ -39,6 +39,7 @@ export function generateID(tableName: string): string {
     Match: "mtc",
     Team: "tem",
     Player: "ply",
+    Historical: "hst",
   };
 
   const CHAR_SET = "0123456789abcdefghijklmnopqrstuvwxyz";
