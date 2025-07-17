@@ -1,7 +1,6 @@
 import {
   Config,
   Fixture,
-  FixtureType,
   NewMatch,
   NewPlayoffMatch,
   Phase,
@@ -9,7 +8,7 @@ import {
 } from "@/shared/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Category } from "./definitions";
+import { FixtureType } from "./definitions";
 
 export function isPair(number: number): boolean {
   return number % 2 === 0;
@@ -128,9 +127,7 @@ export function getTextByFixtureType(fixtureType: FixtureType): string {
   }
 }
 
-export function getValidEquiposCounts(
-  format: Category["fixture_type"]
-): number[] {
+export function getValidEquiposCounts(format: FixtureType): number[] {
   switch (format) {
     case "playoffs":
       return [4, 8, 16];

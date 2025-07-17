@@ -1,7 +1,5 @@
-import { Category } from "@/lib/definitions";
+import { FixtureType } from "@/lib/definitions";
 import { Badge } from "./shadcn-ui/badge";
-
-type FixtureType = Category["fixture_type"];
 
 export function FixtureBadge({
   fixtureType,

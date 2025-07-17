@@ -4,8 +4,20 @@ import { ButtonLink } from "@/components/atomic-components/button-link";
 import { ReturnButton } from "@/components/atomic-components/return-button";
 import { Button } from "@/components/shadcn-ui/button";
 import { CreateTournamentNameForm } from "@/components/tournaments/create-name";
+import { NewCategory } from "@/lib/definitions";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+
+const initialCategory: NewCategory = {
+  name: "",
+  min_age: 6,
+  max_age: 99,
+  team_count: 4,
+  fixture_type: "groups",
+  group_count: 1,
+  teams_per_group: 4,
+  teams_qualified: 0,
+};
 
 export default function CreateTournamentPage() {
   const [tournamentName, setTournamentName] = useState("");

@@ -30,6 +30,8 @@ export interface Category {
   has_fixture?: boolean;
 }
 
+export type NewCategory = Omit<Category, "id" | "tournament_id">;
+
 export type Phase =
   | "groups"
   | "round_16"
