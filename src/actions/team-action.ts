@@ -5,7 +5,6 @@ import { playerTable, teamTable } from "@/db/schemas";
 import { CategoryTeamsPlayers, NewTeamExcel } from "@/lib/definitions";
 import { generateID, getStartedPhaseByFixtureType } from "@/lib/utils";
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
 export async function createEquiposFromExcel(
   category: CategoryTeamsPlayers,
@@ -23,6 +22,13 @@ export async function createEquiposFromExcel(
       logo: team.logo,
     }))
   );
+}
+
+export async function updateTeamValidation(team_id: string) {
+  await db
+    .update(teamTable)
+    .set({ has_validated_players: true })
+    .where(eq(teamTable.id, team_id));
 }
 
 export async function deleteTeam(team_id: string) {

@@ -9,16 +9,19 @@ export async function createPlayers(
   team_id: string,
   players: NewPlayerExcel[]
 ) {
-  await db.insert(playerTable).values(
-    players.map((player) => ({
-      team_id,
-      age: player.age,
-      jersey_number: player.jersey_number,
-      name: player.name,
-      position: player.position,
-      ci: player.ci,
-    }))
-  );
+  await db
+    .insert(playerTable)
+    .values(
+      players.map((player) => ({
+        team_id,
+        age: player.age,
+        jersey_number: player.jersey_number,
+        name: player.name,
+        position: player.position,
+        ci: player.ci,
+      }))
+    )
+    .onConflictDoNothing();
 }
 
 export async function deletePlayer(player_ci: number) {
