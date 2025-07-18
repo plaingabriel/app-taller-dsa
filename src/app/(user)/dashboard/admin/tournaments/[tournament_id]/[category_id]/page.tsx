@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/shadcn-ui/card";
 import { DetailSkeleton, HeadingSkeleton } from "@/components/skeletons";
+import { CreateTeamsForm } from "@/components/teams/create-form";
 import { TeamDetails } from "@/components/teams/details";
 import { Heading } from "@/components/teams/heading";
 import { fetchCategory } from "@/lib/data";
@@ -50,9 +51,9 @@ export default async function TeamsPage({
         </Card>
 
         {/* Upload Teams */}
-        {/* {teams.length < category.fixture.team_count && !hasMatches && (
-          <UploadCard category={category} />
-        )} */}
+        <Suspense fallback={<DetailSkeleton />}>
+          <CreateTeamsForm category={category} />
+        </Suspense>
 
         {/* Teams List */}
         {/* {teams.length > 0 && <TeamList teams={teams} />} */}

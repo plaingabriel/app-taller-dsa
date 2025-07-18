@@ -7,8 +7,13 @@ import {
   readExcelFile,
   validateEquiposData,
 } from "@/lib/excel-reader";
-import { AlertCircle, CheckCircle, FileSpreadsheet } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import {
+  AlertCircle,
+  CheckCircle,
+  FileSpreadsheet,
+  Upload,
+} from "lucide-react";
+import { use, useEffect, useRef, useState } from "react";
 import { FormField } from "../atomic-components/form-field";
 import { DownloadCSV } from "../block-components/download-csv";
 import { FileUploadInput } from "../block-components/file-upload-input";
@@ -16,6 +21,7 @@ import { FormatInfoCard } from "../cards";
 import { Button } from "../shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 import { Label } from "../shadcn-ui/label";
+import { PreviewTable } from "./preview-table";
 
 export function CreateTeamsForm({
   category,
@@ -28,6 +34,13 @@ export function CreateTeamsForm({
     return null;
   }
 
+  if (
+    categoryData.teams.length >= categoryData.team_count ||
+    categoryData.has_fixture
+  ) {
+    return null;
+  }
+
   const [file, setFile] = useState<File | null>(null);
   const [validationResult, setValidationResult] = useState<{
     valid: boolean;
@@ -35,7 +48,7 @@ export function CreateTeamsForm({
   } | null>(null);
   const [previewData, setPreviewData] = useState<NewTeamExcel[]>([]);
   const [processingError, setProcessingError] = useState<string | null>(null);
-  const fileInput = document.getElementById("file") as HTMLInputElement;
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const csvContent = `NOMBRE,CANTIDAD_JUGADORES,LOGO
 Equipo A,11,
@@ -219,7 +232,16 @@ Equipo D,9,`;
                 Vista Previa de Equipos ({previewData.length} encontrados)
               </CardTitle>
             </CardHeader>
-            <CardContent></CardContent>
+            <CardContent>
+              <div className="mt-4 flex justify-end">
+                <PreviewTable teams={previewData} />
+
+                <Button onClick={(e) => handleUploadTeams(e)}>
+                  <Upload />
+                  Confirmar y Subir {previewData.length} Equipos
+                </Button>
+              </div>
+            </CardContent>
           </Card>
         )}
       </CardContent>
