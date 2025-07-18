@@ -68,6 +68,11 @@ export interface Player {
   age: number;
 }
 
+export type TeamPlayers = Team & { players: Player[] };
+export type CategoryTeamsPlayers = Category & {
+  teams: TeamPlayers[];
+};
+
 export interface Match {
   id: string;
   category_id: Category["id"];

@@ -19,7 +19,7 @@ export function HeadingSkeleton() {
 export function DetailSkeleton() {
   return (
     <div className="space-y-4">
-      <Skeleton className="h-20 w-full" />
+      <Skeleton className="h-32 w-full" />
     </div>
   );
 }
@@ -27,7 +27,7 @@ export function DetailSkeleton() {
 export function FormSkeleton() {
   return (
     <div className="space-y-4">
-      <Skeleton className="h-16 w-full" />
+      <Skeleton className="h-[400px] w-full" />
     </div>
   );
 }

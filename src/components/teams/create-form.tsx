@@ -1,7 +1,7 @@
 "use client";
 
 import { createEquiposFromExcel } from "@/actions/team-action";
-import { Category, NewTeamExcel, Team } from "@/lib/definitions";
+import { CategoryTeamsPlayers, NewTeamExcel } from "@/lib/definitions";
 import {
   normalizeEquiposData,
   readExcelFile,
@@ -26,7 +26,7 @@ import { PreviewTable } from "./preview-table";
 export function CreateTeamsForm({
   category,
 }: {
-  category: Promise<(Category & { teams: Team[] }) | undefined>;
+  category: Promise<CategoryTeamsPlayers | undefined>;
 }) {
   const categoryData = use(category);
 
@@ -238,9 +238,8 @@ Equipo D,9,`;
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <PreviewTable teams={previewData} />
               <div className="mt-4 flex justify-end">
-                <PreviewTable teams={previewData} />
-
                 <Button onClick={(e) => handleUploadTeams(e)}>
                   <Upload />
                   Confirmar y Subir {previewData.length} Equipos

@@ -1,11 +1,11 @@
-import { Category, Team } from "@/lib/definitions";
+import { CategoryTeamsPlayers, Team } from "@/lib/definitions";
 import { redirect } from "next/navigation";
 
 export async function Heading({
   category,
   tournament_id,
 }: {
-  category: Promise<(Category & { teams: Team[] }) | undefined>;
+  category: Promise<CategoryTeamsPlayers | undefined>;
   tournament_id: string;
 }) {
   const categoryData = await category;

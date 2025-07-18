@@ -1,12 +1,14 @@
-import { Category, Team } from "@/lib/definitions";
+import { CategoryTeamsPlayers } from "@/lib/definitions";
 import { getTextByFixtureType } from "@/lib/utils";
 
 export async function TeamDetails({
   category,
 }: {
-  category: Promise<Category & { teams: Team[] }>;
+  category: Promise<CategoryTeamsPlayers | undefined>;
 }) {
   const categoryData = await category;
+
+  if (!categoryData) return null;
 
   return (
     <div className="grid grid-cols-3 gap-x-4 -mt-4">

@@ -6,10 +6,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import { DetailSkeleton, HeadingSkeleton } from "@/components/skeletons";
+import {
+  DetailSkeleton,
+  FormSkeleton,
+  HeadingSkeleton,
+  TableSkeleton,
+} from "@/components/skeletons";
 import { CreateTeamsForm } from "@/components/teams/create-form";
 import { TeamDetails } from "@/components/teams/details";
 import { Heading } from "@/components/teams/heading";
+import TeamTable from "@/components/teams/table";
 import { fetchCategory } from "@/lib/data";
 import { Users } from "lucide-react";
 import { Suspense } from "react";
@@ -32,31 +38,33 @@ export default async function TeamsPage({
         </Suspense>
 
         {/* Category Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex gap-x-2 ">
-              <span>
-                <Users />
-              </span>
+        <Suspense fallback={<DetailSkeleton />}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex gap-x-2 ">
+                <span>
+                  <Users />
+                </span>
 
-              <span className="text-xl">Información de la Categoría</span>
-            </CardTitle>
-          </CardHeader>
+                <span className="text-xl">Información de la Categoría</span>
+              </CardTitle>
+            </CardHeader>
 
-          <CardContent>
-            <Suspense fallback={<DetailSkeleton />}>
+            <CardContent>
               <TeamDetails category={category} />
-            </Suspense>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Suspense>
 
         {/* Upload Teams */}
-        <Suspense fallback={<DetailSkeleton />}>
+        <Suspense fallback={<FormSkeleton />}>
           <CreateTeamsForm category={category} />
         </Suspense>
 
         {/* Teams List */}
-        {/* {teams.length > 0 && <TeamList teams={teams} />} */}
+        <Suspense fallback={<TableSkeleton />}>
+          <TeamTable category={category} />
+        </Suspense>
 
         {/* Instructions */}
         <InstructionTeamCard />

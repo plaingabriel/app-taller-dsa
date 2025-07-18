@@ -2,12 +2,12 @@
 
 import { db } from "@/db";
 import { teamTable } from "@/db/schemas";
-import { Category, NewTeamExcel, Team } from "@/lib/definitions";
+import { CategoryTeamsPlayers, NewTeamExcel } from "@/lib/definitions";
 import { generateID, getStartedPhaseByFixtureType } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 
 export async function createEquiposFromExcel(
-  category: Category & { teams: Team[] },
+  category: CategoryTeamsPlayers,
   newTeams: NewTeamExcel[]
 ) {
   const startedPhase = getStartedPhaseByFixtureType(category);
@@ -24,7 +24,7 @@ export async function createEquiposFromExcel(
   );
 }
 
-export async function deleteTeam(team_id: number) {
+export async function deleteTeam(team_id: string) {
   // await deleteTeamById(team_id);
 
   revalidatePath("/");
