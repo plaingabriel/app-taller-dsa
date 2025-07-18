@@ -1,7 +1,10 @@
 // File to store the fetching functions
 import { db } from "@/db";
-import { User } from "./definitions";
+import { Category, Team, User } from "./definitions";
 import { getUserSession } from "./session";
+
+// Uncomment for testing
+// import { simulateDelay } from "./utils";
 
 export async function fetchUsers(): Promise<User[]> {
   const users = await db.query.usersTable.findMany();
@@ -57,9 +60,10 @@ export async function fetchCategories(tournament_id: string) {
 }
 
 export async function fetchCategory(id: string) {
-  const category = await db.query.categoryTable.findFirst({
+  const category = (await db.query.categoryTable.findFirst({
     where: (category, { eq }) => eq(category.id, id),
-  });
+    with: { teams: true },
+  })) as Category & { teams: Team[] };
 
   return category;
 }

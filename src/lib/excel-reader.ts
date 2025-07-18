@@ -1,4 +1,6 @@
-import { NewPlayerExcel, NewTeamExcel } from "@/shared/types";
+import { NewPlayerExcel } from "@/shared/types";
+
+import { NewTeamExcel } from "./definitions";
 
 export async function readExcelFile(file: File): Promise<any[]> {
   return new Promise((resolve, reject) => {
@@ -75,7 +77,7 @@ export function normalizeEquiposData(data: any[]) {
 
   const newTeamsExcel: NewTeamExcel[] = equipos.map((equipo) => ({
     name: equipo.nombre,
-    number_players: equipo.cantidad_jugadores,
+    players_count: equipo.cantidad_jugadores,
     logo: equipo.logo,
   }));
 
@@ -105,4 +107,29 @@ export function normalizeJugadoresData(data: any[]) {
   }));
 
   return newJugadoresExcel;
+}
+
+export function validateEquiposData(data: NewTeamExcel[]): {
+  valid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+
+  data.forEach((row, index) => {
+    const rowNum = index + 1;
+
+    if (!row.name || typeof row.name !== "string") {
+      errors.push(`Fila ${rowNum}: Nombre del equipo es requerido`);
+    }
+
+    if (!row.players_count || typeof row.players_count !== "number") {
+      errors.push(`Fila ${rowNum}: Cantidad de jugadores debe ser un número`);
+    } else if (row.players_count < 5 || row.players_count > 12) {
+      errors.push(
+        `Fila ${rowNum}: Cantidad de jugadores debe estar entre 5 y 12`
+      );
+    }
+  });
+
+  return { valid: errors.length === 0, errors };
 }

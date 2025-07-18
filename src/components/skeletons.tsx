@@ -7,3 +7,19 @@ export function TableSkeleton() {
     </div>
   );
 }
+
+export function HeadingSkeleton() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="h-12 w-full" />
+    </div>
+  );
+}
+
+export function DetailSkeleton() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="h-20 w-full" />
+    </div>
+  );
+}

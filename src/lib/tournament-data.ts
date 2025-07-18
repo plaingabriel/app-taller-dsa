@@ -1,31 +1,5 @@
 import { getPlayersByTeam } from "@/db/methods/player";
-import { NewPlayerExcel, NewTeamExcel, Player, Team } from "@/shared/types";
-
-// Funciones de validación de datos
-export function validateEquiposData(data: NewTeamExcel[]): {
-  valid: boolean;
-  errors: string[];
-} {
-  const errors: string[] = [];
-
-  data.forEach((row, index) => {
-    const rowNum = index + 1;
-
-    if (!row.name || typeof row.name !== "string") {
-      errors.push(`Fila ${rowNum}: Nombre del equipo es requerido`);
-    }
-
-    if (!row.number_players || typeof row.number_players !== "number") {
-      errors.push(`Fila ${rowNum}: Cantidad de jugadores debe ser un número`);
-    } else if (row.number_players < 5 || row.number_players > 12) {
-      errors.push(
-        `Fila ${rowNum}: Cantidad de jugadores debe estar entre 5 y 12`
-      );
-    }
-  });
-
-  return { valid: errors.length === 0, errors };
-}
+import { NewPlayerExcel, Player, Team } from "@/shared/types";
 
 export function validateJugadoresData(data: NewPlayerExcel[]): {
   valid: boolean;

@@ -1,61 +1,47 @@
 "use client";
 
 import { createEquiposFromExcel } from "@/actions/team-action";
-import { getTeamsByCategory } from "@/db/methods/team";
-import { normalizeEquiposData, readExcelFile } from "@/lib/excel-reader";
-import { validateEquiposData } from "@/lib/tournament-data";
-import { CategoryFixture, NewTeamExcel, Team } from "@/shared/types";
+import { Category, NewTeamExcel, Team } from "@/lib/definitions";
 import {
-  AlertCircle,
-  CheckCircle,
-  Download,
-  FileSpreadsheet,
-  Upload,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import FormField from "../atomic-components/form-field";
+  normalizeEquiposData,
+  readExcelFile,
+  validateEquiposData,
+} from "@/lib/excel-reader";
+import { AlertCircle, CheckCircle, FileSpreadsheet } from "lucide-react";
+import { use, useEffect, useState } from "react";
+import { FormField } from "../atomic-components/form-field";
+import { DownloadCSV } from "../block-components/download-csv";
+import { FileUploadInput } from "../block-components/file-upload-input";
+import { FormatInfoCard } from "../cards";
 import { Button } from "../shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
-import { Input } from "../shadcn-ui/input";
 import { Label } from "../shadcn-ui/label";
-import FormatInfoCard from "./FormatInfoCard";
 
-export default function UploadCard({
+export function CreateTeamsForm({
   category,
 }: {
-  category: CategoryFixture;
+  category: Promise<(Category & { teams: Team[] }) | undefined>;
 }) {
+  const categoryData = use(category);
+
+  if (!categoryData) {
+    return null;
+  }
+
   const [file, setFile] = useState<File | null>(null);
   const [validationResult, setValidationResult] = useState<{
     valid: boolean;
     errors: string[];
   } | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [previewData, setPreviewData] = useState<NewTeamExcel[]>([]);
   const [processingError, setProcessingError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [equiposExistentes, setEquiposExistentes] = useState<Team[]>([]);
+  const fileInput = document.getElementById("file") as HTMLInputElement;
 
-  const getTeams = async (category_id: number) => {
-    const teams = await getTeamsByCategory(category_id);
-    setEquiposExistentes(teams);
-  };
-
-  const downloadTemplate = () => {
-    const csvContent = `NOMBRE,CANTIDAD_JUGADORES,LOGO
-Equipo A,11,https://ejemplo.com/logo1.png
-Equipo B,10,https://ejemplo.com/logo2.png
+  const csvContent = `NOMBRE,CANTIDAD_JUGADORES,LOGO
+Equipo A,11,
+Equipo B,10,
 Equipo C,12,
-Equipo D,9,https://ejemplo.com/logo4.png`;
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "plantilla_equipos.csv";
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
+Equipo D,9,`;
 
   const handleValidateFile = async () => {
     if (!file) return;
@@ -63,7 +49,6 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
     setValidationResult(null);
     setPreviewData([]);
     setProcessingError(null);
-    setUploading(true);
 
     try {
       const rawData = await readExcelFile(file);
@@ -73,8 +58,6 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
         setProcessingError(
           "No se encontraron datos válidos en el archivo. Verifique que tenga las columnas correctas."
         );
-
-        setUploading(false);
         return;
       }
 
@@ -83,18 +66,6 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
       setPreviewData(normalizedData);
     } catch (error) {
       setProcessingError("Error al procesar el archivo");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setValidationResult(null);
-      setPreviewData([]);
-      setProcessingError(null);
     }
   };
 
@@ -103,8 +74,8 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
     setValidationResult(null);
     setPreviewData([]);
     setProcessingError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+    if (fileInput) {
+      fileInput.value = "";
     }
   };
 
@@ -120,29 +91,25 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
     }
 
     if (
-      equiposExistentes.length + previewData.length >
-      category.fixture.team_count
+      categoryData.teams.length + previewData.length >
+      categoryData.team_count
     ) {
       alert(
-        `No se pueden agregar ${previewData.length} equipos. Límite: ${category.fixture.team_count}, Existentes: ${equiposExistentes.length}`
+        `No se pueden agregar ${previewData.length} equipos. Límite: ${categoryData.team_count}, Existentes: ${categoryData.teams.length}`
       );
       button.disabled = false;
       return;
     }
 
-    await createEquiposFromExcel(category, previewData);
-
-    setPreviewData([]);
-    setFile(null);
-    setValidationResult(null);
-    fileInputRef.current!.value = "";
-    button.disabled = false;
+    await createEquiposFromExcel(categoryData, previewData);
     window.location.reload();
   };
 
   useEffect(() => {
-    getTeams(category.id);
-  }, []);
+    setProcessingError(null);
+    setPreviewData([]);
+    setValidationResult(null);
+  }, [setFile]);
 
   return (
     <Card>
@@ -151,30 +118,16 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
       </CardHeader>
 
       <CardContent className="-mt-2 space-y-6">
-        <FormatInfoCard />
+        <FormatInfoCard
+          columnsRequired={["NOMBRE", "CANTIDAD_JUGADORES"]}
+          optionalColumn=" LOGO (URL del logo del equipo)"
+        />
 
-        {/* UPLOAD FILE SECTION */}
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={downloadTemplate}>
-            <Download className="w-4 h-4 mr-2" />
-            Descargar Plantilla CSV
-          </Button>
-          <span className="text-sm text-neutral-700">
-            Descarga una plantilla de ejemplo
-          </span>
-        </div>
+        <DownloadCSV csvContent={csvContent} fileName="plantilla_equipos.csv" />
 
         <FormField>
           <Label htmlFor="file">Seleccionar Archivo CSV</Label>
-          <Input
-            id="file"
-            type="file"
-            accept=".csv"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-            className="mt-1"
-            disabled={!!file}
-          />
+          <FileUploadInput id="file" file={file} setFile={setFile} />
         </FormField>
 
         {/* SHOW FILE */}
@@ -188,17 +141,11 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
               <Button
                 size="sm"
                 onClick={handleValidateFile}
-                disabled={uploading}
                 className="bg-primary-800 text-primary-100 hover:bg-primary-800/90"
               >
                 Procesar Archivo
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleRemoveFile}
-                disabled={uploading}
-              >
+              <Button size="sm" variant="outline" onClick={handleRemoveFile}>
                 Eliminar
               </Button>
             </div>
@@ -272,45 +219,7 @@ Equipo D,9,https://ejemplo.com/logo4.png`;
                 Vista Previa de Equipos ({previewData.length} encontrados)
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2 text-neutral-900">
-                        Nombre
-                      </th>
-                      <th className="text-left py-2 text-neutral-900">
-                        Cantidad Jugadores
-                      </th>
-                      <th className="text-left py-2 text-neutral-900">Logo</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {previewData.map((equipo, index) => (
-                      <tr key={index} className="border-b">
-                        <td className="py-2 font-medium text-neutral-900">
-                          {equipo.name}
-                        </td>
-                        <td className="py-2 text-neutral-900">
-                          {equipo.number_players}
-                        </td>
-                        <td className="py-2 text-neutral-900">
-                          {equipo.logo || "Sin logo"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="mt-4 flex justify-end">
-                <Button onClick={(e) => handleUploadTeams(e)}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Confirmar y Subir {previewData.length} Equipos
-                </Button>
-              </div>
-            </CardContent>
+            <CardContent></CardContent>
           </Card>
         )}
       </CardContent>

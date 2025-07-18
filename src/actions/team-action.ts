@@ -1,38 +1,31 @@
 "use server";
 
-import { deleteTeamById, postTeam } from "@/db/methods/team";
-import { getStartedPhaseByFixtureType } from "@/lib/utils";
-import { CategoryFixture, NewTeam, NewTeamExcel } from "@/shared/types";
+import { db } from "@/db";
+import { teamTable } from "@/db/schemas";
+import { Category, NewTeamExcel, Team } from "@/lib/definitions";
+import { generateID, getStartedPhaseByFixtureType } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 
 export async function createEquiposFromExcel(
-  category: CategoryFixture,
-  data: NewTeamExcel[]
+  category: Category & { teams: Team[] },
+  newTeams: NewTeamExcel[]
 ) {
-  const startedPhase = getStartedPhaseByFixtureType({
-    ...category.fixture,
-    category_id: category.id,
-  });
+  const startedPhase = getStartedPhaseByFixtureType(category);
 
-  const newTeams = data.map((row) => {
-    const newEquipo: NewTeam = {
+  await db.insert(teamTable).values(
+    newTeams.map((team) => ({
       category_id: category.id,
-      name: row.name,
-      players_count: row.number_players,
-      logo: row.logo || undefined,
-      phase_id: startedPhase.id,
-    };
-
-    return newEquipo;
-  });
-
-  Promise.all(newTeams.map((team) => postTeam(team)));
-
-  revalidatePath("/");
+      id: generateID("team"),
+      name: team.name,
+      phase: startedPhase,
+      players_count: team.players_count,
+      logo: team.logo,
+    }))
+  );
 }
 
 export async function deleteTeam(team_id: number) {
-  await deleteTeamById(team_id);
+  // await deleteTeamById(team_id);
 
   revalidatePath("/");
 }

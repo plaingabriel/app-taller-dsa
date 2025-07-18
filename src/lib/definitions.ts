@@ -56,6 +56,8 @@ export interface Team {
   phase?: Phase;
 }
 
+export type NewTeamExcel = Pick<Team, "name" | "logo" | "players_count">;
+
 export interface Player {
   ci: number;
   team_id: Team["id"];

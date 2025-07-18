@@ -3,12 +3,11 @@ import {
   Fixture,
   NewMatch,
   NewPlayoffMatch,
-  Phase,
   Team,
 } from "@/shared/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { FixtureType } from "./definitions";
+import { Category, FixtureType, Phase } from "./definitions";
 
 export function isPair(number: number): boolean {
   return number % 2 === 0;
@@ -92,35 +91,27 @@ export function generateID(tableName: TableNames): string {
   return `${prefix}_${timestampPart}_${randomPart}_${checksum}`;
 }
 
-export function getStartedPhaseByFixtureType(fixture: Fixture): Phase {
-  switch (fixture.fixture_type) {
+export function simulateDelay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function getStartedPhaseByFixtureType(category: Category): Phase {
+  switch (category.fixture_type) {
     case "playoffs":
-      if (fixture.team_count === 4) {
-        return {
-          id: 4,
-          name: "semifinals",
-        };
+      if (category.team_count === 4) {
+        return "semifinal";
       }
 
-      if (fixture.team_count === 8) {
-        return {
-          id: 3,
-          name: "quarterfinals",
-        };
+      if (category.team_count === 8) {
+        return "quarterfinals";
       }
 
-      if (fixture.team_count === 16) {
-        return {
-          id: 2,
-          name: "round_16",
-        };
+      if (category.team_count === 16) {
+        return "round_16";
       }
 
     default:
-      return {
-        id: 1,
-        name: "groups",
-      };
+      return "groups";
   }
 }
 
