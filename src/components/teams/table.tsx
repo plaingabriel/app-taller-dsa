@@ -7,7 +7,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { use } from "react";
 import { ButtonLink } from "../atomic-components/button-link";
-import { RemoveSubmit } from "../atomic-components/remove-submit";
+import { RemoveSubmitAndReload } from "../atomic-components/remove-submit";
 import { Badge } from "../shadcn-ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 
@@ -36,7 +36,7 @@ export default function TeamTable({
             const deleteTeamWithID = deleteTeam.bind(null, team.id);
 
             return (
-              <Card className="border-neutral-600">
+              <Card key={team.id} className="border-neutral-600">
                 <CardContent className="flex items-center justify-between">
                   <div className="flex gap-x-4 items-center">
                     <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center overflow-hidden">
@@ -81,7 +81,7 @@ export default function TeamTable({
                     </ButtonLink>
 
                     {!team.has_validated_players && (
-                      <RemoveSubmit deleteAction={deleteTeamWithID} />
+                      <RemoveSubmitAndReload deleteAction={deleteTeamWithID} />
                     )}
                   </div>
                 </CardContent>

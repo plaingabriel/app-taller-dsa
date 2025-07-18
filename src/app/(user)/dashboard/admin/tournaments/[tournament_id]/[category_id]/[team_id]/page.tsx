@@ -1,14 +1,25 @@
-import ReturnButton from "@/components/atomic-components/return-button";
-import PlayersSection from "@/components/sections/PlayersSection";
+import { ReturnButton } from "@/components/atomic-components/return-button";
+import { CreatePlayersForm } from "@/components/players/create-form";
+import { PlayersDetails } from "@/components/players/details";
+import { PlayersPageHeading } from "@/components/players/heading";
+import { PlayersTable } from "@/components/players/table";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import { getPlayersByTeam } from "@/db/methods/player";
-import { getTeamById, teamHasMatches } from "@/db/methods/team";
+import {
+  DetailSkeleton,
+  FormSkeleton,
+  HeadingSkeleton,
+  TableSkeleton,
+} from "@/components/skeletons";
+import { db } from "@/db";
+import { fetchTeam } from "@/lib/data";
 import { Users } from "lucide-react";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function PlayersPage({
   params,
@@ -20,9 +31,15 @@ export default async function PlayersPage({
   }>;
 }) {
   const { tournament_id, category_id, team_id } = await params;
-  const team = await getTeamById(parseInt(team_id));
-  const players = await getPlayersByTeam(parseInt(team_id));
-  const hasMatches = await teamHasMatches(parseInt(team_id));
+  const team = fetchTeam(team_id);
+  const ages = db.query.categoryTable.findFirst({
+    columns: { min_age: true, max_age: true },
+    where: (category, { eq }) => eq(category.id, category_id),
+  });
+
+  if (!team) {
+    redirect(`/dashboard/admin/tournaments/${tournament_id}/${category_id}`);
+  }
 
   return (
     <div className="pb-8">
@@ -31,44 +48,38 @@ export default async function PlayersPage({
           href={`/dashboard/admin/tournaments/${tournament_id}/${category_id}`}
         />
 
-        <div>
-          <h1 className="text-2xl font-bold">
-            Gestionar Jugadores del {team.name}
-          </h1>
-          <p className="text-neutral-800">
-            {players.length}/{team.players_count} jugadores registrados
-          </p>
-        </div>
+        <Suspense fallback={<HeadingSkeleton />}>
+          <PlayersPageHeading team={team} />
+        </Suspense>
 
         {/* Team Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex gap-x-2 ">
-              <span>
-                <Users />
-              </span>
+        <Suspense fallback={<DetailSkeleton />}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex gap-x-2 ">
+                <span>
+                  <Users />
+                </span>
 
-              <span className="text-xl">Información de la Categoría</span>
-            </CardTitle>
-          </CardHeader>
+                <span className="text-xl">Información de la Categoría</span>
+              </CardTitle>
+            </CardHeader>
 
-          <CardContent>
-            <div className="grid grid-cols-2 gap-x-4 -mt-4">
-              <div>
-                <h4 className="font-medium">Jugadores Requeridos</h4>
-                <span>{team.players_count}</span>
-              </div>
+            <CardContent>
+              <PlayersDetails team={team} ages={ages} />
+            </CardContent>
+          </Card>
+        </Suspense>
 
-              <div>
-                <h4 className="font-medium">Jugadores Registrados</h4>
-                <span>{players.length}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Upload Players */}
+        <Suspense fallback={<FormSkeleton />}>
+          <CreatePlayersForm team={team} ages={ages} />
+        </Suspense>
 
-        {/* Players Section */}
-        <PlayersSection team={team} players={players} hasMatches={hasMatches} />
+        {/* Players Table */}
+        <Suspense fallback={<TableSkeleton />}>
+          <PlayersTable team={team} />
+        </Suspense>
       </div>
     </div>
   );

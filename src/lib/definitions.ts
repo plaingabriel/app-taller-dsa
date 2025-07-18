@@ -68,6 +68,8 @@ export interface Player {
   age: number;
 }
 
+export type NewPlayerExcel = Omit<Player, "team_id" | "goals_scored">;
+
 export type TeamPlayers = Team & { players: Player[] };
 export type CategoryTeamsPlayers = Category & {
   teams: TeamPlayers[];

@@ -1,9 +1,10 @@
 "use server";
 
 import { db } from "@/db";
-import { teamTable } from "@/db/schemas";
+import { playerTable, teamTable } from "@/db/schemas";
 import { CategoryTeamsPlayers, NewTeamExcel } from "@/lib/definitions";
 import { generateID, getStartedPhaseByFixtureType } from "@/lib/utils";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function createEquiposFromExcel(
@@ -25,7 +26,9 @@ export async function createEquiposFromExcel(
 }
 
 export async function deleteTeam(team_id: string) {
-  // await deleteTeamById(team_id);
+  // Delete players of the team
+  await db.delete(playerTable).where(eq(playerTable.team_id, team_id));
 
-  revalidatePath("/");
+  // Then delete the team
+  await db.delete(teamTable).where(eq(teamTable.id, team_id));
 }

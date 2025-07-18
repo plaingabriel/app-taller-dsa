@@ -1,56 +1,67 @@
 "use client";
 
+import { createPlayers } from "@/actions/player-actions";
+import { NewPlayerExcel, TeamPlayers } from "@/lib/definitions";
 import {
-  createPlayerAction,
-  getPlayersByTeamAction,
-} from "@/actions/player-actions";
-import { normalizeJugadoresData, readExcelFile } from "@/lib/excel-reader";
-import { validateJugadoresData } from "@/lib/tournament-data";
-import { NewPlayerExcel, Player, Team } from "@/shared/types";
+  normalizeJugadoresData,
+  readExcelFile,
+  validateJugadoresData,
+} from "@/lib/excel-reader";
 import {
   AlertCircle,
   CheckCircle,
-  Download,
   FileSpreadsheet,
   Upload,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import FormField from "../atomic-components/form-field";
+import { use, useEffect, useRef, useState } from "react";
+import { FormField } from "../atomic-components/form-field";
+import { DataTable } from "../block-components/data-table";
+import { DownloadCSV } from "../block-components/download-csv";
+import { FileUploadInput } from "../block-components/file-upload-input";
+import { FormatInfoCard } from "../cards";
 import { Button } from "../shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
-import { Input } from "../shadcn-ui/input";
 import { Label } from "../shadcn-ui/label";
-import FormatPlayerCard from "./FormatPlayersCard";
+import { playerColumns } from "./columns";
 
-export default function UploadPlayers({ team }: { team: Team }) {
+export function CreatePlayersForm({
+  team,
+  ages,
+}: {
+  team: Promise<TeamPlayers | undefined>;
+  ages: Promise<{ min_age: number; max_age: number } | undefined>;
+}) {
+  const teamData = use(team);
+  const agesRange = use(ages);
+
+  if (!teamData || !agesRange) {
+    return null;
+  }
+
+  const { players } = teamData;
+
+  if (
+    players.length >= teamData.players_count ||
+    teamData.has_validated_players
+  ) {
+    return null;
+  }
+
   const [file, setFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [processingError, setProcessingError] = useState<string | null>(null);
   const [validationResult, setValidationResult] = useState<{
     valid: boolean;
     errors: string[];
   } | null>(null);
   const [previewData, setPreviewData] = useState<NewPlayerExcel[]>([]);
-  const [players, setPlayers] = useState<Omit<Player, "team_id">[]>([]);
+  const [processingError, setProcessingError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const getPlayers = async () => {
-    const players = (await getPlayersByTeamAction(team.id)) as Omit<
-      Player,
-      "team_id"
-    >[];
-
-    setPlayers(players);
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setValidationResult(null);
-      setPreviewData([]);
-      setProcessingError(null);
-    }
-  };
+  const csvContent = `NOMBRE,CEDULA,NUMERO_CAMISETA,POSICION,EDAD
+Carlos Rodriguez,28702071,1,PORTERO,28
+Luis Gonzalez,29752084,5,DEFENSA,24
+Pedro Martinez,30543092,8,MEDIOCAMPISTA,26
+Jose Fernandez,31562105,9,DELANTERO,30
+Manuel Suarez,32573016,10,MEDIOCAMPISTA,22`;
 
   const handleValidateFile = async () => {
     if (!file) return;
@@ -70,7 +81,7 @@ export default function UploadPlayers({ team }: { team: Team }) {
         return;
       }
 
-      const validation = validateJugadoresData(normalizedData);
+      const validation = validateJugadoresData(normalizedData, agesRange);
       setValidationResult(validation);
       setPreviewData(normalizedData);
     } catch (error) {
@@ -99,73 +110,48 @@ export default function UploadPlayers({ team }: { team: Team }) {
       return;
     }
 
-    if (players.length + previewData.length > team.players_count) {
+    if (players.length + previewData.length > teamData.players_count) {
       alert(
-        `"No se pueden agregar ${previewData.length} jugadores. Límite: ${team.players_count}, Existentes: ${players.length}`
+        `No se pueden agregar ${previewData.length} equipos. Límite: ${teamData.players_count}, Existentes: ${players.length}`
       );
       button.disabled = false;
       return;
     }
 
-    await createPlayerAction(team.id, previewData);
-
-    setPreviewData([]);
-    setFile(null);
-    setValidationResult(null);
-    fileInputRef.current!.value = "";
-    button.disabled = false;
+    await createPlayers(teamData.id, previewData);
     window.location.reload();
   };
 
-  const downloadTemplate = () => {
-    const csvContent = `NOMBRE, POSICION, NUMERO_CAMISETA
-Juan Pérez,PORTERO,1
-Carlos López,DEFENSA,2
-Miguel Torres,MEDIOCAMPISTA,10
-Ana García,DELANTERO,9`;
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "plantilla_jugadores.csv";
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
   useEffect(() => {
-    getPlayers();
-  }, []);
+    setProcessingError(null);
+    setPreviewData([]);
+    setValidationResult(null);
+  }, [setFile]);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Subir Jugadores</CardTitle>
+        <CardTitle>Subir Nuevos Equipos</CardTitle>
       </CardHeader>
 
       <CardContent className="-mt-2 space-y-6">
-        <FormatPlayerCard />
+        <FormatInfoCard
+          columnsRequired={["NOMBRE", "CEDULA", "NUMERO_CAMISETA", "POSICION"]}
+          validPositions={["PORTERO", "DEFENSA", "MEDIOCAMPISTA", "DELANTERO"]}
+        />
 
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={downloadTemplate}>
-            <Download className="w-4 h-4 mr-2" />
-            Descargar Plantilla CSV
-          </Button>
-          <span className="text-sm text-gray-700">
-            Descarga una plantilla de ejemplo
-          </span>
-        </div>
+        <DownloadCSV
+          csvContent={csvContent}
+          fileName="plantilla_jugadores.csv"
+        />
 
         <FormField>
           <Label htmlFor="file">Seleccionar Archivo CSV</Label>
-          <Input
+          <FileUploadInput
             id="file"
-            type="file"
-            accept=".csv"
-            onChange={handleFileChange}
+            file={file}
+            setFile={setFile}
             ref={fileInputRef}
-            className="mt-1"
-            disabled={!!file}
           />
         </FormField>
 
@@ -255,46 +241,14 @@ Ana García,DELANTERO,9`;
           <Card>
             <CardHeader>
               <CardTitle className="text-neutral-900">
-                Vista Previa de Jugadores ({previewData.length} encontrados)
+                Vista Previa de Equipos ({previewData.length} encontrados)
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2 text-neutral-900">
-                        Nombre
-                      </th>
-                      <th className="text-left py-2 text-neutral-900">
-                        Posición
-                      </th>
-                      <th className="text-left py-2 text-neutral-900">
-                        Número
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {previewData.map((player, index) => (
-                      <tr key={index} className="border-b">
-                        <td className="py-2 font-medium text-neutral-900">
-                          {player.name}
-                        </td>
-                        <td className="py-2 text-neutral-900">
-                          {player.position}
-                        </td>
-                        <td className="py-2 text-neutral-900">
-                          {player.number}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
+              <DataTable columns={playerColumns} data={previewData} />
               <div className="mt-4 flex justify-end">
                 <Button onClick={(e) => handleUploadPlayers(e)}>
-                  <Upload className="w-4 h-4 mr-2" />
+                  <Upload />
                   Confirmar y Subir {previewData.length} Equipos
                 </Button>
               </div>

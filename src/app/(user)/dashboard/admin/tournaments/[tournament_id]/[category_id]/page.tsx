@@ -14,7 +14,7 @@ import {
 } from "@/components/skeletons";
 import { CreateTeamsForm } from "@/components/teams/create-form";
 import { TeamDetails } from "@/components/teams/details";
-import { Heading } from "@/components/teams/heading";
+import { TeamPageHeading } from "@/components/teams/heading";
 import TeamTable from "@/components/teams/table";
 import { fetchCategory } from "@/lib/data";
 import { Users } from "lucide-react";
@@ -34,7 +34,7 @@ export default async function TeamsPage({
         <ReturnButton href={`/dashboard/admin/tournaments/${tournament_id}`} />
 
         <Suspense fallback={<HeadingSkeleton />}>
-          <Heading category={category} tournament_id={tournament_id} />
+          <TeamPageHeading category={category} tournament_id={tournament_id} />
         </Suspense>
 
         {/* Category Details */}

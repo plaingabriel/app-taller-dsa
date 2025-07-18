@@ -1,6 +1,6 @@
 // File to store the fetching functions
 import { db } from "@/db";
-import { CategoryTeamsPlayers, User } from "./definitions";
+import { CategoryTeamsPlayers, TeamPlayers, User } from "./definitions";
 import { getUserSession } from "./session";
 
 // Uncomment for testing
@@ -67,7 +67,7 @@ export async function fetchCategory(id: string) {
         with: { players: true },
       },
     },
-  })) as CategoryTeamsPlayers;
+  })) as CategoryTeamsPlayers | undefined;
 
   return category;
 }
@@ -77,17 +77,14 @@ export async function fetchTeams(category_id: string) {
     where: (team, { eq }) => eq(team.category_id, category_id),
   });
 
-  if (!teams) {
-    return [];
-  }
-
   return teams;
 }
 
 export async function fetchTeam(id: string) {
-  const team = await db.query.teamTable.findFirst({
+  const team = (await db.query.teamTable.findFirst({
     where: (team, { eq }) => eq(team.id, id),
-  });
+    with: { players: true },
+  })) as TeamPlayers | undefined;
 
   return team;
 }
@@ -96,10 +93,6 @@ export async function fetchPlayers(team_id: string) {
   const players = await db.query.playerTable.findMany({
     where: (player, { eq }) => eq(player.team_id, team_id),
   });
-
-  if (!players) {
-    return [];
-  }
 
   return players;
 }

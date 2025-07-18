@@ -1,31 +1,26 @@
 "use server";
 
-import {
-  deletePlayerById,
-  getPlayersByTeam,
-  postPlayer,
-} from "@/db/methods/player";
-import { NewPlayerExcel } from "@/shared/types";
-import { revalidatePath } from "next/cache";
+import { db } from "@/db";
+import { playerTable } from "@/db/schemas";
+import { NewPlayerExcel } from "@/lib/definitions";
+import { eq } from "drizzle-orm";
 
-export async function getPlayersByTeamAction(team_id: number) {
-  const players = await getPlayersByTeam(team_id);
-  return players;
-}
-
-export async function createPlayerAction(
-  team_id: number,
+export async function createPlayers(
+  team_id: string,
   players: NewPlayerExcel[]
 ) {
-  const newPlayers = players.map((player) => ({
-    ...player,
-    team_id,
-  }));
-
-  Promise.all(newPlayers.map((player) => postPlayer(player)));
-  revalidatePath("/");
+  await db.insert(playerTable).values(
+    players.map((player) => ({
+      team_id,
+      age: player.age,
+      jersey_number: player.jersey_number,
+      name: player.name,
+      position: player.position,
+      ci: player.ci,
+    }))
+  );
 }
 
-export async function deletePlayerAction(player_id: number) {
-  await deletePlayerById(player_id);
+export async function deletePlayer(player_ci: number) {
+  await db.delete(playerTable).where(eq(playerTable.ci, player_ci));
 }

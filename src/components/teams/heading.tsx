@@ -1,7 +1,7 @@
 import { CategoryTeamsPlayers, Team } from "@/lib/definitions";
 import { redirect } from "next/navigation";
 
-export async function Heading({
+export async function TeamPageHeading({
   category,
   tournament_id,
 }: {
