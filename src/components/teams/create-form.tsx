@@ -48,7 +48,7 @@ export function CreateTeamsForm({
   } | null>(null);
   const [previewData, setPreviewData] = useState<NewTeamExcel[]>([]);
   const [processingError, setProcessingError] = useState<string | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const csvContent = `NOMBRE,CANTIDAD_JUGADORES,LOGO
 Equipo A,11,
@@ -87,8 +87,8 @@ Equipo D,9,`;
     setValidationResult(null);
     setPreviewData([]);
     setProcessingError(null);
-    if (fileInput) {
-      fileInput.value = "";
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
