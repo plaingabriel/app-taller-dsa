@@ -140,7 +140,12 @@ Equipo D,9,`;
 
         <FormField>
           <Label htmlFor="file">Seleccionar Archivo CSV</Label>
-          <FileUploadInput id="file" file={file} setFile={setFile} />
+          <FileUploadInput
+            id="file"
+            file={file}
+            setFile={setFile}
+            ref={fileInputRef}
+          />
         </FormField>
 
         {/* SHOW FILE */}
