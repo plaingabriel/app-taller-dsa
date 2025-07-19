@@ -30,6 +30,11 @@ export interface Category {
   has_fixture?: boolean;
 }
 
+export type Config = Pick<
+  Category,
+  "group_count" | "teams_per_group" | "teams_qualified"
+>;
+
 export type NewCategory = Omit<Category, "id" | "tournament_id">;
 
 export type Phase =
@@ -93,7 +98,7 @@ export type PlayoffMatch = Match & {
   phase?: Phase;
 };
 
-type GroupMatch = Match & {
+export type GroupMatch = Match & {
   day: number;
 };
 

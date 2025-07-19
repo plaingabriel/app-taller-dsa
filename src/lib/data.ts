@@ -64,6 +64,7 @@ export async function fetchCategory(id: string) {
     where: (category, { eq }) => eq(category.id, id),
     with: {
       teams: {
+        columns: { group: false },
         with: { players: true },
       },
     },

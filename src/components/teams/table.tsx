@@ -1,7 +1,9 @@
 "use client";
 
+import { createMatches } from "@/actions/match-actions";
 import { deleteTeam } from "@/actions/team-action";
 import { CategoryTeamsPlayers } from "@/lib/definitions";
+import { testFixtureFunctions } from "@/lib/fixture";
 import { ShieldCheck, Shuffle, Users } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -32,6 +34,8 @@ export default function TeamTable({
     return true;
   };
 
+  // testFixtureFunctions();
+
   const teamsValidated = allTeamsValidated();
   return (
     <>
@@ -39,7 +43,17 @@ export default function TeamTable({
         {!categoryData.has_fixture &&
           teamsValidated &&
           categoryData.team_count === teams.length && (
-            <Button className="bg-success-600 hover:bg-success-600/90">
+            <Button
+              className="bg-success-600 hover:bg-success-600/90"
+              onClick={(e) => {
+                const button = e.target as HTMLButtonElement;
+                button.disabled = true;
+
+                createMatches(categoryData);
+                // alert("Fixture generado con éxito");
+                // window.location.reload();
+              }}
+            >
               <Shuffle />
               <span>Generar Fixture</span>
             </Button>

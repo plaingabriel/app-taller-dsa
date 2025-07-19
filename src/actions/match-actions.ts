@@ -1,80 +1,92 @@
 "use server";
 
-import {
-  postGroupMatches,
-  postMatch,
-  postPlayoffMatches,
-} from "@/db/methods/match";
-import { getPlayersByTeam } from "@/db/methods/player";
-import { validateTeam } from "@/lib/tournament-data";
-import {
-  generateDraftTeamsForPlayoffBracket,
-  generateFullPlayoffBracket,
-  generateGroupStageMatches,
-  generateGroupsPlayoffsFixture,
-} from "@/lib/utils";
-import { CategoryFixture, Fixture, Team } from "@/shared/types";
-import { revalidatePath } from "next/cache";
+import { db } from "@/db";
+import { categoryTable, groupTable, matchTable } from "@/db/schemas";
+import { CategoryTeamsPlayers } from "@/lib/definitions";
+import { generateLeagueFixture, generatePlayoffFixture } from "@/lib/fixture";
+import { generateID } from "@/lib/utils";
+import { eq } from "drizzle-orm";
 
-async function validateTeams(teams: Team[]) {
-  for (const team of teams) {
-    const players = await getPlayersByTeam(team.id);
-    const result = validateTeam(players);
+export async function createMatches(category: CategoryTeamsPlayers) {
+  switch (category.fixture_type) {
+    case "groups": {
+      const { teams } = category;
+      const matches = generateLeagueFixture(teams);
+      const group_id = generateID("group");
 
-    if (!result.valid) {
-      return {
-        ok: false,
-        error: result.errors,
+      // Create group
+      await db.insert(groupTable).values({
+        id: group_id,
+        name: "Solo grupos",
+        category_id: category.id,
+      });
+
+      await db.transaction(async (tx) => {
+        // Loop the match days
+        for (let day = 0; day < matches.length; day++) {
+          const matchDay = day + 1;
+
+          // Loop the matches in the day
+          for (const match of matches[day]) {
+            const team1 = match[0];
+            const team2 = match[1];
+
+            await tx.insert(matchTable).values({
+              category_id: category.id,
+              home_team: team1.id,
+              away_team: team2.id,
+              home_score: 0,
+              away_score: 0,
+              status: "pending",
+              day: matchDay,
+              id: generateID("match"),
+              group: group_id,
+              date: "",
+              phase: "groups",
+            });
+          }
+        }
+      });
+
+      await db
+        .update(categoryTable)
+        .set({ has_fixture: true })
+        .where(eq(categoryTable.id, category.id));
+
+      break;
+    }
+    case "playoffs": {
+      const { teams } = category;
+      const matches = generatePlayoffFixture(teams);
+      const group_id = generateID("group");
+
+      // Create group
+      await db.insert(groupTable).values({
+        id: group_id,
+        name: "Solo eliminatorias",
+        category_id: category.id,
+      });
+
+      const matchesIdByPhases: { [key: string]: string[] } = {
+        finals: [],
+        semifinals: [],
+        quarterfinals: [],
+        round_16: [],
       };
+
+      await db.transaction(async (tx) => {
+        // Loop the phases starting from the end
+        for (let phase = matches.length - 1; phase >= 0; phase--) {
+          if (matches[phase].length === 1) {
+            const finalID = generateID("match");
+            matchesIdByPhases["finals"].push(finalID);
+          }
+        }
+      });
+
+      break;
     }
+    default:
+      break;
   }
-
-  return {
-    ok: true,
-  };
-}
-
-export async function createMatchesAction(
-  category: CategoryFixture,
-  teams: Team[]
-) {
-  const result = await validateTeams(teams);
-
-  if (result.ok === false) {
-    throw new Error(`${result.error}`);
-  }
-
-  if (category.fixture.fixture_type === "groups") {
-    const matches = generateGroupStageMatches(category.fixture as Fixture, [
-      ...teams.map((team) => team.id),
-    ]);
-
-    for (const match of matches) {
-      await postMatch(match);
-    }
-  }
-
-  if (category.fixture.fixture_type === "playoffs") {
-    const matches = generateFullPlayoffBracket(teams, category.fixture.id);
-    await postPlayoffMatches(matches);
-  }
-
-  if (category.fixture.fixture_type === "groups+playoffs") {
-    const groupMatches = generateGroupsPlayoffsFixture(category.fixture, teams);
-    const teamsToClassifyCount =
-      category.fixture.teams_qualified * category.fixture.group_count;
-    const teamsDrafted = generateDraftTeamsForPlayoffBracket(
-      teamsToClassifyCount,
-      category.id
-    );
-    const playoffMatches = generateFullPlayoffBracket(
-      teamsDrafted,
-      category.fixture.id
-    );
-
-    await postGroupMatches(groupMatches, category.fixture.id);
-    await postPlayoffMatches(playoffMatches);
-  }
-
-  revalidatePath("/");
 }
