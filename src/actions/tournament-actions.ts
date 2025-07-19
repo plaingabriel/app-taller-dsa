@@ -1,9 +1,17 @@
 "use server";
 
 import { db } from "@/db";
-import { categoryTable, tournamentTable } from "@/db/schemas";
+import {
+  categoryTable,
+  groupTable,
+  matchTable,
+  playerTable,
+  teamTable,
+  tournamentTable,
+} from "@/db/schemas";
 import { NewCategory, Tournament } from "@/lib/definitions";
 import { generateID } from "@/lib/utils";
+import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -64,7 +72,48 @@ export async function createTournament(tournament: {
 }
 
 export async function deleteTournament(id: string) {
-  // TODO: Implementar la lógica para eliminar un torneo
-  // await deleteTournament(id);
-  // redirect("/dashboard/admin/tournaments");
+  // Eliminar el torneo junto a todas sus relaciones
+
+  // Obtener categorías dentro del torneo
+  const categories = await db.query.categoryTable.findMany({
+    where: (category, { eq }) => eq(category.tournament_id, id),
+  });
+
+  // Eliminar todos los partidos de cada categoría
+  for (const category of categories) {
+    await db.delete(matchTable).where(eq(matchTable.category_id, category.id));
+  }
+
+  // Eliminar todos los grupos de cada categoría
+  for (const category of categories) {
+    await db.delete(groupTable).where(eq(groupTable.category_id, category.id));
+  }
+
+  // Para eliminar los equipos de cada categoría, eliminando sus jugadores
+  for (const category of categories) {
+    // Obtener equipos de la categoría
+    const teams = await db.query.teamTable.findMany({
+      where: (team, { eq }) => eq(team.category_id, category.id),
+    });
+
+    // Eliminar los jugadores de cada equipo
+    for (const team of teams) {
+      await db.delete(playerTable).where(eq(playerTable.team_id, team.id));
+    }
+
+    // Eliminar equipos
+    for (const team of teams) {
+      await db.delete(teamTable).where(eq(teamTable.id, team.id));
+    }
+  }
+
+  // Eliminar categorías
+  for (const category of categories) {
+    await db.delete(categoryTable).where(eq(categoryTable.id, category.id));
+  }
+
+  // Eliminar torneo
+  await db.delete(tournamentTable).where(eq(tournamentTable.id, id));
+
+  redirect("/dashboard/admin/tournaments");
 }

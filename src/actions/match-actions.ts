@@ -334,7 +334,10 @@ export async function createMatches(category: CategoryTeamsPlayers) {
           name: group_name,
           category_id: category.id,
         });
+
         await generateGroupMatches(category.id, group_id, group);
+
+        i++;
       }
 
       const group_id = generateID("group");

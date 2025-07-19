@@ -3,11 +3,12 @@
 import { deleteTournament } from "@/actions/tournament-actions";
 import { Category, Tournament } from "@/lib/definitions";
 import { allEqual, getTextByFixtureType } from "@/lib/utils";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, Trash } from "lucide-react";
 import { use } from "react";
 import { ButtonLink } from "../atomic-components/button-link";
 import { RemoveSubmit } from "../atomic-components/remove-submit";
 import { FixtureBadge, InfoBadge } from "../badges";
+import { Button } from "../shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 
 type TournamentClient = Tournament & {
@@ -77,7 +78,26 @@ export function TournamentTable({
                 >
                   <Settings />
                 </ButtonLink>
-                <RemoveSubmit deleteAction={deleteTournamentWithID} />
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  onClick={(e) => {
+                    const button = e.target as HTMLButtonElement;
+                    button.disabled = true;
+
+                    const confirm = window.confirm(
+                      "¿Estás seguro de eliminar TODO el torneo? Esta acción es IRREVERSIBLE."
+                    );
+
+                    if (confirm) {
+                      deleteTournamentWithID();
+                    }
+
+                    button.disabled = false;
+                  }}
+                >
+                  <Trash />
+                </Button>
               </div>
             </CardHeader>
 
