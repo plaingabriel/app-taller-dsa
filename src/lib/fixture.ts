@@ -1,5 +1,3 @@
-import { Phase, Team } from "./definitions";
-
 export function generateLeagueFixture<T>(teams: T[]): [T, T][][] {
   if (teams.length === 0) return [];
 
@@ -101,24 +99,6 @@ export function generateCompleteFixture<T>(
       }
     }
   });
-
-  // Determinar la etapa de la eliminatoria basada en el número de clasificados
-  let stage: Phase;
-
-  switch (qualifiedTeams.length) {
-    case 16:
-      stage = "round_16";
-      break;
-    case 8:
-      stage = "quarterfinals";
-      break;
-    case 4:
-      stage = "semifinal";
-      break;
-    case 2:
-      stage = "final";
-      break;
-  }
 
   // Generar fase eliminatoria
   const playoffStage = generatePlayoffFixture(qualifiedTeams);
