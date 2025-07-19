@@ -89,7 +89,17 @@ export interface Match {
   away_score?: number;
   date?: string;
   status?: "pending" | "finished";
+  home_penalty_score?: number;
+  away_penalty_score?: number;
+  next_match?: Match["id"];
+  phase?: Phase;
 }
+
+export type MatchTeam = Omit<Match, "home_team" | "away_team"> & {
+  home_team: Team | null;
+  away_team: Team | null;
+  day: number;
+};
 
 export type PlayoffMatch = Match & {
   home_penalty_score?: number;
@@ -97,13 +107,3 @@ export type PlayoffMatch = Match & {
   next_match?: Match["id"];
   phase?: Phase;
 };
-
-export type GroupMatch = Match & {
-  day: number;
-};
-
-export interface Group {
-  id: string;
-  name: string;
-  matches: GroupMatch[];
-}

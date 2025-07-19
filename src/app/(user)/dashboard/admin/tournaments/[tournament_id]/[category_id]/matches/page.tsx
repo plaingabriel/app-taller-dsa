@@ -1,8 +1,11 @@
-import ReturnButton from "@/components/atomic-components/return-button";
-import DisplayGroupMatches from "@/components/display-matches/DisplayGroupMatches";
-import GroupPlayoffsMatches from "@/components/display-matches/GroupPlayoffsMatches";
-import PlayOffsMatches from "@/components/display-matches/PlayOffsMatches";
-import { getCategoryById } from "@/db/methods/category";
+import { ReturnButton } from "@/components/atomic-components/return-button";
+import {
+  DisplayCompleteFixture,
+  DisplayMatchesGroups,
+  DisplayMatchesPlayoffs,
+} from "@/components/block-components/display-match";
+import { db } from "@/db";
+import { redirect } from "next/navigation";
 
 export default async function MatchesPage({
   params,
@@ -10,22 +13,31 @@ export default async function MatchesPage({
   params: Promise<{ tournament_id: string; category_id: string }>;
 }) {
   const { tournament_id, category_id } = await params;
-  const category = await getCategoryById(parseInt(category_id));
+  const fixture = await db.query.categoryTable.findFirst({
+    columns: { fixture_type: true },
+    where: (category, { eq }) => eq(category.id, category_id),
+  });
+
+  if (!fixture) {
+    redirect(`/dashboard/admin/tournaments/${tournament_id}`);
+  }
+
+  const { fixture_type } = fixture;
 
   return (
     <div className="pb-8">
       <div className="mx-auto px-4 md:px-8 max-w-2xl py-2">
         <ReturnButton href={`/dashboard/admin/tournaments/${tournament_id}`} />
-        {category.fixture.fixture_type === "groups" && (
-          <DisplayGroupMatches category={category} />
+        {fixture_type === "groups" && (
+          <DisplayMatchesGroups category_id={category_id} />
         )}
 
-        {category.fixture.fixture_type === "playoffs" && (
-          <PlayOffsMatches category={category} />
+        {fixture_type === "playoffs" && (
+          <DisplayMatchesPlayoffs category_id={category_id} />
         )}
 
-        {category.fixture.fixture_type === "groups+playoffs" && (
-          <GroupPlayoffsMatches category={category} />
+        {fixture_type === "groups+playoffs" && (
+          <DisplayCompleteFixture category_id={category_id} />
         )}
       </div>
     </div>

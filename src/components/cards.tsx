@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import { FixtureType } from "@/lib/definitions";
+import { FixtureType, Match, MatchTeam, Team } from "@/lib/definitions";
 import { getInfoConfig } from "@/lib/utils";
 import { FileSpreadsheet, Info, Trophy } from "lucide-react";
 
@@ -135,6 +135,37 @@ export function FormatInfoCard({
                 {validPositions.join(", ").toUpperCase()}
               </p>
             )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function MatchCard({ match }: { match: MatchTeam }) {
+  const { home_team, away_team } = match;
+
+  return (
+    <Card>
+      <CardContent className="space-y-6">
+        <div className="flex items-center justify-between">
+          {/* Equipo Local */}
+          <div className="text-right flex-1">
+            <p className={`font-semibold`}>
+              {!home_team ? "Equipo Local" : home_team.name}
+            </p>
+          </div>
+
+          {/* Points*/}
+          <div className="mx-6 text-center">
+            <div className="text-lg text-muted-foreground">vs</div>
+          </div>
+
+          {/* Equipo Visitante */}
+          <div className="text-left flex-1">
+            <p className={`font-semibold`}>
+              {!away_team ? "Equipo Visitante" : away_team.name}
+            </p>
           </div>
         </div>
       </CardContent>
