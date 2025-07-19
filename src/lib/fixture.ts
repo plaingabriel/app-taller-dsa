@@ -163,7 +163,7 @@ export function generateLeagueFixture<T>(teams: T[]): [T, T][][] {
   return fixture;
 }
 
-interface PlayoffMatch<T> {
+export interface PlayoffMatch<T> {
   home: T | null;
   away: T | null;
 }

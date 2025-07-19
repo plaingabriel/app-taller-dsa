@@ -50,8 +50,8 @@ export default function TeamTable({
                 button.disabled = true;
 
                 createMatches(categoryData);
-                // alert("Fixture generado con éxito");
-                // window.location.reload();
+                alert("Fixture generado con éxito");
+                window.location.reload();
               }}
             >
               <Shuffle />
