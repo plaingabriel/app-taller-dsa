@@ -1,17 +1,30 @@
-import { defineConfig } from "drizzle-kit";
+import { defineConfig, type Config } from "drizzle-kit";
 
-const dialect = process.env.DB_FILE_NAME !== undefined ? "sqlite" : "turso";
-const dbCredentials =
-  dialect === "sqlite"
-    ? { url: process.env.DB_FILE_NAME! }
+const config: {
+  dialect: Config["dialect"];
+  dbCredentials: {
+    url: string;
+    authToken?: string;
+  };
+} =
+  process.env.NODE_ENV === "production"
+    ? {
+        dialect: "turso" as Config["dialect"],
+        dbCredentials: {
+          url: process.env.TURSO_DATABASE_URL!,
+          authToken: process.env.TURSO_AUTH_TOKEN!,
+        },
+      }
     : {
-        url: process.env.TURSO_DATABASE_URL!,
-        authToken: process.env.TURSO_AUTH_TOKEN!,
+        dialect: "sqlite",
+        dbCredentials: {
+          url: "file:db/local.db",
+        },
       };
 
 export default defineConfig({
   out: "./drizzle",
   schema: "./src/db/schemas/index.ts",
-  dialect: dialect,
-  dbCredentials: dbCredentials,
+  dialect: config.dialect,
+  dbCredentials: config.dbCredentials,
 });

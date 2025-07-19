@@ -1,13 +1,14 @@
+// import { fetchUser } from "@/lib/data";
 import { decrypt } from "@/lib/session";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getUserByCI } from "./db/methods/user";
+import { User } from "./lib/definitions";
 
 const protectedPrefix = "/dashboard";
 const publicRoutes = ["/login"];
 const commonRoute = "/dashboard/account"; // Ruta común para todos los roles
 
-export default async function middleware(req: NextRequest) {
+export default async function pene(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const isProtectedRoute = path.startsWith(protectedPrefix);
   const isPublicRoute = publicRoutes.includes(path);
@@ -22,19 +23,13 @@ export default async function middleware(req: NextRequest) {
   }
 
   // 2. Redirigir si hay sesión en ruta pública
-  if (isPublicRoute && session?.userCI) {
-    return redirectByRole(session.userCI as number, req.nextUrl);
+  if (isPublicRoute && session) {
+    return redirectByRole(session.role, req.nextUrl);
   }
 
   // 3. Verificar permisos de rol en rutas protegidas (excepto ruta común)
-  if (isProtectedRoute && session?.userCI && !isCommonRoute) {
-    const user = await getUserByCI(session.userCI as number);
-
-    if (!user) {
-      return NextResponse.redirect(new URL("/login", req.nextUrl));
-    }
-
-    const rolePath = `/dashboard/${user.role}`;
+  if (isProtectedRoute && session && !isCommonRoute) {
+    const rolePath = `/dashboard/${session.role}`;
     const isCorrectRolePath = path.startsWith(rolePath);
     const isBaseDashboard = path === "/dashboard";
 
@@ -50,14 +45,8 @@ export default async function middleware(req: NextRequest) {
 }
 
 // Función auxiliar para redireccionar según rol
-async function redirectByRole(userCI: number, baseUrl: URL) {
-  const user = await getUserByCI(userCI);
-
-  if (!user) {
-    throw new Error("Usuario no encontrado");
-  }
-
-  switch (user.role) {
+async function redirectByRole(role: User["role"], baseUrl: URL) {
+  switch (role) {
     case "admin":
       return NextResponse.redirect(new URL("/dashboard/admin", baseUrl));
     case "editor":
@@ -65,6 +54,6 @@ async function redirectByRole(userCI: number, baseUrl: URL) {
     case "operator":
       return NextResponse.redirect(new URL("/dashboard/operator", baseUrl));
     default:
-      throw new Error("Rol no válido");
+      return NextResponse.redirect(new URL("/login", baseUrl));
   }
 }

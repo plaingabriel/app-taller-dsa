@@ -1,16 +1,17 @@
 "use client";
 
 import { createTournament } from "@/actions/tournament-actions";
-import AddButton from "@/components/buttons/AddButton";
-import ReturnButton from "@/components/buttons/ReturnButton";
-import CreateCategoryForm from "@/components/forms/CreateCategoryForm";
-import CreateTournamentForm from "@/components/forms/CreateTournamentForm";
-import CategoriesList from "@/components/lists/CategoriesList";
-import ButtonLink from "@/components/ui/button-link";
-import { CategoryClient, TournamentClient } from "@/shared/types";
+import { ButtonLink } from "@/components/atomic-components/button-link";
+import { ReturnButton } from "@/components/atomic-components/return-button";
+import { CreateCategoriesForm } from "@/components/categories/create-form";
+import { CategoriesTable } from "@/components/categories/table";
+import { Button } from "@/components/shadcn-ui/button";
+import { CreateTournamentNameForm } from "@/components/tournaments/create-name";
+import { NewCategory } from "@/lib/definitions";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 
-const initialCategory: CategoryClient = {
+const initialCategory: NewCategory = {
   name: "",
   min_age: 6,
   max_age: 99,
@@ -21,30 +22,25 @@ const initialCategory: CategoryClient = {
   teams_qualified: 0,
 };
 
-export default function NewTournamentPage() {
+export default function CreateTournamentPage() {
   const [tournamentName, setTournamentName] = useState("");
-  const [categoriesClient, setCategoriesClient] = useState<CategoryClient[]>(
-    []
-  );
+  const [categories, setCategories] = useState<NewCategory[]>([]);
 
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTournamentName(e.target.value);
   };
 
-  const handleAddTournament = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    const button = document.getElementById(
+      "create-tournament-button"
+    ) as HTMLButtonElement;
+    button.disabled = true;
 
-    const tournament: TournamentClient = {
-      name: tournamentName,
-      categories: categoriesClient,
-    };
+    const result = await createTournament({ name: tournamentName, categories });
 
-    const resultError = await createTournament(tournament);
-
-    if (resultError) {
-      alert("Por favor rellene todos los campos correctamente");
+    if (result.errors) {
+      alert("Por favor, ingrese los datos correctamente.");
+      button.disabled = false;
     }
   };
 
@@ -56,18 +52,18 @@ export default function NewTournamentPage() {
         <h1 className="font-bold text-3xl">Crear Nuevo Torneo</h1>
 
         <div className="space-y-6">
-          <CreateTournamentForm handleName={handleName} />
+          <CreateTournamentNameForm handleName={handleName} />
 
-          <CreateCategoryForm
-            categoriesClient={categoriesClient}
-            setCategoriesClient={setCategoriesClient}
+          <CreateCategoriesForm
+            categories={categories}
+            setCategories={setCategories}
             initialCategory={initialCategory}
           />
 
-          {categoriesClient.length > 0 && (
-            <CategoriesList
-              categoriesClient={categoriesClient}
-              setCategoriesClient={setCategoriesClient}
+          {categories.length > 0 && (
+            <CategoriesTable
+              categories={categories}
+              setCategories={setCategories}
             />
           )}
 
@@ -80,9 +76,16 @@ export default function NewTournamentPage() {
                 Cancelar
               </ButtonLink>
 
-              <AddButton onClick={(e) => handleAddTournament(e)}>
-                Agregar Torneo
-              </AddButton>
+              <Button
+                id="create-tournament-button"
+                disabled={
+                  tournamentName.length === 0 || categories.length === 0
+                }
+                onClick={handleSubmit}
+              >
+                <Plus />
+                <span>Crear Torneo</span>
+              </Button>
             </div>
           </div>
         </div>

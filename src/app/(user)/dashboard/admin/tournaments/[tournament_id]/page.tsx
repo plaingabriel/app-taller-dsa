@@ -1,18 +1,29 @@
-import StatusBadge from "@/components/badges/StatusBadge";
-import ReturnButton from "@/components/buttons/ReturnButton";
-import CategoryTournamentCard from "@/components/cards/CategoryTournamentCard";
-import WorkflowCard from "@/components/cards/WorkFlowCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getTournamentById } from "@/db/methods/tournament";
+import { ButtonLink } from "@/components/atomic-components/button-link";
+import { ReturnButton } from "@/components/atomic-components/return-button";
+import { FixtureBadge, StatusBadge } from "@/components/badges";
+import { Badge } from "@/components/shadcn-ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/shadcn-ui/card";
+import { WorkflowCategory } from "@/components/workflows";
+import { fetchTournament } from "@/lib/data";
 import { Trophy, Users } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export default async function TournamentProfilePage({
   params,
 }: {
   params: Promise<{ tournament_id: string }>;
 }) {
-  const { tournament_id: id } = await params;
-  const tournament = await getTournamentById(parseInt(id));
+  const { tournament_id } = await params;
+  const tournament = await fetchTournament(tournament_id);
+
+  if (!tournament) {
+    redirect("/dashboard/admin/tournaments");
+  }
 
   return (
     <div className="pb-8">
@@ -53,7 +64,7 @@ export default async function TournamentProfilePage({
               <div>
                 <h4 className="font-medium">Fecha de Creación</h4>
                 <span className="text-neutral-800">
-                  {new Date(tournament.creationDate).toLocaleDateString(
+                  {new Date(tournament.creation_date).toLocaleDateString(
                     "es-ES"
                   )}
                 </span>
@@ -74,20 +85,69 @@ export default async function TournamentProfilePage({
             </CardTitle>
           </CardHeader>
 
-          {/* Category Cards */}
+          {/* Category List */}
           <CardContent className="space-y-4">
-            {tournament.categories.map((category) => (
-              <CategoryTournamentCard
-                key={category.id}
-                category={category}
-                tournament_id={tournament.id}
-              />
-            ))}
+            {tournament.categories.map((category) => {
+              const { teams } = category;
+
+              const text =
+                teams.length === 0
+                  ? "Sin equipos"
+                  : teams.length < category.team_count
+                  ? `Parcial (${teams.length}/${category.team_count})`
+                  : "Completa";
+
+              const { has_fixture } = category;
+              return (
+                <Card key={category.id} className="border-neutral-600">
+                  <CardContent className="flex justify-between items-center">
+                    <div>
+                      <div className="flex gap-x-2 items-center">
+                        <h4 className="font-medium">{category.name}</h4>
+                        <FixtureBadge fixtureType={category.fixture_type} />
+                        <Badge variant={"outline"}>{text}</Badge>
+                      </div>
+
+                      <div className="flex flex-col text-neutral-700">
+                        <span>
+                          Edad: {category.min_age} - {category.max_age}
+                        </span>
+                        <span>Equipos: {category.team_count}</span>
+                        {category.fixture_type === "groups+playoffs" && (
+                          <span>
+                            Grupos: {category.group_count} grupos de{" "}
+                            {category.teams_per_group} equipos, avanzan{" "}
+                            {category.teams_qualified} por grupo
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-x-2">
+                      <ButtonLink
+                        href={`/dashboard/admin/tournaments/${tournament_id}/${category.id}`}
+                      >
+                        {has_fixture ? "Ver" : "Gestionar"} Equipos
+                      </ButtonLink>
+
+                      {has_fixture && (
+                        <ButtonLink
+                          href={`/dashboard/admin/tournaments/${tournament_id}/${category.id}/matches`}
+                          variant={"secondary"}
+                        >
+                          Ver Partidos
+                        </ButtonLink>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </CardContent>
         </Card>
 
         {/* Workflow */}
-        <WorkflowCard />
+        <WorkflowCategory />
       </div>
     </div>
   );
