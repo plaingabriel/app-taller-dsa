@@ -1,127 +1,4 @@
-import { Team } from "./definitions";
-
-const teams: Team[] = [
-  {
-    id: "tem_md9iyjq_ipn_g7x",
-    category_id: "cat_md7ug5i_lgd_ryz",
-    name: "Equipo 1",
-    players_count: 5,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    logo: "",
-    has_validated_players: true,
-    goals_count: 0,
-    goals_against: 0,
-    points: 0,
-    phase: "quarterfinals",
-  },
-  {
-    id: "tem_md9iyjq_10x_1or",
-    category_id: "cat_md7ug5i_lgd_ryz",
-    name: "Equipo 2",
-    players_count: 5,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    logo: "",
-    has_validated_players: true,
-    goals_count: 0,
-    goals_against: 0,
-    points: 0,
-    phase: "quarterfinals",
-  },
-  {
-    id: "tem_md9iyjq_1e1_xfs",
-    category_id: "cat_md7ug5i_lgd_ryz",
-    name: "Equipo 3",
-    players_count: 5,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    logo: "",
-    has_validated_players: true,
-    goals_count: 0,
-    goals_against: 0,
-    points: 0,
-    phase: "quarterfinals",
-  },
-  {
-    id: "tem_md9iyjq_1l0_xgr",
-    category_id: "cat_md7ug5i_lgd_ryz",
-    name: "Equipo 4",
-    players_count: 5,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    logo: "",
-    has_validated_players: true,
-    goals_count: 0,
-    goals_against: 0,
-    points: 0,
-    phase: "quarterfinals",
-  },
-  {
-    id: "tem_md9iyjq_2qf_1kz",
-    category_id: "cat_md7ug5i_lgd_ryz",
-    name: "Equipo 5",
-    players_count: 5,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    logo: "",
-    has_validated_players: true,
-    goals_count: 0,
-    goals_against: 0,
-    points: 0,
-    phase: "quarterfinals",
-  },
-  {
-    id: "tem_md9iyjq_1vd_197",
-    category_id: "cat_md7ug5i_lgd_ryz",
-    name: "Equipo 6",
-    players_count: 5,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    logo: "",
-    has_validated_players: true,
-    goals_count: 0,
-    goals_against: 0,
-    points: 0,
-    phase: "quarterfinals",
-  },
-  {
-    id: "tem_md9iyjq_14d_0c7",
-    category_id: "cat_md7ug5i_lgd_ryz",
-    name: "Equipo 7",
-    players_count: 5,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    logo: "",
-    has_validated_players: true,
-    goals_count: 0,
-    goals_against: 0,
-    points: 0,
-    phase: "quarterfinals",
-  },
-  {
-    id: "tem_md9iyjq_q2l_h9n",
-    category_id: "cat_md7ug5i_lgd_ryz",
-    name: "Equipo 8",
-    players_count: 5,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    logo: "",
-    has_validated_players: true,
-    goals_count: 0,
-    goals_against: 0,
-    points: 0,
-    phase: "quarterfinals",
-  },
-];
+import { Phase, Team } from "./definitions";
 
 export function generateLeagueFixture<T>(teams: T[]): [T, T][][] {
   if (teams.length === 0) return [];
@@ -193,10 +70,61 @@ export function generatePlayoffFixture<T>(teams: T[]): PlayoffMatch<T>[][] {
   return allRounds;
 }
 
-export function testFixtureFunctions() {
-  const matches = generatePlayoffFixture(teams);
-
-  for (const round of matches) {
-    console.log(round);
+export function generateCompleteFixture<T>(
+  teams: T[],
+  teams_per_group: number,
+  group_count: number,
+  teams_qualified: number
+) {
+  // Crear grupos
+  const groups: T[][] = [];
+  for (let i = 0; i < group_count; i++) {
+    const start = i * teams_per_group;
+    const end = start + teams_per_group;
+    groups.push(teams.slice(start, end));
   }
+
+  // Generar partidos de fase de grupos
+  const groupStage: [T, T][][][] = [];
+  groups.forEach((group) => {
+    const groupFixture = generateLeagueFixture(group);
+    groupStage.push(groupFixture);
+  });
+
+  // Obtener equipos que clasificarán, dejarlos en null al inicio
+  const qualifiedTeams: null[] = [];
+  groups.forEach((group) => {
+    // Simulamos que los primeros 'teams_qualified' equipos se clasifican
+    for (let i = 0; i < teams_qualified; i++) {
+      if (i < group.length) {
+        qualifiedTeams.push(null);
+      }
+    }
+  });
+
+  // Determinar la etapa de la eliminatoria basada en el número de clasificados
+  let stage: Phase;
+
+  switch (qualifiedTeams.length) {
+    case 16:
+      stage = "round_16";
+      break;
+    case 8:
+      stage = "quarterfinals";
+      break;
+    case 4:
+      stage = "semifinal";
+      break;
+    case 2:
+      stage = "final";
+      break;
+  }
+
+  // Generar fase eliminatoria
+  const playoffStage = generatePlayoffFixture(qualifiedTeams);
+
+  return {
+    groupStage,
+    playoffStage,
+  };
 }

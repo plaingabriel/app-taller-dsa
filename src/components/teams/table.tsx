@@ -3,7 +3,6 @@
 import { createMatches } from "@/actions/match-actions";
 import { deleteTeam } from "@/actions/team-action";
 import { CategoryTeamsPlayers } from "@/lib/definitions";
-import { testFixtureFunctions } from "@/lib/fixture";
 import { ShieldCheck, Shuffle, Users } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -34,8 +33,6 @@ export default function TeamTable({
     return true;
   };
 
-  // testFixtureFunctions();
-
   const teamsValidated = allTeamsValidated();
   return (
     <>
@@ -48,7 +45,6 @@ export default function TeamTable({
               onClick={(e) => {
                 const button = e.target as HTMLButtonElement;
                 button.disabled = true;
-
                 createMatches(categoryData);
                 alert("Fixture generado con éxito");
                 window.location.reload();

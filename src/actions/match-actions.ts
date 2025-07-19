@@ -2,8 +2,9 @@
 
 import { db } from "@/db";
 import { categoryTable, groupTable, matchTable } from "@/db/schemas";
-import { CategoryTeamsPlayers, Phase, TeamPlayers } from "@/lib/definitions";
+import { CategoryTeamsPlayers, TeamPlayers } from "@/lib/definitions";
 import {
+  generateCompleteFixture,
   generateLeagueFixture,
   generatePlayoffFixture,
   PlayoffMatch,
@@ -13,7 +14,7 @@ import { eq } from "drizzle-orm";
 
 async function generatePlayOffs(
   group_id: string,
-  matches: PlayoffMatch<TeamPlayers>[][],
+  matches: PlayoffMatch<TeamPlayers | null>[][],
   category: CategoryTeamsPlayers
 ) {
   type PlayOffPhases = "final" | "semifinal" | "quarterfinals" | "round_16";
@@ -233,6 +234,39 @@ async function generatePlayOffs(
   });
 }
 
+async function generateGroupMatches(
+  category_id: string,
+  group_id: string,
+  matches: [TeamPlayers, TeamPlayers][][]
+) {
+  await db.transaction(async (tx) => {
+    // Loop the match days
+    for (let day = 0; day < matches.length; day++) {
+      const matchDay = day + 1;
+
+      // Loop the matches in the day
+      for (const match of matches[day]) {
+        const team1 = match[0];
+        const team2 = match[1];
+
+        await tx.insert(matchTable).values({
+          category_id: category_id,
+          home_team: team1.id,
+          away_team: team2.id,
+          home_score: 0,
+          away_score: 0,
+          status: "pending",
+          day: matchDay,
+          id: generateID("match"),
+          group: group_id,
+          date: "",
+          phase: "groups",
+        });
+      }
+    }
+  });
+}
+
 export async function createMatches(category: CategoryTeamsPlayers) {
   switch (category.fixture_type) {
     case "groups": {
@@ -247,33 +281,9 @@ export async function createMatches(category: CategoryTeamsPlayers) {
         category_id: category.id,
       });
 
-      await db.transaction(async (tx) => {
-        // Loop the match days
-        for (let day = 0; day < matches.length; day++) {
-          const matchDay = day + 1;
+      await generateGroupMatches(category.id, group_id, matches);
 
-          // Loop the matches in the day
-          for (const match of matches[day]) {
-            const team1 = match[0];
-            const team2 = match[1];
-
-            await tx.insert(matchTable).values({
-              category_id: category.id,
-              home_team: team1.id,
-              away_team: team2.id,
-              home_score: 0,
-              away_score: 0,
-              status: "pending",
-              day: matchDay,
-              id: generateID("match"),
-              group: group_id,
-              date: "",
-              phase: "groups",
-            });
-          }
-        }
-      });
-
+      // Update category
       await db
         .update(categoryTable)
         .set({ has_fixture: true })
@@ -281,6 +291,7 @@ export async function createMatches(category: CategoryTeamsPlayers) {
 
       break;
     }
+
     case "playoffs": {
       const { teams } = category;
       const matches = generatePlayoffFixture(teams);
@@ -303,7 +314,45 @@ export async function createMatches(category: CategoryTeamsPlayers) {
 
       break;
     }
-    default:
+
+    default: {
+      const { groupStage, playoffStage } = generateCompleteFixture(
+        category.teams,
+        category.teams_per_group,
+        category.group_count,
+        category.teams_qualified
+      );
+
+      let i = 0;
+
+      for (const group of groupStage) {
+        const group_id = generateID("group");
+        const group_name = `Grupo ${String.fromCharCode(65 + i)}`;
+
+        await db.insert(groupTable).values({
+          id: group_id,
+          name: group_name,
+          category_id: category.id,
+        });
+        await generateGroupMatches(category.id, group_id, group);
+      }
+
+      const group_id = generateID("group");
+      await db.insert(groupTable).values({
+        id: group_id,
+        name: "Fase Eliminatorias",
+        category_id: category.id,
+      });
+
+      await generatePlayOffs(group_id, playoffStage, category);
+
+      // Update category
+      await db
+        .update(categoryTable)
+        .set({ has_fixture: true })
+        .where(eq(categoryTable.id, category.id));
+
       break;
+    }
   }
 }
