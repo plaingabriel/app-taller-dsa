@@ -5,7 +5,7 @@ import { deleteTeam } from "@/actions/team-action";
 import { CategoryTeamsPlayers } from "@/lib/definitions";
 import { ShieldCheck, Shuffle, Users } from "lucide-react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { use } from "react";
 import { ButtonLink } from "../atomic-components/button-link";
 import { RemoveSubmitAndReload } from "../atomic-components/remove-submit";
@@ -47,7 +47,7 @@ export default function TeamTable({
                 button.disabled = true;
                 createMatches(categoryData);
                 alert("Fixture generado con éxito");
-                window.location.reload();
+                redirect(pathname);
               }}
             >
               <Shuffle />
