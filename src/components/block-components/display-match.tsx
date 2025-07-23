@@ -147,13 +147,6 @@ export async function DisplayCompleteFixture({ category_id }: MatchCardProps) {
   // Matches in playoffs phase
   const matchesInPlayoffs = matches.filter((match) => match.phase !== "groups");
 
-  // Separate group matches by day
-  const groupMatchesByDay = matchesInGroups.reduce((acc, match) => {
-    if (!acc[match.day]) acc[match.day] = [match];
-    else acc[match.day].push(match);
-    return acc;
-  }, {} as { [day: number]: MatchTeam[] });
-
   // Separate playoff matches by phase
   const playoffMatchesByPhase = matchesInPlayoffs.reduce((acc, match) => {
     if (!match.phase) return acc;
@@ -168,6 +161,34 @@ export async function DisplayCompleteFixture({ category_id }: MatchCardProps) {
     return acc;
   }, {} as { [phase: string]: MatchTeam[] });
 
+  // Get groups
+  const groups = await db.query.groupTable.findMany({
+    where: (group, { eq }) => eq(group.category_id, category_id),
+  });
+
+  // Sort matches in groups by day
+  const matchesByDay = matchesInGroups.reduce((acc, match) => {
+    if (!acc[match.day]) acc[match.day] = [match];
+    else acc[match.day].push(match);
+    return acc;
+  }, {} as { [day: number]: MatchTeam[] });
+
+  // Sort matches in every day by group
+  const sortedMatchesByDay = Object.entries(matchesByDay).reduce(
+    (acc, [day, matches]) => {
+      const sortedMatches = groups.reduce((acc, group) => {
+        const matchesInGroup = matches.filter(
+          (match) => match.group === group.id
+        );
+        if (matchesInGroup.length > 0) acc[group.name] = matchesInGroup;
+        return acc;
+      }, {} as { [group: string]: MatchTeam[] });
+      acc[+day] = sortedMatches;
+      return acc;
+    },
+    {} as { [day: number]: { [group: string]: MatchTeam[] } }
+  );
+
   return (
     <div className="w-full p-6 space-y-6">
       <h1 className="text-3xl font-bold text-center mb-8">
@@ -175,15 +196,24 @@ export async function DisplayCompleteFixture({ category_id }: MatchCardProps) {
       </h1>
 
       <div className="space-y-4">
-        {/* Display group matches by day */}
-        {Object.entries(groupMatchesByDay).map(([day, matches]) => (
+        {/* Display matches by day */}
+        {Object.entries(sortedMatchesByDay).map(([day, matchesByGroup]) => (
           <div key={day} className="space-y-4">
             <h2 className="text-xl text-white font-semibold text-center py-2 bg-secondary-400 rounded-lg">
               Jornada {day}
             </h2>
             <div className="space-y-4">
-              {matches.map((match) => (
-                <MatchCard key={match.id} match={match} />
+              {Object.entries(matchesByGroup).map(([group, matches]) => (
+                <div key={group} className="space-y-4">
+                  <h3 className="text-lg text-secondary-800 font-semibold text-center py-2 bg-secondary-100 border border-secondary-800 rounded-lg">
+                    {group}
+                  </h3>
+                  <div className="space-y-4">
+                    {matches.map((match) => (
+                      <MatchCard key={match.id} match={match} />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

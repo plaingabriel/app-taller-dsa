@@ -93,6 +93,7 @@ export interface Match {
   away_penalty_score?: number;
   next_match?: Match["id"];
   phase?: Phase;
+  group?: string;
 }
 
 export type MatchTeam = Omit<Match, "home_team" | "away_team"> & {
