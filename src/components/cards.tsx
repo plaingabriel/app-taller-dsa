@@ -1,3 +1,6 @@
+"use client";
+
+import { updateDates } from "@/actions/match-actions";
 import {
   Card,
   CardContent,
@@ -5,9 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import { FixtureType, Match, MatchTeam, Team } from "@/lib/definitions";
+import { FixtureType, MatchTeam } from "@/lib/definitions";
 import { getInfoConfig } from "@/lib/utils";
 import { FileSpreadsheet, Info, Trophy } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { FormField } from "./atomic-components/form-field";
+import { Input } from "./shadcn-ui/input";
+import { Label } from "./shadcn-ui/label";
 
 export function ComingTournamentCard({ number }: { number: number }) {
   return (
@@ -143,7 +150,18 @@ export function FormatInfoCard({
 }
 
 export function MatchCard({ match }: { match: MatchTeam }) {
+  const pathname = usePathname();
+  const isEditor = pathname.includes("editor");
   const { home_team, away_team } = match;
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    try {
+      const date = new Date(value).toISOString();
+      await updateDates(match.id, date);
+    } catch (error) {}
+  };
 
   return (
     <Card>
@@ -168,6 +186,27 @@ export function MatchCard({ match }: { match: MatchTeam }) {
             </p>
           </div>
         </div>
+
+        {isEditor && !match.date && (
+          <form>
+            <FormField>
+              <Label>Fecha: </Label>
+              <Input
+                type="datetime-local"
+                name="date"
+                onChange={handleChange}
+              />
+            </FormField>
+          </form>
+        )}
+
+        {match.date && (
+          <div className="text-center">
+            <p className="font-semibold">
+              {new Date(match.date).toLocaleString()}
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

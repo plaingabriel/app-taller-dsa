@@ -267,6 +267,11 @@ async function generateGroupMatches(
   });
 }
 
+export async function updateDates(match_id: string, date: string) {
+  console.log(match_id, date);
+  await db.update(matchTable).set({ date }).where(eq(matchTable.id, match_id));
+}
+
 export async function createMatches(category: CategoryTeamsPlayers) {
   switch (category.fixture_type) {
     case "groups": {
