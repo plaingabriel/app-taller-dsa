@@ -22,31 +22,46 @@ export default async function MatchesPage({
     redirect(`/dashboard/editor/${tournament_id}`);
   }
 
+  const matches = await db.query.matchTable.findMany({
+    where: (match, { eq }) => eq(match.category_id, category_id),
+  });
+  const allMatchesFinished = matches.every(
+    (match) => match.status === "finished"
+  );
   const { fixture_type } = fixture;
 
   return (
     <div className="pb-8">
       <div className="mx-auto px-4 md:px-8 max-w-2xl py-2">
         <ReturnButton href={`/dashboard/operator/${tournament_id}`} />
-        {fixture_type === "groups" && (
+        {fixture_type === "groups" && allMatchesFinished && (
           <DisplayMatchesGroups
             category_id={category_id}
             isEditorCorrection={true}
           />
         )}
 
-        {fixture_type === "playoffs" && (
+        {fixture_type === "playoffs" && allMatchesFinished && (
           <DisplayMatchesPlayoffs
             category_id={category_id}
             isEditorCorrection={true}
           />
         )}
 
-        {fixture_type === "groups+playoffs" && (
+        {fixture_type === "groups+playoffs" && allMatchesFinished && (
           <DisplayCompleteFixture
             category_id={category_id}
             isEditorCorrection={true}
           />
+        )}
+
+        {!allMatchesFinished && (
+          <div className="flex justify-center py-6">
+            <h2 className="text-2xl font-bold text-neutral-800 text-center">
+              El operador no ha terminado de corregir los partidos, por favor
+              espere
+            </h2>
+          </div>
         )}
       </div>
     </div>
