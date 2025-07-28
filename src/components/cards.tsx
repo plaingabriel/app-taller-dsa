@@ -325,7 +325,8 @@ export function MatchCard({
             match.date &&
             away_team &&
             home_team &&
-            matchData.home_team.points === matchData.away_team.points && (
+            matchData.home_team.points === matchData.away_team.points &&
+            match.phase !== "groups" && (
               <div className="space-y-2">
                 <h4 className="text-center">
                   Empate - Por favor seleccione el ganador
