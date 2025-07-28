@@ -537,11 +537,7 @@ async function createPlayoffWithTeamsQualifiedPerGroup(category_id: string) {
   }
 }
 
-export async function updateResults(
-  match: MatchTeam,
-  matchData: MatchData,
-  isEditorCorrection: boolean
-) {
+export async function updateResults(match: MatchTeam, matchData: MatchData) {
   const { home_team, away_team, draw_winner } = matchData;
   const home_players = home_team.players_scored;
   const away_players = away_team.players_scored;
@@ -583,15 +579,13 @@ export async function updateResults(
       updateDrawGroups(team_loser),
     ]);
   } else {
-    if (match.phase !== "groups" && !isEditorCorrection) {
+    if (match.phase !== "groups") {
       await updateWinPlayoff(team_winner, team_loser, match);
     } else {
       await Promise.all([
         updateWinGroups(team_winner, true),
         updateWinGroups(team_loser, false),
       ]);
-
-      if (isEditorCorrection) return;
 
       // Get all matches in groups phase
       const category_id = match.category_id;
