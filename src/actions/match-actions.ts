@@ -1,8 +1,21 @@
 "use server";
 
 import { db } from "@/db";
-import { categoryTable, groupTable, matchTable } from "@/db/schemas";
-import { CategoryTeamsPlayers, TeamPlayers } from "@/lib/definitions";
+import {
+  categoryTable,
+  groupTable,
+  matchTable,
+  playerTable,
+  teamTable,
+} from "@/db/schemas";
+import { fetchMatch } from "@/lib/data";
+import {
+  CategoryTeamsPlayers,
+  MatchData,
+  MatchTeam,
+  TeamData,
+  TeamPlayers,
+} from "@/lib/definitions";
 import {
   generateCompleteFixture,
   generateLeagueFixture,
@@ -10,7 +23,8 @@ import {
   PlayoffMatch,
 } from "@/lib/fixture";
 import { generateID } from "@/lib/utils";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 async function generatePlayOffs(
   group_id: string,
@@ -262,14 +276,188 @@ async function generateGroupMatches(
           date: "",
           phase: "groups",
         });
+
+        await tx
+          .update(teamTable)
+          .set({ group: group_id })
+          .where(eq(teamTable.id, team1.id));
+        await tx
+          .update(teamTable)
+          .set({ group: group_id })
+          .where(eq(teamTable.id, team2.id));
       }
     }
   });
 }
 
 export async function updateDates(match_id: string, date: string) {
-  console.log(match_id, date);
   await db.update(matchTable).set({ date }).where(eq(matchTable.id, match_id));
+}
+
+function getWinner(
+  home_team: TeamData,
+  away_team: TeamData,
+  draw_winner?: TeamData
+): [TeamData, TeamData, boolean] {
+  // Draw in playoff match
+  if (draw_winner) {
+    const [team_winner, team_loser] =
+      draw_winner.id === home_team.id
+        ? [home_team, away_team]
+        : [away_team, home_team];
+
+    return [team_winner, team_loser, true];
+  }
+
+  // Draw in group match
+  return home_team.points > away_team.points
+    ? [home_team, away_team, false]
+    : home_team.points < away_team.points
+    ? [away_team, home_team, false]
+    : [home_team, away_team, true];
+}
+
+async function updateDrawGroups(team: TeamData) {
+  await db
+    .update(teamTable)
+    .set({
+      draws: sql`${teamTable.draws} + 1`,
+      points: sql`${teamTable.points} + 1`,
+      goals_count: sql`${teamTable.goals_count} + ${team.points}`,
+      goals_against: sql`${teamTable.goals_against} + ${team.points}`,
+    })
+    .where(eq(teamTable.id, team.id));
+}
+
+async function updateWinGroups(team: TeamData, win: boolean) {
+  const points = win ? 3 : 0;
+
+  await db
+    .update(teamTable)
+    .set({
+      wins: sql`${teamTable.wins} + ${win ? 1 : 0}`,
+      losses: sql`${teamTable.losses} + ${win ? 0 : 1}`,
+      points: sql`${teamTable.points} + ${points}`,
+      goals_count: sql`${teamTable.goals_count} + ${team.points}`,
+      goals_against: sql`${teamTable.goals_against} + ${team.points}`,
+    })
+    .where(eq(teamTable.id, team.id));
+}
+
+async function updateGoals(
+  team: TeamData,
+  goals_scored: number,
+  goals_against: number
+) {
+  await db
+    .update(teamTable)
+    .set({
+      goals_count: sql`${teamTable.goals_count} + ${goals_scored}`,
+      goals_against: sql`${teamTable.goals_against} + ${goals_against}`,
+    })
+    .where(eq(teamTable.id, team.id));
+}
+
+async function updateWinPlayoff(
+  teamWinner: TeamData,
+  teamLoser: TeamData,
+  match: MatchTeam
+) {
+  const nextMatch = await fetchMatch(match.next_match as string);
+
+  if (!nextMatch) return;
+
+  // Update the next match with the winner
+  // Find if will play as home or away
+  if (!nextMatch.home_team) {
+    await db
+      .update(matchTable)
+      .set({ home_team: teamWinner.id })
+      .where(eq(matchTable.id, match.next_match as string));
+  } else {
+    await db
+      .update(matchTable)
+      .set({ away_team: teamWinner.id })
+      .where(eq(matchTable.id, match.next_match as string));
+  }
+
+  await updateGoals(teamWinner, teamWinner.points, teamLoser.points);
+  await updateGoals(teamLoser, teamLoser.points, teamWinner.points);
+}
+
+async function createPlayoffWithTeamsQualifiedPerGroup(category_id: string) {
+  const category = db.query.categoryTable.findFirst({
+    columns: { teams_qualified: true },
+    where: (category, { eq }) => eq(category.id, category_id),
+  });
+}
+
+export async function updateResults(match: MatchTeam, matchData: MatchData) {
+  const { home_team, away_team, draw_winner } = matchData;
+  const home_players = home_team.players_scored;
+  const away_players = away_team.players_scored;
+
+  // Make one array
+  const players_scored = [...home_players, ...away_players];
+
+  // Update match results
+  await db
+    .update(matchTable)
+    .set({
+      home_score: home_team.points,
+      away_score: away_team.points,
+      status: "finished",
+    })
+    .where(eq(matchTable.id, match.id));
+
+  // Update players goals
+  await db.transaction(async (tx) => {
+    for (const player of players_scored) {
+      await tx
+        .update(playerTable)
+        .set({ goals_scored: player.goals })
+        .where(eq(playerTable.ci, player.ci));
+    }
+  });
+
+  // Get the winner, the loser or draw
+  const [team_winner, team_loser, draw] = getWinner(
+    home_team,
+    away_team,
+    draw_winner
+  );
+
+  // Update wins, losses and draws
+  if (draw && match.phase === "groups") {
+    await Promise.all([
+      updateDrawGroups(team_winner),
+      updateDrawGroups(team_loser),
+    ]);
+  } else {
+    if (match.phase !== "groups") {
+      await updateWinPlayoff(team_winner, team_loser, match);
+    } else {
+      await Promise.all([
+        updateWinGroups(team_winner, true),
+        updateWinGroups(team_loser, false),
+      ]);
+
+      // Get all matches in groups phase
+      const category_id = match.category_id;
+      const matchesInGroups = await db.query.matchTable.findMany({
+        where: (match, { eq, and }) =>
+          and(eq(match.category_id, category_id), eq(match.phase, "groups")),
+      });
+      const allMatchesInGroupsFinished = matchesInGroups.every((match) => {
+        return match.status === "finished";
+      });
+
+      // With every group match finished, create table of qualification per group
+      if (allMatchesInGroupsFinished) {
+        await createPlayoffWithTeamsQualifiedPerGroup(category_id);
+      }
+    }
+  }
 }
 
 export async function createMatches(category: CategoryTeamsPlayers) {

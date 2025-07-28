@@ -27,25 +27,25 @@ export default async function MatchesPage({
   return (
     <div className="pb-8">
       <div className="mx-auto px-4 md:px-8 max-w-2xl py-2">
-        <ReturnButton href={`/dashboard/editor/${tournament_id}`} />
+        <ReturnButton href={`/dashboard/operator/${tournament_id}`} />
         {fixture_type === "groups" && (
           <DisplayMatchesGroups
             category_id={category_id}
-            isUploadingCalendar={true}
+            isUploadingResults={true}
           />
         )}
 
         {fixture_type === "playoffs" && (
           <DisplayMatchesPlayoffs
             category_id={category_id}
-            isUploadingCalendar={true}
+            isUploadingResults={true}
           />
         )}
 
         {fixture_type === "groups+playoffs" && (
           <DisplayCompleteFixture
             category_id={category_id}
-            isUploadingCalendar={true}
+            isUploadingResults={true}
           />
         )}
       </div>

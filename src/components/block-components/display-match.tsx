@@ -1,12 +1,20 @@
 import { db } from "@/db";
-import { MatchTeam, Phase } from "@/lib/definitions";
+import { MatchTeam, Phase, User } from "@/lib/definitions";
 import { MatchCard } from "../cards";
 
 interface MatchCardProps {
   category_id: string;
+  isUploadingCalendar?: boolean;
+  isUploadingResults?: boolean;
+  isEditorCorrection?: boolean;
 }
 
-export async function DisplayMatchesGroups({ category_id }: MatchCardProps) {
+export async function DisplayMatchesGroups({
+  category_id,
+  isUploadingCalendar = false,
+  isUploadingResults = false,
+  isEditorCorrection = false,
+}: MatchCardProps) {
   const category_name = await db.query.categoryTable.findFirst({
     columns: { name: true },
     where: (category, { eq }) => eq(category.id, category_id),
@@ -15,7 +23,14 @@ export async function DisplayMatchesGroups({ category_id }: MatchCardProps) {
   const matches = (await db.query.matchTable.findMany({
     columns: { home_team: false, away_team: false },
     where: (match, { eq }) => eq(match.category_id, category_id),
-    with: { home_team: true, away_team: true },
+    with: {
+      home_team: {
+        with: { players: true },
+      },
+      away_team: {
+        with: { players: true },
+      },
+    },
   })) as unknown as MatchTeam[];
 
   if (!matches || matches.length === 0 || !category_name) return null;
@@ -44,7 +59,13 @@ export async function DisplayMatchesGroups({ category_id }: MatchCardProps) {
 
               <div className="space-y-4">
                 {matches.map((match) => (
-                  <MatchCard key={match.id} match={match} />
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    isEditorCorrection={isEditorCorrection}
+                    isUploadingCalendar={isUploadingCalendar}
+                    isUploadingResults={isUploadingResults}
+                  />
                 ))}
               </div>
             </div>
@@ -72,7 +93,12 @@ const getPhaseName = (phase: Phase) => {
 
 const phases = ["groups", "round_16", "quarterfinals", "semifinal", "final"];
 
-export async function DisplayMatchesPlayoffs({ category_id }: MatchCardProps) {
+export async function DisplayMatchesPlayoffs({
+  category_id,
+  isUploadingCalendar = false,
+  isUploadingResults = false,
+  isEditorCorrection = false,
+}: MatchCardProps) {
   const category_name = await db.query.categoryTable.findFirst({
     columns: { name: true },
     where: (category, { eq }) => eq(category.id, category_id),
@@ -81,7 +107,14 @@ export async function DisplayMatchesPlayoffs({ category_id }: MatchCardProps) {
   const matches = (await db.query.matchTable.findMany({
     columns: { home_team: false, away_team: false },
     where: (match, { eq }) => eq(match.category_id, category_id),
-    with: { home_team: true, away_team: true },
+    with: {
+      home_team: {
+        with: { players: true },
+      },
+      away_team: {
+        with: { players: true },
+      },
+    },
   })) as unknown as MatchTeam[];
 
   if (!matches || matches.length === 0 || !category_name) return null;
@@ -117,7 +150,13 @@ export async function DisplayMatchesPlayoffs({ category_id }: MatchCardProps) {
 
               <div className="space-y-4">
                 {matches.map((match) => (
-                  <MatchCard key={match.id} match={match} />
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    isEditorCorrection={isEditorCorrection}
+                    isUploadingCalendar={isUploadingCalendar}
+                    isUploadingResults={isUploadingResults}
+                  />
                 ))}
               </div>
             </div>
@@ -128,7 +167,12 @@ export async function DisplayMatchesPlayoffs({ category_id }: MatchCardProps) {
   );
 }
 
-export async function DisplayCompleteFixture({ category_id }: MatchCardProps) {
+export async function DisplayCompleteFixture({
+  category_id,
+  isUploadingCalendar = false,
+  isUploadingResults = false,
+  isEditorCorrection = false,
+}: MatchCardProps) {
   const category_name = await db.query.categoryTable.findFirst({
     columns: { name: true },
     where: (category, { eq }) => eq(category.id, category_id),
@@ -137,7 +181,14 @@ export async function DisplayCompleteFixture({ category_id }: MatchCardProps) {
   const matches = (await db.query.matchTable.findMany({
     columns: { home_team: false, away_team: false },
     where: (match, { eq }) => eq(match.category_id, category_id),
-    with: { home_team: true, away_team: true },
+    with: {
+      home_team: {
+        with: { players: true },
+      },
+      away_team: {
+        with: { players: true },
+      },
+    },
   })) as unknown as MatchTeam[];
 
   if (!matches || matches.length === 0 || !category_name) return null;
@@ -210,7 +261,13 @@ export async function DisplayCompleteFixture({ category_id }: MatchCardProps) {
                   </h3>
                   <div className="space-y-4">
                     {matches.map((match) => (
-                      <MatchCard key={match.id} match={match} />
+                      <MatchCard
+                        key={match.id}
+                        match={match}
+                        isEditorCorrection={isEditorCorrection}
+                        isUploadingCalendar={isUploadingCalendar}
+                        isUploadingResults={isUploadingResults}
+                      />
                     ))}
                   </div>
                 </div>
@@ -227,7 +284,13 @@ export async function DisplayCompleteFixture({ category_id }: MatchCardProps) {
             </h2>
             <div className="space-y-4">
               {matches.map((match) => (
-                <MatchCard key={match.id} match={match} />
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  isUploadingResults={isUploadingResults}
+                  isUploadingCalendar={isUploadingCalendar}
+                  isEditorCorrection={isEditorCorrection}
+                />
               ))}
             </div>
           </div>

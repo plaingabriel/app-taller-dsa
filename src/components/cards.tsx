@@ -1,6 +1,6 @@
 "use client";
 
-import { updateDates } from "@/actions/match-actions";
+import { updateDates, updateResults } from "@/actions/match-actions";
 import {
   Card,
   CardContent,
@@ -8,11 +8,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import { FixtureType, MatchTeam } from "@/lib/definitions";
+import {
+  FixtureType,
+  Match,
+  MatchData,
+  MatchTeam,
+  Player,
+  User,
+} from "@/lib/definitions";
 import { getInfoConfig } from "@/lib/utils";
 import { FileSpreadsheet, Info, Trophy } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import { useState } from "react";
 import { FormField } from "./atomic-components/form-field";
+import { Button } from "./shadcn-ui/button";
 import { Input } from "./shadcn-ui/input";
 import { Label } from "./shadcn-ui/label";
 
@@ -149,10 +158,31 @@ export function FormatInfoCard({
   );
 }
 
-export function MatchCard({ match }: { match: MatchTeam }) {
+export function MatchCard({
+  match,
+  isUploadingCalendar,
+  isUploadingResults,
+  isEditorCorrection,
+}: {
+  match: MatchTeam;
+  isUploadingCalendar?: boolean;
+  isUploadingResults?: boolean;
+  isEditorCorrection?: boolean;
+}) {
   const pathname = usePathname();
-  const isEditor = pathname.includes("editor");
   const { home_team, away_team } = match;
+  const [matchData, setMatchData] = useState<MatchData>({
+    home_team: {
+      id: match.home_team?.id || "",
+      points: match.home_score ? (match.home_score as number) : 0,
+      players_scored: [],
+    },
+    away_team: {
+      id: match.away_team?.id || "",
+      points: match.away_score ? (match.away_score as number) : 0,
+      players_scored: [],
+    },
+  });
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -163,50 +193,276 @@ export function MatchCard({ match }: { match: MatchTeam }) {
     } catch (error) {}
   };
 
+  const handleTeamScored = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    team: "home_team" | "away_team"
+  ) => {
+    const { value } = e.target;
+
+    if (!value) return;
+
+    setMatchData((prev) => ({
+      ...prev,
+      [team]: {
+        ...prev[team],
+        points: Number(value),
+      },
+    }));
+  };
+
+  const handlePlayerScored = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    player: Player,
+    team: "home_team" | "away_team"
+  ) => {
+    const { value } = e.target;
+
+    if (!value) return;
+    const goals = Number(value);
+
+    const players_scored = matchData[team].players_scored.filter(
+      (p) => p.ci !== player.ci
+    );
+
+    // Only add player if goals > 0
+    if (goals !== 0) {
+      players_scored.push({
+        ci: player.ci,
+        goals,
+      });
+    }
+
+    setMatchData((prev) => ({
+      ...prev,
+      [team]: {
+        ...prev[team],
+        players_scored,
+      },
+    }));
+  };
+
   return (
     <Card>
       <CardContent className="space-y-6">
-        <div className="flex items-center justify-between">
-          {/* Equipo Local */}
-          <div className="text-right flex-1">
-            <p className={`font-semibold`}>
-              {!home_team ? "Equipo Local" : home_team.name}
-            </p>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            {/* Equipo Local */}
+            <div className="text-right flex-1">
+              <p className={`font-semibold`}>
+                {!home_team ? "Equipo Local" : home_team.name}
+              </p>
+            </div>
+
+            {/* Points*/}
+            <div className="flex items-center mx-6 gap-x-3">
+              {!isUploadingCalendar &&
+              ((isUploadingResults && match.status === "pending") ||
+                isEditorCorrection) &&
+              match.date ? (
+                <Input
+                  type="number"
+                  name="home_score"
+                  placeholder="0"
+                  className="max-w-14"
+                  onChange={(e) => {
+                    handleTeamScored(e, "home_team");
+                  }}
+                  min={0}
+                />
+              ) : (
+                <p className="text-lg font-semibold">
+                  {matchData.home_team.points}
+                </p>
+              )}
+
+              <div className="text-lg text-muted-foreground">vs</div>
+
+              {!isUploadingCalendar &&
+              ((isUploadingResults && match.status === "pending") ||
+                isEditorCorrection) &&
+              match.date ? (
+                <Input
+                  type="number"
+                  name="away_score"
+                  placeholder="0"
+                  className="max-w-14"
+                  min={0}
+                  onChange={(e) => {
+                    handleTeamScored(e, "away_team");
+                  }}
+                />
+              ) : (
+                <p className="text-lg font-semibold">
+                  {matchData.away_team.points}
+                </p>
+              )}
+            </div>
+
+            {/* Equipo Visitante */}
+            <div className="text-left flex-1">
+              <p className={`font-semibold`}>
+                {!away_team ? "Equipo Visitante" : away_team.name}
+              </p>
+            </div>
           </div>
 
-          {/* Points*/}
-          <div className="mx-6 text-center">
-            <div className="text-lg text-muted-foreground">vs</div>
-          </div>
+          {isUploadingCalendar && !match.date && (
+            <form>
+              <FormField>
+                <Label>Fecha: </Label>
+                <Input
+                  type="datetime-local"
+                  name="date"
+                  onChange={handleChange}
+                />
+              </FormField>
+            </form>
+          )}
 
-          {/* Equipo Visitante */}
-          <div className="text-left flex-1">
-            <p className={`font-semibold`}>
-              {!away_team ? "Equipo Visitante" : away_team.name}
-            </p>
-          </div>
+          {!isUploadingCalendar &&
+            ((isUploadingResults && match.status === "pending") ||
+              isEditorCorrection) &&
+            match.date &&
+            away_team &&
+            home_team &&
+            matchData.home_team.points === matchData.away_team.points && (
+              <div className="space-y-2">
+                <h4 className="text-center">
+                  Empate - Por favor seleccione el ganador
+                </h4>
+                <div className="flex items-center justify-between">
+                  <Input
+                    type="radio"
+                    name="winner"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setMatchData((prev) => ({
+                          ...prev,
+                          draw_winner: matchData.home_team,
+                        }));
+                      }
+                    }}
+                  />
+                  <Input
+                    type="radio"
+                    name="winner"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setMatchData((prev) => ({
+                          ...prev,
+                          draw_winner: matchData.away_team,
+                        }));
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+          {match.date && (
+            <div className="text-center">
+              <p className="font-semibold">
+                {new Date(match.date).toLocaleString("es-VE")}
+              </p>
+            </div>
+          )}
         </div>
 
-        {isEditor && !match.date && (
-          <form>
-            <FormField>
-              <Label>Fecha: </Label>
-              <Input
-                type="datetime-local"
-                name="date"
-                onChange={handleChange}
-              />
-            </FormField>
-          </form>
-        )}
+        {/* Players Table */}
+        {home_team &&
+          away_team &&
+          home_team.players &&
+          away_team.players &&
+          !isUploadingCalendar &&
+          ((isUploadingResults && match.status === "pending") ||
+            isEditorCorrection) &&
+          match.date && (
+            <div className="grid grid-cols-2 gap-x-4">
+              <div>
+                {home_team.players.map((player) => (
+                  <div
+                    key={player.ci}
+                    className="flex items-center justify-between"
+                  >
+                    <div>
+                      <p className={`font-semibold`}>{player.name}</p>
+                    </div>
+                    <div>
+                      <Input
+                        type="number"
+                        min={0}
+                        className="max-w-14"
+                        defaultValue={0}
+                        onChange={(e) => {
+                          handlePlayerScored(e, player, "home_team");
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-        {match.date && (
-          <div className="text-center">
-            <p className="font-semibold">
-              {new Date(match.date).toLocaleString()}
-            </p>
-          </div>
-        )}
+              <div>
+                {away_team.players.map((player) => (
+                  <div
+                    key={player.ci}
+                    className="flex items-center justify-between"
+                  >
+                    <div>
+                      <p className={`font-semibold`}>{player.name}</p>
+                    </div>
+                    <div>
+                      <Input
+                        type="number"
+                        min={0}
+                        className="max-w-14"
+                        defaultValue={0}
+                        onChange={(e) => {
+                          handlePlayerScored(e, player, "away_team");
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+        {!isUploadingCalendar &&
+          ((isUploadingResults && match.status === "pending") ||
+            isEditorCorrection) &&
+          match.date &&
+          home_team &&
+          away_team && (
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                variant={"secondary"}
+                onClick={async (e) => {
+                  const button = e.target as HTMLButtonElement;
+                  button.disabled = true;
+
+                  const match_data = {
+                    ...matchData,
+                    home_team: {
+                      ...matchData.home_team,
+                      id: home_team.id,
+                    },
+                    away_team: {
+                      ...matchData.away_team,
+                      id: away_team.id,
+                    },
+                  };
+
+                  await updateResults(match, match_data);
+                  button.disabled = false;
+                  redirect(pathname);
+                }}
+              >
+                Guardar
+              </Button>
+            </div>
+          )}
       </CardContent>
     </Card>
   );

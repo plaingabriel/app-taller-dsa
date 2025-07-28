@@ -97,8 +97,8 @@ export interface Match {
 }
 
 export type MatchTeam = Omit<Match, "home_team" | "away_team"> & {
-  home_team: Team | null;
-  away_team: Team | null;
+  home_team: TeamPlayers | null;
+  away_team: TeamPlayers | null;
   day: number;
 };
 
@@ -108,3 +108,18 @@ export type PlayoffMatch = Match & {
   next_match?: Match["id"];
   phase?: Phase;
 };
+
+export interface TeamData {
+  id: string;
+  points: number;
+  players_scored: {
+    ci: number;
+    goals: number;
+  }[];
+}
+
+export interface MatchData {
+  home_team: TeamData;
+  away_team: TeamData;
+  draw_winner?: TeamData;
+}
