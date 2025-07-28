@@ -450,11 +450,7 @@ export function MatchCard({
                     },
                   };
 
-                  await updateResults(
-                    match,
-                    match_data,
-                    isEditorCorrection || false
-                  );
+                  await updateResults(match, match_data);
                   button.disabled = false;
                   redirect(pathname);
                 }}
