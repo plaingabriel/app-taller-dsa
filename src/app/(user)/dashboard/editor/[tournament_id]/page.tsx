@@ -40,7 +40,8 @@ export default async function TournamentEditorPage({
           </h1>
 
           <p className="text-neutral-700">
-            Seleccione una categoría para gestionar asignar horarios
+            Seleccione una categoría para asignar horarios o gestionar
+            resultados
           </p>
         </div>
 
@@ -64,10 +65,18 @@ export default async function TournamentEditorPage({
                 </p>
 
                 <ButtonLink
-                  href={`/dashboard/editor/${tournament_id}/${category.id}`}
+                  href={`/dashboard/editor/${tournament_id}/${category.id}/schedule`}
                   className="w-full"
                 >
                   Asignar Horarios
+                </ButtonLink>
+
+                <ButtonLink
+                  href={`/dashboard/editor/${tournament_id}/${category.id}/matches`}
+                  className="w-full"
+                  variant={"secondary"}
+                >
+                  Gestionar Resultados
                 </ButtonLink>
               </CardContent>
             </Card>

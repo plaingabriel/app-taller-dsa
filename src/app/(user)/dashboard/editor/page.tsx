@@ -17,9 +17,11 @@ export default async function EditorPage() {
     <div>
       <div className="mx-auto max-w-4xl">
         <div className="text-center my-8 space-y-2">
-          <h1 className="text-3xl font-bold">Gestión de Calendarios</h1>
+          <h1 className="text-3xl font-bold">
+            Gestión de Calendarios y Resultados
+          </h1>
           <p className="text-neutral-700">
-            Selecciona un torneo para gestionar su calendario
+            Selecciona un torneo para gestionar
           </p>
         </div>
 
@@ -47,7 +49,7 @@ export default async function EditorPage() {
                   href={`/dashboard/editor/${tournament.id}`}
                   className="w-full"
                 >
-                  Editar Calendario
+                  Editar
                 </ButtonLink>
               </CardContent>
             </Card>

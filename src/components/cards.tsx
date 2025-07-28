@@ -261,6 +261,7 @@ export function MatchCard({
                     handleTeamScored(e, "home_team");
                   }}
                   min={0}
+                  defaultValue={matchData.home_team.points}
                 />
               ) : (
                 <p className="text-lg font-semibold">
@@ -283,6 +284,7 @@ export function MatchCard({
                   onChange={(e) => {
                     handleTeamScored(e, "away_team");
                   }}
+                  defaultValue={matchData.away_team.points}
                 />
               ) : (
                 <p className="text-lg font-semibold">
@@ -448,7 +450,11 @@ export function MatchCard({
                     },
                   };
 
-                  await updateResults(match, match_data);
+                  await updateResults(
+                    match,
+                    match_data,
+                    isEditorCorrection || false
+                  );
                   button.disabled = false;
                   redirect(pathname);
                 }}
