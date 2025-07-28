@@ -381,12 +381,12 @@ async function updateWinPlayoff(
       .where(eq(matchTable.id, match.next_match as string));
   } else {
     // Update the next match if now the loser team now plays the next match
-    if (nextMatch.home_team !== teamWinner.id) {
+    if (nextMatch.home_team === teamLoser.id) {
       await db
         .update(matchTable)
         .set({ home_team: teamWinner.id })
         .where(eq(matchTable.id, match.next_match as string));
-    } else if (nextMatch.away_team !== teamWinner.id) {
+    } else if (nextMatch.away_team === teamLoser.id) {
       await db
         .update(matchTable)
         .set({ away_team: teamWinner.id })
