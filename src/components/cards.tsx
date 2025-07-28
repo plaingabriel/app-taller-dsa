@@ -8,14 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import {
-  FixtureType,
-  Match,
-  MatchData,
-  MatchTeam,
-  Player,
-  User,
-} from "@/lib/definitions";
+import { FixtureType, MatchData, MatchTeam, Player } from "@/lib/definitions";
 import { getInfoConfig } from "@/lib/utils";
 import { FileSpreadsheet, Info, Trophy } from "lucide-react";
 import { redirect, usePathname } from "next/navigation";
