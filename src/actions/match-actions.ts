@@ -275,6 +275,7 @@ async function generateGroupMatches(
           group: group_id,
           date: "",
           phase: "groups",
+          penalty_win: false,
         });
 
         await tx
