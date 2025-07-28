@@ -593,6 +593,12 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
     ]);
   } else {
     if (match.phase !== "groups") {
+      if (draw_winner) {
+        await db
+          .update(matchTable)
+          .set({ penalty_win: true })
+          .where(eq(matchTable.id, draw_winner.id));
+      }
       await updateWinPlayoff(team_winner, team_loser, match);
     } else {
       await Promise.all([
