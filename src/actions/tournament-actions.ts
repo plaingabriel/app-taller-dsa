@@ -84,11 +84,6 @@ export async function deleteTournament(id: string) {
     await db.delete(matchTable).where(eq(matchTable.category_id, category.id));
   }
 
-  // Eliminar todos los grupos de cada categoría
-  for (const category of categories) {
-    await db.delete(groupTable).where(eq(groupTable.category_id, category.id));
-  }
-
   // Para eliminar los equipos de cada categoría, eliminando sus jugadores
   for (const category of categories) {
     // Obtener equipos de la categoría
@@ -105,6 +100,11 @@ export async function deleteTournament(id: string) {
     for (const team of teams) {
       await db.delete(teamTable).where(eq(teamTable.id, team.id));
     }
+  }
+
+  // Eliminar todos los grupos de cada categoría
+  for (const category of categories) {
+    await db.delete(groupTable).where(eq(groupTable.category_id, category.id));
   }
 
   // Eliminar categorías
