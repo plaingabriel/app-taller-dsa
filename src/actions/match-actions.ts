@@ -13,6 +13,7 @@ import {
   CategoryTeamsPlayers,
   MatchData,
   MatchTeam,
+  Phase,
   TeamData,
   TeamPlayers,
 } from "@/lib/definitions";
@@ -24,7 +25,6 @@ import {
 } from "@/lib/fixture";
 import { generateID } from "@/lib/utils";
 import { eq, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
 async function generatePlayOffs(
   group_id: string,
@@ -385,11 +385,156 @@ async function updateWinPlayoff(
   await updateGoals(teamLoser, teamLoser.points, teamWinner.points);
 }
 
+function getLowestPlayoffPhase(team_count: number): Phase {
+  if (team_count === 16) return "round_16";
+  if (team_count === 8) return "quarterfinals";
+  if (team_count === 4) return "semifinal";
+
+  return "final";
+}
+
+async function getMatchesInPhaseAvailable(category_id: string, phase: Phase) {
+  const matchesInPhase = await db.query.matchTable.findMany({
+    where: (match, { eq }) =>
+      eq(match.category_id, category_id) && eq(match.phase, phase),
+  });
+
+  // Filter only the matches with no home_team or away_team
+  return matchesInPhase.filter((match) => !match.home_team && !match.away_team);
+}
+
 async function createPlayoffWithTeamsQualifiedPerGroup(category_id: string) {
-  const category = db.query.categoryTable.findFirst({
-    columns: { teams_qualified: true },
+  const category = await db.query.categoryTable.findFirst({
+    columns: { teams_qualified: true, group_count: true },
     where: (category, { eq }) => eq(category.id, category_id),
   });
+
+  if (!category) return;
+
+  const { teams_qualified, group_count } = category;
+
+  const groups = await db.query.groupTable.findMany({
+    with: { teams: true },
+    where: (group, { eq }) => eq(group.category_id, category_id),
+  });
+
+  const filterGroups = groups.filter(
+    (group) => group.name !== "Fase Eliminatorias"
+  );
+
+  // Sort by points or goals
+  for (const group of filterGroups) {
+    group.teams.sort((a, b) => {
+      const pointsDiff = (b.points || 0) - (a.points || 0);
+      if (pointsDiff !== 0) return pointsDiff;
+
+      const diffA = (a.goals_count || 0) - (a.goals_against || 0);
+      const diffB = (b.goals_count || 0) - (b.goals_against || 0);
+      return diffB - diffA;
+    });
+  }
+
+  if (group_count === 1) {
+    const groupTeams = filterGroups[0].teams;
+
+    // For single group with 2 teams: create final match
+    if (teams_qualified === 2) {
+      await db
+        .update(matchTable)
+        .set({ home_team: groupTeams[0].id, away_team: groupTeams[1].id })
+        .where(eq(matchTable.phase, "final"));
+    }
+    // For single group with 4 teams: create semifinals
+    else if (teams_qualified === 4) {
+      // Get all semifinals matches in the category
+      const semifinals = await getMatchesInPhaseAvailable(
+        category_id,
+        "semifinal"
+      );
+
+      let i = 0;
+
+      for (const semifinal of semifinals) {
+        // With index 0 and 2, we get 1st vs 3rd of the group
+        // With index 1 and 3, we get 2nd vs 4th of the group
+        await db
+          .update(matchTable)
+          .set({ home_team: groupTeams[i].id, away_team: groupTeams[i + 2].id })
+          .where(eq(matchTable.id, semifinal.id));
+
+        i++;
+      }
+    }
+  }
+
+  const phase = getLowestPlayoffPhase(teams_qualified * group_count);
+
+  // Handle 2 or 4 groups
+  if (group_count === 2 || group_count === 4) {
+    // Create group pairs: for 2 groups -> 1 pair, for 4 groups -> 2 pairs
+    const groupPairs: string[][] = [];
+    if (group_count === 2) {
+      groupPairs.push([filterGroups[0].name, filterGroups[1].name]);
+    } else {
+      groupPairs.push([filterGroups[0].name, filterGroups[2].name]);
+      groupPairs.push([filterGroups[1].name, filterGroups[3].name]);
+    }
+
+    // Generate matches for each pair of groups
+    for (const [groupA, groupB] of groupPairs) {
+      const teamsA = filterGroups.find((g) => g.name === groupA)?.teams || [];
+      const teamsB = filterGroups.find((g) => g.name === groupB)?.teams || [];
+
+      const matchesInPhaseAvailable = await getMatchesInPhaseAvailable(
+        category_id,
+        phase
+      );
+
+      // Generate matches based on qualification count
+      if (teams_qualified === 1) {
+        await db
+          .update(matchTable)
+          .set({ home_team: teamsA[0].id, away_team: teamsB[0].id })
+          .where(eq(matchTable.id, matchesInPhaseAvailable[0].id));
+      } else if (teams_qualified === 2) {
+        // 1st of group A vs 2nd of group B
+        await db
+          .update(matchTable)
+          .set({ home_team: teamsA[0].id, away_team: teamsB[1].id })
+          .where(eq(matchTable.id, matchesInPhaseAvailable[0].id));
+
+        // 2nd of group A vs 1st of group B
+        await db
+          .update(matchTable)
+          .set({ home_team: teamsA[1].id, away_team: teamsB[0].id })
+          .where(eq(matchTable.id, matchesInPhaseAvailable[1].id));
+      } else if (teams_qualified === 4) {
+        // 1st of group A vs 2nd of group B
+        await db
+          .update(matchTable)
+          .set({ home_team: teamsA[0].id, away_team: teamsB[1].id })
+          .where(eq(matchTable.id, matchesInPhaseAvailable[0].id));
+
+        // 2nd of group A vs 1st of group B
+        await db
+          .update(matchTable)
+          .set({ home_team: teamsA[1].id, away_team: teamsB[0].id })
+          .where(eq(matchTable.id, matchesInPhaseAvailable[1].id));
+
+        // 3rd of group A vs 4th of group B
+        await db
+          .update(matchTable)
+          .set({ home_team: teamsA[2].id, away_team: teamsB[3].id })
+          .where(eq(matchTable.id, matchesInPhaseAvailable[2].id));
+
+        // 4th of group A vs 3rd of group B
+        await db
+          .update(matchTable)
+          .set({ home_team: teamsA[3].id, away_team: teamsB[2].id })
+          .where(eq(matchTable.id, matchesInPhaseAvailable[3].id));
+      }
+    }
+  }
 }
 
 export async function updateResults(match: MatchTeam, matchData: MatchData) {
