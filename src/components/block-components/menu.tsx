@@ -8,13 +8,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/shadcn-ui/dropdown-menu";
-import { UserClient } from "@/shared/types";
+import { User } from "@/lib/definitions";
 import { CircleUserRound } from "lucide-react";
 import { redirect, usePathname } from "next/navigation";
 import { Button } from "../shadcn-ui/button";
 
 interface Props {
-  user: UserClient;
+  user: User;
 }
 
 export function MenuUser({ user }: Props) {
@@ -38,11 +38,13 @@ export function MenuUser({ user }: Props) {
         <DropdownMenuItem onClick={() => redirect(`/dashboard/${user.role}`)}>
           Panel principal
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => redirect(`/dashboard/account?prevPage=${pathname}`)}
-        >
-          Editar credenciales
-        </DropdownMenuItem>
+        {user.role === "admin" && (
+          <DropdownMenuItem
+            onClick={() => redirect(`/dashboard/account?prevPage=${pathname}`)}
+          >
+            Editar credenciales
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={logout}>Cerrar sesión</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
