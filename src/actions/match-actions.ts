@@ -658,7 +658,8 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
       await db
         .update(matchTable)
         .set({ penalty_win: penaltyWin })
-        .where(eq(matchTable.id, draw_winner.id));
+        .where(eq(matchTable.id, match.id));
+      await updateWinPlayoff(team_winner, team_loser, match);
     } else {
       await db
         .update(matchTable)
