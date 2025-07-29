@@ -7,6 +7,7 @@ import {
   matchTable,
   playerTable,
   teamTable,
+  tournamentTable,
 } from "@/db/schemas";
 import { fetchMatch } from "@/lib/data";
 import {
@@ -329,12 +330,14 @@ async function updateGroups(
 
     if (!prevMatch) return;
 
+    // @ts-ignore
     const home_team: TeamData = {
       id: prevMatch.home_team as string,
       points: prevMatch.home_score as number,
       players_scored: [],
     };
 
+    // @ts-ignore
     const away_team: TeamData = {
       id: prevMatch.away_team as string,
       points: prevMatch.away_score as number,
@@ -434,6 +437,13 @@ async function updateWinPlayoff(
 ) {
   const nextMatch = await fetchMatch(match.next_match as string);
 
+  if (match.phase === "final") {
+    await db
+      .update(categoryTable)
+      .set({ champion: teamWinner.name })
+      .where(eq(categoryTable.id, match.category_id));
+  }
+
   if (!nextMatch) return;
 
   // Update the next match with the winner
@@ -484,11 +494,38 @@ async function getMatchesInPhaseAvailable(category_id: string, phase: Phase) {
 
 async function createPlayoffWithTeamsQualifiedPerGroup(category_id: string) {
   const category = await db.query.categoryTable.findFirst({
-    columns: { teams_qualified: true, group_count: true },
+    columns: { teams_qualified: true, group_count: true, fixture_type: true },
     where: (category, { eq }) => eq(category.id, category_id),
   });
 
   if (!category) return;
+
+  if (category.fixture_type === "groups") {
+    // Get the teams table sorted by points or goals
+    const teams = await db.query.teamTable.findMany({
+      where: (team, { eq }) => eq(team.category_id, category_id),
+      with: { players: true },
+    });
+
+    teams.sort((a, b) => {
+      const pointsDiff = (b.points || 0) - (a.points || 0);
+      if (pointsDiff !== 0) return pointsDiff;
+
+      const diffA = (a.goals_count || 0) - (a.goals_against || 0);
+      const diffB = (b.goals_count || 0) - (b.goals_against || 0);
+      return diffB - diffA;
+    });
+
+    // The first team is the champion
+    const teamChampion = teams[0];
+
+    await db
+      .update(categoryTable)
+      .set({ champion: teamChampion.name })
+      .where(eq(categoryTable.id, category_id));
+
+    return;
+  }
 
   const { teams_qualified, group_count } = category;
 

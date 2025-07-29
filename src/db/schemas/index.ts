@@ -44,6 +44,7 @@ export const categoryTable = sqliteTable("Category", {
   })
     .notNull()
     .default(false),
+  champion: text(),
 });
 
 export const categoryRelations = relations(categoryTable, ({ one, many }) => ({

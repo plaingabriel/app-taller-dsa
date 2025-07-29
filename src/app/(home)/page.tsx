@@ -1,6 +1,10 @@
-import { ComingTournamentCard } from "@/components/cards";
+import { ComingTournamentCard, TournamentCard } from "@/components/cards";
+import { db } from "@/db";
 
 export default async function page() {
+  const tournaments = await db.query.tournamentTable.findMany({
+    with: { categories: true },
+  });
   return (
     <div className="grow">
       <div className="flex flex-col gap-y-12 max-w-6xl mx-auto">
@@ -12,19 +16,31 @@ export default async function page() {
           </h1>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
-          <ComingTournamentCard number={1} />
-          <ComingTournamentCard number={2} />
-          <ComingTournamentCard number={3} />
+          {new Array(3).fill(null).map((_, index) => {
+            if (tournaments[index]) {
+              return (
+                <TournamentCard
+                  key={tournaments[index].id}
+                  tournament={tournaments[index]}
+                  categories_count={tournaments[index].categories.length}
+                />
+              );
+            }
+
+            return <ComingTournamentCard key={index} number={index + 1} />;
+          })}
         </div>
 
-        <div className="text-center">
-          <h3 className="text-neutral-700 text-xl">
-            No hay torneos activos en este momento
-          </h3>
-          <p className="text-neutral-500">
-            Los torneos aparecerán aquí una vez hayan sido creados
-          </p>
-        </div>
+        {tournaments.length === 0 && (
+          <div className="text-center">
+            <h3 className="text-neutral-700 text-xl">
+              No hay torneos activos en este momento
+            </h3>
+            <p className="text-neutral-500">
+              Los torneos aparecerán aquí una vez hayan sido creados
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -112,6 +112,7 @@ export type PlayoffMatch = Match & {
 
 export interface TeamData {
   id: string;
+  name: string;
   points: number;
   players_scored: {
     ci: number;

@@ -8,12 +8,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import { FixtureType, MatchData, MatchTeam, Player } from "@/lib/definitions";
+import {
+  FixtureType,
+  MatchData,
+  MatchTeam,
+  Player,
+  Tournament,
+} from "@/lib/definitions";
 import { getInfoConfig } from "@/lib/utils";
-import { FileSpreadsheet, Info, Trophy } from "lucide-react";
+import { Calendar, FileSpreadsheet, Info, Trophy, Users } from "lucide-react";
 import { redirect, usePathname } from "next/navigation";
 import { useState } from "react";
+import { ButtonLink } from "./atomic-components/button-link";
 import { FormField } from "./atomic-components/form-field";
+import { StatusBadge } from "./badges";
 import { Button } from "./shadcn-ui/button";
 import { Input } from "./shadcn-ui/input";
 import { Label } from "./shadcn-ui/label";
@@ -34,6 +42,46 @@ export function ComingTournamentCard({ number }: { number: number }) {
           </CardDescription>
         </CardContent>
       </div>
+    </Card>
+  );
+}
+
+export function TournamentCard({
+  tournament,
+  categories_count,
+}: {
+  tournament: Tournament;
+  categories_count: number;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>{tournament.name}</CardTitle>
+
+          <div>
+            <StatusBadge status={tournament.status} />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="flex-1 flex flex-col justify-between">
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2">
+            <Users className="w-6 h-6" />
+            <span>{categories_count} Categorías</span>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Calendar className="w-6 h-6" />
+            <span>
+              Creado:{" "}
+              {new Date(tournament.creation_date).toLocaleDateString("es-VE")}
+            </span>
+          </div>
+        </div>
+
+        <ButtonLink href={`/${tournament.id}`}>Ver Torneo</ButtonLink>
+      </CardContent>
     </Card>
   );
 }
@@ -167,11 +215,13 @@ export function MatchCard({
   const [matchData, setMatchData] = useState<MatchData>({
     home_team: {
       id: match.home_team?.id || "",
+      name: match.home_team?.name || "",
       points: match.home_score ? (match.home_score as number) : 0,
       players_scored: [],
     },
     away_team: {
       id: match.away_team?.id || "",
+      name: match.away_team?.name || "",
       points: match.away_score ? (match.away_score as number) : 0,
       players_scored: [],
     },
