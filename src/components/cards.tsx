@@ -457,6 +457,8 @@ export function MatchCard({
                     },
                   };
 
+                  console.log(match_data.draw_winner);
+
                   await updateResults(match, match_data);
                   button.disabled = false;
                   redirect(pathname);

@@ -317,20 +317,6 @@ function getWinner(
     : [home_team, away_team, true];
 }
 
-async function updateGoals(
-  team: TeamData,
-  goals_scored: number,
-  goals_against: number
-) {
-  await db
-    .update(teamTable)
-    .set({
-      goals_count: sql`${teamTable.goals_count} + ${goals_scored}`,
-      goals_against: sql`${teamTable.goals_against} + ${goals_against}`,
-    })
-    .where(eq(teamTable.id, team.id));
-}
-
 async function updateGroups(
   match: MatchTeam,
   teamWinner: TeamData,
@@ -363,6 +349,8 @@ async function updateGroups(
         .set({
           draws: sql`${teamTable.draws} - 1`,
           points: sql`${teamTable.points} - 1`,
+          goals_count: sql`${teamTable.goals_count} - ${prevWinner.points}`,
+          goals_against: sql`${teamTable.goals_against} - ${prevLoser.points}`,
         })
         .where(eq(teamTable.id, prevWinner.id));
 
@@ -371,6 +359,8 @@ async function updateGroups(
         .set({
           draws: sql`${teamTable.draws} - 1`,
           points: sql`${teamTable.points} - 1`,
+          goals_count: sql`${teamTable.goals_count} - ${prevLoser.points}`,
+          goals_against: sql`${teamTable.goals_against} - ${prevWinner.points}`,
         })
         .where(eq(teamTable.id, prevLoser.id));
     } else {
@@ -379,12 +369,18 @@ async function updateGroups(
         .set({
           wins: sql`${teamTable.wins} - 1`,
           points: sql`${teamTable.points} - 3`,
+          goals_count: sql`${teamTable.goals_count} - ${prevWinner.points}`,
+          goals_against: sql`${teamTable.goals_against} - ${prevLoser.points}`,
         })
         .where(eq(teamTable.id, prevWinner.id));
 
       await db
         .update(teamTable)
-        .set({ losses: sql`${teamTable.losses} - 1` })
+        .set({
+          losses: sql`${teamTable.losses} - 1`,
+          goals_count: sql`${teamTable.goals_count} - ${prevLoser.points}`,
+          goals_against: sql`${teamTable.goals_against} - ${prevWinner.points}`,
+        })
         .where(eq(teamTable.id, prevLoser.id));
     }
   }
@@ -395,6 +391,8 @@ async function updateGroups(
       .set({
         draws: sql`${teamTable.draws} + 1`,
         points: sql`${teamTable.points} + 1`,
+        goals_count: sql`${teamTable.goals_count} + ${teamWinner.points}`,
+        goals_against: sql`${teamTable.goals_against} + ${teamLoser.points}`,
       })
       .where(eq(teamTable.id, teamWinner.id));
 
@@ -403,6 +401,8 @@ async function updateGroups(
       .set({
         draws: sql`${teamTable.draws} + 1`,
         points: sql`${teamTable.points} + 1`,
+        goals_count: sql`${teamTable.goals_count} + ${teamLoser.points}`,
+        goals_against: sql`${teamTable.goals_against} + ${teamWinner.points}`,
       })
       .where(eq(teamTable.id, teamLoser.id));
   } else {
@@ -411,17 +411,20 @@ async function updateGroups(
       .set({
         wins: sql`${teamTable.wins} + 1`,
         points: sql`${teamTable.points} + 3`,
+        goals_count: sql`${teamTable.goals_count} + ${teamWinner.points}`,
+        goals_against: sql`${teamTable.goals_against} + ${teamLoser.points}`,
       })
       .where(eq(teamTable.id, teamWinner.id));
 
     await db
       .update(teamTable)
-      .set({ losses: sql`${teamTable.losses} + 1` })
+      .set({
+        losses: sql`${teamTable.losses} + 1`,
+        goals_count: sql`${teamTable.goals_count} + ${teamLoser.points}`,
+        goals_against: sql`${teamTable.goals_against} + ${teamWinner.points}`,
+      })
       .where(eq(teamTable.id, teamLoser.id));
   }
-
-  updateGoals(teamWinner, teamWinner.points, teamLoser.points);
-  updateGoals(teamLoser, teamLoser.points, teamWinner.points);
 }
 
 async function updateWinPlayoff(
@@ -450,18 +453,15 @@ async function updateWinPlayoff(
     if (nextMatch.home_team === teamLoser.id) {
       await db
         .update(matchTable)
-        .set({ home_team: teamWinner.id })
+        .set({ home_team: teamWinner.id, penalty_win: "none" })
         .where(eq(matchTable.id, match.next_match as string));
     } else if (nextMatch.away_team === teamLoser.id) {
       await db
         .update(matchTable)
-        .set({ away_team: teamWinner.id })
+        .set({ away_team: teamWinner.id, penalty_win: "none" })
         .where(eq(matchTable.id, match.next_match as string));
     }
   }
-
-  await updateGoals(teamWinner, teamWinner.points, teamLoser.points);
-  await updateGoals(teamLoser, teamLoser.points, teamWinner.points);
 }
 
 function getLowestPlayoffPhase(team_count: number): Phase {
@@ -624,16 +624,6 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
   // Make one array
   const players_scored = [...home_players, ...away_players];
 
-  // Update match results
-  await db
-    .update(matchTable)
-    .set({
-      home_score: home_team.points,
-      away_score: away_team.points,
-      status: "finished",
-    })
-    .where(eq(matchTable.id, match.id));
-
   // Update players goals
   await db.transaction(async (tx) => {
     for (const player of players_scored) {
@@ -654,7 +644,15 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
   // Update wins, losses and draws
   if (match.phase !== "groups") {
     if (draw_winner) {
-      const penaltyWin = draw_winner.id === home_team.id ? "home" : "away";
+      const penaltyWin =
+        draw_winner.id === home_team.id
+          ? "home"
+          : draw_winner.id === away_team.id
+          ? "away"
+          : "none";
+
+      if (penaltyWin === "none") return;
+
       await db
         .update(matchTable)
         .set({ penalty_win: penaltyWin })
@@ -684,6 +682,16 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
     if (allMatchesInGroupsFinished) {
       await createPlayoffWithTeamsQualifiedPerGroup(category_id);
     }
+
+    // Update match results
+    await db
+      .update(matchTable)
+      .set({
+        home_score: home_team.points,
+        away_score: away_team.points,
+        status: "finished",
+      })
+      .where(eq(matchTable.id, match.id));
   }
 }
 
