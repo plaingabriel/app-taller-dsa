@@ -665,8 +665,28 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
         .where(eq(matchTable.id, match.id));
       await updateWinPlayoff(team_winner, team_loser, match);
     }
+
+    // Update match results
+    await db
+      .update(matchTable)
+      .set({
+        home_score: home_team.points,
+        away_score: away_team.points,
+        status: "finished",
+      })
+      .where(eq(matchTable.id, match.id));
   } else {
     await updateGroups(match, team_winner, team_loser, draw);
+
+    // Update match results
+    await db
+      .update(matchTable)
+      .set({
+        home_score: home_team.points,
+        away_score: away_team.points,
+        status: "finished",
+      })
+      .where(eq(matchTable.id, match.id));
 
     // Get all matches in groups phase
     const category_id = match.category_id;
@@ -682,16 +702,6 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
     if (allMatchesInGroupsFinished) {
       await createPlayoffWithTeamsQualifiedPerGroup(category_id);
     }
-
-    // Update match results
-    await db
-      .update(matchTable)
-      .set({
-        home_score: home_team.points,
-        away_score: away_team.points,
-        status: "finished",
-      })
-      .where(eq(matchTable.id, match.id));
   }
 }
 
