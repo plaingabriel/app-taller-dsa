@@ -573,43 +573,71 @@ async function createPlayoffWithTeamsQualifiedPerGroup(category_id: string) {
       if (teams_qualified === 1) {
         await db
           .update(matchTable)
-          .set({ home_team: teamsA[0].id, away_team: teamsB[0].id })
+          .set({
+            home_team: teamsA[0].id,
+            away_team: teamsB[0].id,
+            penalty_win: "none",
+          })
           .where(eq(matchTable.id, matchesInPhaseAvailable[0].id));
       } else if (teams_qualified === 2) {
         // 1st of group A vs 2nd of group B
         await db
           .update(matchTable)
-          .set({ home_team: teamsA[0].id, away_team: teamsB[1].id })
+          .set({
+            home_team: teamsA[0].id,
+            away_team: teamsB[1].id,
+            penalty_win: "none",
+          })
           .where(eq(matchTable.id, matchesInPhaseAvailable[0].id));
 
         // 2nd of group A vs 1st of group B
         await db
           .update(matchTable)
-          .set({ home_team: teamsA[1].id, away_team: teamsB[0].id })
+          .set({
+            home_team: teamsA[1].id,
+            away_team: teamsB[0].id,
+            penalty_win: "none",
+          })
           .where(eq(matchTable.id, matchesInPhaseAvailable[1].id));
       } else if (teams_qualified === 4) {
         // 1st of group A vs 2nd of group B
         await db
           .update(matchTable)
-          .set({ home_team: teamsA[0].id, away_team: teamsB[1].id })
+          .set({
+            home_team: teamsA[0].id,
+            away_team: teamsB[1].id,
+            penalty_win: "none",
+          })
           .where(eq(matchTable.id, matchesInPhaseAvailable[0].id));
 
         // 2nd of group A vs 1st of group B
         await db
           .update(matchTable)
-          .set({ home_team: teamsA[1].id, away_team: teamsB[0].id })
+          .set({
+            home_team: teamsA[1].id,
+            away_team: teamsB[0].id,
+            penalty_win: "none",
+          })
           .where(eq(matchTable.id, matchesInPhaseAvailable[1].id));
 
         // 3rd of group A vs 4th of group B
         await db
           .update(matchTable)
-          .set({ home_team: teamsA[2].id, away_team: teamsB[3].id })
+          .set({
+            home_team: teamsA[2].id,
+            away_team: teamsB[3].id,
+            penalty_win: "none",
+          })
           .where(eq(matchTable.id, matchesInPhaseAvailable[2].id));
 
         // 4th of group A vs 3rd of group B
         await db
           .update(matchTable)
-          .set({ home_team: teamsA[3].id, away_team: teamsB[2].id })
+          .set({
+            home_team: teamsA[3].id,
+            away_team: teamsB[2].id,
+            penalty_win: "none",
+          })
           .where(eq(matchTable.id, matchesInPhaseAvailable[3].id));
       }
     }
