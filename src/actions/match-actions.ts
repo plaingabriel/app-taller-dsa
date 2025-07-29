@@ -275,7 +275,6 @@ async function generateGroupMatches(
           group: group_id,
           date: "",
           phase: "groups",
-          penalty_win: false,
         });
 
         await tx
@@ -318,33 +317,6 @@ function getWinner(
     : [home_team, away_team, true];
 }
 
-async function updateDrawGroups(team: TeamData) {
-  await db
-    .update(teamTable)
-    .set({
-      draws: sql`${teamTable.draws} + 1`,
-      points: sql`${teamTable.points} + 1`,
-      goals_count: sql`${teamTable.goals_count} + ${team.points}`,
-      goals_against: sql`${teamTable.goals_against} + ${team.points}`,
-    })
-    .where(eq(teamTable.id, team.id));
-}
-
-async function updateWinGroups(team: TeamData, win: boolean) {
-  const points = win ? 3 : 0;
-
-  await db
-    .update(teamTable)
-    .set({
-      wins: sql`${teamTable.wins} + ${win ? 1 : 0}`,
-      losses: sql`${teamTable.losses} + ${win ? 0 : 1}`,
-      points: sql`${teamTable.points} + ${points}`,
-      goals_count: sql`${teamTable.goals_count} + ${team.points}`,
-      goals_against: sql`${teamTable.goals_against} + ${team.points}`,
-    })
-    .where(eq(teamTable.id, team.id));
-}
-
 async function updateGoals(
   team: TeamData,
   goals_scored: number,
@@ -357,6 +329,99 @@ async function updateGoals(
       goals_against: sql`${teamTable.goals_against} + ${goals_against}`,
     })
     .where(eq(teamTable.id, team.id));
+}
+
+async function updateGroups(
+  match: MatchTeam,
+  teamWinner: TeamData,
+  teamLoser: TeamData,
+  draw: boolean
+) {
+  // If match has been played, update points and goals correctly
+  if (match.status === "finished") {
+    const prevMatch = await fetchMatch(match.id);
+
+    if (!prevMatch) return;
+
+    const home_team: TeamData = {
+      id: prevMatch.home_team as string,
+      points: prevMatch.home_score as number,
+      players_scored: [],
+    };
+
+    const away_team: TeamData = {
+      id: prevMatch.away_team as string,
+      points: prevMatch.away_score as number,
+      players_scored: [],
+    };
+
+    const [prevWinner, prevLoser, prevDraw] = getWinner(home_team, away_team);
+
+    if (prevDraw) {
+      await db
+        .update(teamTable)
+        .set({
+          draws: sql`${teamTable.draws} - 1`,
+          points: sql`${teamTable.points} - 1`,
+        })
+        .where(eq(teamTable.id, prevWinner.id));
+
+      await db
+        .update(teamTable)
+        .set({
+          draws: sql`${teamTable.draws} - 1`,
+          points: sql`${teamTable.points} - 1`,
+        })
+        .where(eq(teamTable.id, prevLoser.id));
+    } else {
+      await db
+        .update(teamTable)
+        .set({
+          wins: sql`${teamTable.wins} - 1`,
+          points: sql`${teamTable.points} - 3`,
+        })
+        .where(eq(teamTable.id, prevWinner.id));
+
+      await db
+        .update(teamTable)
+        .set({ losses: sql`${teamTable.losses} - 1` })
+        .where(eq(teamTable.id, prevLoser.id));
+    }
+  }
+
+  if (draw) {
+    await db
+      .update(teamTable)
+      .set({
+        draws: sql`${teamTable.draws} + 1`,
+        points: sql`${teamTable.points} + 1`,
+      })
+      .where(eq(teamTable.id, teamWinner.id));
+
+    await db
+      .update(teamTable)
+      .set({
+        draws: sql`${teamTable.draws} + 1`,
+        points: sql`${teamTable.points} + 1`,
+      })
+      .where(eq(teamTable.id, teamLoser.id));
+  } else {
+    await db
+      .update(teamTable)
+      .set({
+        wins: sql`${teamTable.wins} + 1`,
+        points: sql`${teamTable.points} + 3`,
+      })
+      .where(eq(teamTable.id, teamWinner.id));
+
+    await db
+      .update(teamTable)
+      .set({ losses: sql`${teamTable.losses} + 1` })
+      .where(eq(teamTable.id, teamLoser.id));
+  }
+
+  updateGoals(teamWinner, teamWinner.points, teamLoser.points);
+  updateGoals(teamLoser, teamLoser.points, teamWinner.points);
 }
 
 async function updateWinPlayoff(
@@ -587,40 +652,36 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
   );
 
   // Update wins, losses and draws
-  if (draw && match.phase === "groups") {
-    await Promise.all([
-      updateDrawGroups(team_winner),
-      updateDrawGroups(team_loser),
-    ]);
-  } else {
-    if (match.phase !== "groups") {
-      if (draw_winner) {
-        await db
-          .update(matchTable)
-          .set({ penalty_win: true })
-          .where(eq(matchTable.id, draw_winner.id));
-      }
-      await updateWinPlayoff(team_winner, team_loser, match);
+  if (match.phase !== "groups") {
+    if (draw_winner) {
+      const penaltyWin = draw_winner.id === home_team.id ? "home" : "away";
+      await db
+        .update(matchTable)
+        .set({ penalty_win: penaltyWin })
+        .where(eq(matchTable.id, draw_winner.id));
     } else {
-      await Promise.all([
-        updateWinGroups(team_winner, true),
-        updateWinGroups(team_loser, false),
-      ]);
+      await db
+        .update(matchTable)
+        .set({ penalty_win: "none" })
+        .where(eq(matchTable.id, match.id));
+      await updateWinPlayoff(team_winner, team_loser, match);
+    }
+  } else {
+    await updateGroups(match, team_winner, team_loser, draw);
 
-      // Get all matches in groups phase
-      const category_id = match.category_id;
-      const matchesInGroups = await db.query.matchTable.findMany({
-        where: (match, { eq, and }) =>
-          and(eq(match.category_id, category_id), eq(match.phase, "groups")),
-      });
-      const allMatchesInGroupsFinished = matchesInGroups.every((match) => {
-        return match.status === "finished";
-      });
+    // Get all matches in groups phase
+    const category_id = match.category_id;
+    const matchesInGroups = await db.query.matchTable.findMany({
+      where: (match, { eq, and }) =>
+        and(eq(match.category_id, category_id), eq(match.phase, "groups")),
+    });
+    const allMatchesInGroupsFinished = matchesInGroups.every((match) => {
+      return match.status === "finished";
+    });
 
-      // With every group match finished, create table of qualification per group
-      if (allMatchesInGroupsFinished) {
-        await createPlayoffWithTeamsQualifiedPerGroup(category_id);
-      }
+    // With every group match finished, create table of qualification per group
+    if (allMatchesInGroupsFinished) {
+      await createPlayoffWithTeamsQualifiedPerGroup(category_id);
     }
   }
 }

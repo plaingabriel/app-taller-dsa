@@ -150,7 +150,7 @@ export const matchTable = sqliteTable("Match", {
   next_match: text().default(""),
   day: int().notNull(),
   status: text().$type<"pending" | "finished">().default("pending"),
-  penalty_win: int({ mode: "boolean" }).default(false),
+  penalty_win: text().$type<"home" | "away" | "none">().default("none"),
 });
 
 export const matchRelations = relations(matchTable, ({ one, many }) => ({

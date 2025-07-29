@@ -241,7 +241,9 @@ export function MatchCard({
           <div className="flex items-center justify-between">
             {/* Equipo Local */}
             <div className="text-right flex-1">
-              {home_team && <p className="font-semibold text-success-600">P</p>}
+              {home_team && match.penalty_win === "home" && (
+                <p className="font-semibold text-success-600">P</p>
+              )}
               <p className={`font-semibold`}>
                 {!home_team ? "Equipo Local" : home_team.name}
               </p>
@@ -296,7 +298,9 @@ export function MatchCard({
 
             {/* Equipo Visitante */}
             <div className="text-left flex-1">
-              {away_team && <p className="font-semibold text-success-600">P</p>}
+              {away_team && match.penalty_win === "away" && (
+                <p className="font-semibold text-success-600">P</p>
+              )}
               <p className={`font-semibold`}>
                 {!away_team ? "Equipo Visitante" : away_team.name}
               </p>
