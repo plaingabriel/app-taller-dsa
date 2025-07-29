@@ -175,6 +175,7 @@ export function MatchCard({
       points: match.away_score ? (match.away_score as number) : 0,
       players_scored: [],
     },
+    draw_winner: undefined,
   });
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -456,9 +457,6 @@ export function MatchCard({
                       id: away_team.id,
                     },
                   };
-
-                  console.log(match_data.draw_winner);
-
                   await updateResults(match, match_data);
                   button.disabled = false;
                   redirect(pathname);
