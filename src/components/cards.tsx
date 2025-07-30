@@ -12,6 +12,7 @@ import {
   FixtureType,
   MatchData,
   MatchTeam,
+  MatchTeamsPlayers,
   Player,
   Tournament,
 } from "@/lib/definitions";
@@ -205,27 +206,25 @@ export function MatchCard({
   isUploadingResults,
   isEditorCorrection,
 }: {
-  match: MatchTeam;
+  match: MatchTeamsPlayers;
   isUploadingCalendar?: boolean;
   isUploadingResults?: boolean;
   isEditorCorrection?: boolean;
 }) {
   const pathname = usePathname();
-  const { home_team, away_team } = match;
   const [matchData, setMatchData] = useState<MatchData>({
     home_team: {
-      id: match.home_team?.id || "",
-      name: match.home_team?.name || "",
+      id: match.home_team_complete?.id || "",
+      name: match.home_team_complete?.name || "",
       points: match.home_score ? (match.home_score as number) : 0,
       players_scored: [],
     },
     away_team: {
-      id: match.away_team?.id || "",
-      name: match.away_team?.name || "",
+      id: match.away_team_complete?.id || "",
+      name: match.away_team_complete?.name || "",
       points: match.away_score ? (match.away_score as number) : 0,
       players_scored: [],
     },
-    draw_winner: undefined,
   });
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,6 +251,25 @@ export function MatchCard({
         points: Number(value),
       },
     }));
+  };
+
+  const isGoalsCorrect = () => {
+    // Verify if the sum of the goals in each team is equal to the goals scored for the team in the match
+    // Sum players scored in each team
+    const sumPlayersHome = matchData.home_team.players_scored.reduce(
+      (acc, player) => acc + player.goals,
+      0
+    );
+
+    const sumPlayersAway = matchData.away_team.players_scored.reduce(
+      (acc, player) => acc + player.goals,
+      0
+    );
+
+    return (
+      sumPlayersHome === matchData.home_team.points &&
+      sumPlayersAway === matchData.away_team.points
+    );
   };
 
   const handlePlayerScored = (
@@ -292,11 +310,13 @@ export function MatchCard({
           <div className="flex items-center justify-between">
             {/* Equipo Local */}
             <div className="flex flex-1 gap-x-2 justify-end">
-              {home_team && match.penalty_win === "home" && (
+              {match.home_team_complete && match.penalty_win === "home" && (
                 <p className="font-semibold text-success-600">P</p>
               )}
               <p className="font-semibold">
-                {!home_team ? "Equipo Local" : home_team.name}
+                {!match.home_team_complete
+                  ? "Equipo Local"
+                  : match.home_team_complete.name}
               </p>
             </div>
 
@@ -350,10 +370,12 @@ export function MatchCard({
             {/* Equipo Visitante */}
             <div className="text-left flex flex-1 gap-x-2">
               <p className={`font-semibold`}>
-                {!away_team ? "Equipo Visitante" : away_team.name}
+                {!match.away_team_complete
+                  ? "Equipo Visitante"
+                  : match.away_team_complete.name}
               </p>
 
-              {away_team && match.penalty_win === "away" && (
+              {match.away_team_complete && match.penalty_win === "away" && (
                 <p className="font-semibold text-success-600">P</p>
               )}
             </div>
@@ -376,8 +398,8 @@ export function MatchCard({
             ((isUploadingResults && match.status === "pending") ||
               isEditorCorrection) &&
             match.date &&
-            away_team &&
-            home_team &&
+            match.home_team_complete &&
+            match.away_team_complete &&
             matchData.home_team.points === matchData.away_team.points &&
             match.phase !== "groups" && (
               <div className="space-y-2">
@@ -423,17 +445,17 @@ export function MatchCard({
         </div>
 
         {/* Players Table */}
-        {home_team &&
-          away_team &&
-          home_team.players &&
-          away_team.players &&
+        {match.home_team_complete &&
+          match.away_team_complete &&
+          match.home_team_complete.players &&
+          match.away_team_complete.players &&
           !isUploadingCalendar &&
           ((isUploadingResults && match.status === "pending") ||
             isEditorCorrection) &&
           match.date && (
             <div className="grid grid-cols-2 gap-x-4">
               <div>
-                {home_team.players.map((player) => (
+                {match.home_team_complete.players.map((player) => (
                   <div
                     key={player.ci}
                     className="flex items-center justify-between"
@@ -457,7 +479,7 @@ export function MatchCard({
               </div>
 
               <div>
-                {away_team.players.map((player) => (
+                {match.away_team_complete.players.map((player) => (
                   <div
                     key={player.ci}
                     className="flex items-center justify-between"
@@ -486,30 +508,24 @@ export function MatchCard({
           ((isUploadingResults && match.status === "pending") ||
             isEditorCorrection) &&
           match.date &&
-          home_team &&
-          away_team && (
+          match.home_team_complete &&
+          match.away_team_complete && (
             <div className="flex justify-end">
               <Button
                 type="submit"
                 variant={"secondary"}
                 onClick={async (e) => {
-                  const button = e.target as HTMLButtonElement;
-                  button.disabled = true;
+                  if (!isGoalsCorrect()) {
+                    alert("Por favor, ingrese los goles correctamente.");
+                  } else {
+                    const button = e.target as HTMLButtonElement;
+                    button.disabled = true;
 
-                  const match_data = {
-                    ...matchData,
-                    home_team: {
-                      ...matchData.home_team,
-                      id: home_team.id,
-                    },
-                    away_team: {
-                      ...matchData.away_team,
-                      id: away_team.id,
-                    },
-                  };
-                  await updateResults(match, match_data);
-                  button.disabled = false;
-                  redirect(pathname);
+                    await updateResults(match, matchData);
+
+                    button.disabled = false;
+                    redirect(pathname);
+                  }
                 }}
               >
                 Guardar

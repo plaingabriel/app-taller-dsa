@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { MatchTeam, Phase, User } from "@/lib/definitions";
+import { MatchTeam, MatchTeamsPlayers, Phase, User } from "@/lib/definitions";
 import { MatchCard } from "../cards";
 
 interface MatchCardProps {
@@ -24,14 +24,16 @@ export async function DisplayMatchesGroups({
     columns: { home_team: false, away_team: false },
     where: (match, { eq }) => eq(match.category_id, category_id),
     with: {
-      home_team: {
+      home_team_complete: {
         with: { players: true },
       },
-      away_team: {
+      away_team_complete: {
         with: { players: true },
       },
     },
-  })) as unknown as MatchTeam[];
+  })) as MatchTeamsPlayers[];
+
+  console.log(matches);
 
   if (!matches || matches.length === 0 || !category_name) return null;
 
@@ -40,7 +42,7 @@ export async function DisplayMatchesGroups({
     if (!acc[match.day]) acc[match.day] = [match];
     else acc[match.day].push(match);
     return acc;
-  }, {} as { [day: number]: MatchTeam[] });
+  }, {} as { [day: number]: MatchTeamsPlayers[] });
 
   return (
     <div className="w-full p-6 space-y-6">
@@ -108,14 +110,14 @@ export async function DisplayMatchesPlayoffs({
     columns: { home_team: false, away_team: false },
     where: (match, { eq }) => eq(match.category_id, category_id),
     with: {
-      home_team: {
+      home_team_complete: {
         with: { players: true },
       },
-      away_team: {
+      away_team_complete: {
         with: { players: true },
       },
     },
-  })) as unknown as MatchTeam[];
+  })) as MatchTeamsPlayers[];
 
   if (!matches || matches.length === 0 || !category_name) return null;
 
@@ -125,13 +127,13 @@ export async function DisplayMatchesPlayoffs({
     if (!acc[match.phase]) acc[match.phase] = [match];
     else acc[match.phase].push(match);
     return acc;
-  }, {} as { [phase: string]: MatchTeam[] });
+  }, {} as { [phase: string]: MatchTeamsPlayers[] });
 
   // Sort matches by phase (Starting from the first phase that exists up to the last phase)
   const sortedMatchesByPhase = phases.reduce((acc, phase) => {
     if (matchesByPhase[phase]) acc[phase] = matchesByPhase[phase];
     return acc;
-  }, {} as { [phase: string]: MatchTeam[] });
+  }, {} as { [phase: string]: MatchTeamsPlayers[] });
 
   return (
     <div className="w-full p-6 space-y-6">
@@ -182,14 +184,14 @@ export async function DisplayCompleteFixture({
     columns: { home_team: false, away_team: false },
     where: (match, { eq }) => eq(match.category_id, category_id),
     with: {
-      home_team: {
+      home_team_complete: {
         with: { players: true },
       },
-      away_team: {
+      away_team_complete: {
         with: { players: true },
       },
     },
-  })) as unknown as MatchTeam[];
+  })) as MatchTeamsPlayers[];
 
   if (!matches || matches.length === 0 || !category_name) return null;
 
@@ -204,13 +206,13 @@ export async function DisplayCompleteFixture({
     if (!acc[match.phase]) acc[match.phase] = [match];
     else acc[match.phase].push(match);
     return acc;
-  }, {} as { [phase: string]: MatchTeam[] });
+  }, {} as { [phase: string]: MatchTeamsPlayers[] });
 
   // Sort matches by phase (Starting from the first phase that exists up to the last phase)
   const sortedPlayoffMatchesByPhase = phases.reduce((acc, phase) => {
     if (playoffMatchesByPhase[phase]) acc[phase] = playoffMatchesByPhase[phase];
     return acc;
-  }, {} as { [phase: string]: MatchTeam[] });
+  }, {} as { [phase: string]: MatchTeamsPlayers[] });
 
   // Get groups
   const groups = await db.query.groupTable.findMany({
@@ -222,7 +224,7 @@ export async function DisplayCompleteFixture({
     if (!acc[match.day]) acc[match.day] = [match];
     else acc[match.day].push(match);
     return acc;
-  }, {} as { [day: number]: MatchTeam[] });
+  }, {} as { [day: number]: MatchTeamsPlayers[] });
 
   // Sort matches in every day by group
   const sortedMatchesByDay = Object.entries(matchesByDay).reduce(
@@ -233,11 +235,11 @@ export async function DisplayCompleteFixture({
         );
         if (matchesInGroup.length > 0) acc[group.name] = matchesInGroup;
         return acc;
-      }, {} as { [group: string]: MatchTeam[] });
+      }, {} as { [group: string]: MatchTeamsPlayers[] });
       acc[+day] = sortedMatches;
       return acc;
     },
-    {} as { [day: number]: { [group: string]: MatchTeam[] } }
+    {} as { [day: number]: { [group: string]: MatchTeamsPlayers[] } }
   );
 
   return (

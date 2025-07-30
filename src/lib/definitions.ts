@@ -28,6 +28,7 @@ export interface Category {
   teams_per_group: number;
   teams_qualified: number;
   has_fixture?: boolean;
+  champion?: string;
 }
 
 export type Config = Pick<
@@ -95,6 +96,13 @@ export interface Match {
   phase?: Phase;
   group?: string;
   penalty_win?: "home" | "away" | "none";
+  day: number;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  category_id: Category["id"];
 }
 
 export type MatchTeam = Omit<Match, "home_team" | "away_team"> & {
@@ -125,3 +133,44 @@ export interface MatchData {
   away_team: TeamData;
   draw_winner?: TeamData;
 }
+
+export interface GoalScorers {
+  position: number;
+  player: string;
+  team: string;
+  goals: number;
+}
+
+export interface TeamsPositions {
+  position: number;
+  team: string;
+  wins: number;
+  losses: number;
+  draws: number;
+  points: number;
+  goals_for: number;
+  goals_against: number;
+  goal_difference: number;
+}
+
+export type MatchTeams = Match & {
+  home_team_complete: Team;
+  away_team_complete: Team;
+};
+
+export type MatchTeamsPlayers = Match & {
+  home_team_complete: TeamPlayers | null;
+  away_team_complete: TeamPlayers | null;
+};
+
+export type GroupTeams = Group & { teams: TeamPlayers[] };
+
+export type CategoryTeamsMatchesGroups = Category & {
+  teams: TeamPlayers[];
+  matches: MatchTeams[];
+  groups: GroupTeams[];
+};
+
+export type AllTournament = Tournament & {
+  categories: CategoryTeamsMatchesGroups[];
+};

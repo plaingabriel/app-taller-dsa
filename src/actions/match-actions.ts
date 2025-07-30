@@ -14,6 +14,7 @@ import {
   CategoryTeamsPlayers,
   MatchData,
   MatchTeam,
+  MatchTeamsPlayers,
   Phase,
   TeamData,
   TeamPlayers,
@@ -319,7 +320,7 @@ function getWinner(
 }
 
 async function updateGroups(
-  match: MatchTeam,
+  match: MatchTeamsPlayers,
   teamWinner: TeamData,
   teamLoser: TeamData,
   draw: boolean
@@ -433,7 +434,7 @@ async function updateGroups(
 async function updateWinPlayoff(
   teamWinner: TeamData,
   teamLoser: TeamData,
-  match: MatchTeam
+  match: MatchTeamsPlayers
 ) {
   const nextMatch = await fetchMatch(match.next_match as string);
 
@@ -681,7 +682,10 @@ async function createPlayoffWithTeamsQualifiedPerGroup(category_id: string) {
   }
 }
 
-export async function updateResults(match: MatchTeam, matchData: MatchData) {
+export async function updateResults(
+  match: MatchTeamsPlayers,
+  matchData: MatchData
+) {
   const { home_team, away_team, draw_winner } = matchData;
   const home_players = home_team.players_scored;
   const away_players = away_team.players_scored;
@@ -694,7 +698,9 @@ export async function updateResults(match: MatchTeam, matchData: MatchData) {
     for (const player of players_scored) {
       await tx
         .update(playerTable)
-        .set({ goals_scored: player.goals })
+        .set({
+          goals_scored: sql`${playerTable.goals_scored} + ${player.goals}`,
+        })
         .where(eq(playerTable.ci, player.ci));
     }
   });

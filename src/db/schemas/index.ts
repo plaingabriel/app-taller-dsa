@@ -163,12 +163,12 @@ export const matchRelations = relations(matchTable, ({ one, many }) => ({
     fields: [matchTable.group],
     references: [groupTable.id],
   }),
-  home_team: one(teamTable, {
+  home_team_complete: one(teamTable, {
     fields: [matchTable.home_team],
     references: [teamTable.id],
     relationName: "home_team",
   }),
-  away_team: one(teamTable, {
+  away_team_complete: one(teamTable, {
     fields: [matchTable.away_team],
     references: [teamTable.id],
     relationName: "away_team",

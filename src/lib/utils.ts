@@ -34,6 +34,21 @@ type TableNames =
   | "historical";
 type TableValues = "trn" | "cat" | "mtc" | "tem" | "ply" | "grp" | "hst";
 
+export function getPhaseName(phase: Phase) {
+  switch (phase) {
+    case "final":
+      return "Final";
+    case "semifinal":
+      return "Semifinales";
+    case "quarterfinals":
+      return "Cuartos de Final";
+    case "round_16":
+      return "Octavos de Final";
+    case "groups":
+      return "Grupos";
+  }
+}
+
 export function generateID(tableName: TableNames): string {
   const PREFIX_MAP: Record<TableNames, TableValues> = {
     tournament: "trn",
