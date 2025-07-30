@@ -439,6 +439,7 @@ async function updateWinPlayoff(
   const nextMatch = await fetchMatch(match.next_match as string);
 
   if (match.phase === "final") {
+    console.log("final");
     await db
       .update(categoryTable)
       .set({ champion: teamWinner.name })

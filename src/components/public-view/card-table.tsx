@@ -1,6 +1,6 @@
 "use client";
 
-import { AllTournament, Category } from "@/lib/definitions";
+import { AllTournament } from "@/lib/definitions";
 import { MapPin, Trophy } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../shadcn-ui/button";

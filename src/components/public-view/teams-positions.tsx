@@ -70,6 +70,9 @@ function Groups({ groups }: { groups: GroupTeams[] }) {
 function PlayOffDiagram({ matches }: { matches: MatchTeams[] }) {
   const matchesInPlayoffs = matches.filter((match) => match.phase !== "groups");
 
+  const someTeamIsNull = matchesInPlayoffs.some((match) => !match.home_team);
+  if (someTeamIsNull) return null;
+
   // Segment matches by phase
   const matchesByPhase = matchesInPlayoffs.reduce((acc, match) => {
     if (!match.phase) return acc;
