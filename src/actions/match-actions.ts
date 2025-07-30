@@ -439,11 +439,11 @@ async function updateWinPlayoff(
   const nextMatch = await fetchMatch(match.next_match as string);
 
   if (match.phase === "final") {
-    console.log("final");
     await db
       .update(categoryTable)
       .set({ champion: teamWinner.name })
       .where(eq(categoryTable.id, match.category_id));
+    return;
   }
 
   if (!nextMatch) return;
@@ -729,6 +729,7 @@ export async function updateResults(
         .update(matchTable)
         .set({ penalty_win: penaltyWin })
         .where(eq(matchTable.id, match.id));
+
       await updateWinPlayoff(team_winner, team_loser, match);
     } else {
       await db
