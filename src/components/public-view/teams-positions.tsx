@@ -1,21 +1,28 @@
 import {
   CategoryTeamsMatchesGroups,
-  FixtureType,
-  Group,
+  GroupTeams,
   MatchTeams,
   Phase,
-  TeamPlayers,
 } from "@/lib/definitions";
 import { getPhaseName } from "@/lib/utils";
 import { CardPlayoff } from "./card-playoff";
+import { TeamsPositionsTable } from "./tables";
 
 export function TeamsPositions({
   category,
 }: {
   category: CategoryTeamsMatchesGroups;
 }) {
+  const { groups } = category;
   return (
     <div>
+      {category.fixture_type === "groups" && (
+        <div className="space-y-6">
+          <h3 className="text-xl text-center font-bold">Fase de Grupos</h3>
+          <Groups groups={groups} />
+        </div>
+      )}
+
       {category.fixture_type === "playoffs" && (
         <div className="space-y-6">
           <h3 className="text-xl text-center font-bold">
@@ -25,13 +32,46 @@ export function TeamsPositions({
           <PlayOffDiagram matches={category.matches} />
         </div>
       )}
+
+      {category.fixture_type === "groups+playoffs" && (
+        <div className="space-y-6">
+          <div className="space-y-6">
+            <h3 className="text-xl text-center font-bold">Fase de Grupos</h3>
+            <Groups groups={groups} />
+          </div>
+
+          <div className="space-y-6">
+            <h3 className="text-xl text-center font-bold">Fase Eliminatoria</h3>
+            <PlayOffDiagram matches={category.matches} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Groups({ groups }: { groups: GroupTeams[] }) {
+  const groupsNoPlayoff = groups.filter(
+    (group) => group.name !== "Fase Eliminatorias"
+  );
+
+  return (
+    <div>
+      {groupsNoPlayoff.map((group) => (
+        <div className="space-y-4" key={group.id}>
+          <h3 className="text-xl text-center font-bold">{group.name}</h3>
+          <TeamsPositionsTable teams={group.teams} />
+        </div>
+      ))}
     </div>
   );
 }
 
 function PlayOffDiagram({ matches }: { matches: MatchTeams[] }) {
+  const matchesInPlayoffs = matches.filter((match) => match.phase !== "groups");
+
   // Segment matches by phase
-  const matchesByPhase = matches.reduce((acc, match) => {
+  const matchesByPhase = matchesInPlayoffs.reduce((acc, match) => {
     if (!match.phase) return acc;
     if (!acc[match.phase]) acc[match.phase] = [match];
     else acc[match.phase].push(match);

@@ -29,6 +29,16 @@ export function GoalScorersTable({ teams }: { teams: TeamPlayers[] }) {
 }
 
 export function TeamsPositionsTable({ teams }: { teams: TeamPlayers[] }) {
+  // Sort teams by points or goals scored
+  teams.sort((a, b) => {
+    const pointsDiff = (b.points || 0) - (a.points || 0);
+    if (pointsDiff !== 0) return pointsDiff;
+
+    const diffA = (a.goals_count || 0) - (a.goals_against || 0);
+    const diffB = (b.goals_count || 0) - (b.goals_against || 0);
+    return diffB - diffA;
+  });
+
   const teamsPositions: TeamsPositions[] = teams.map((team, index) => ({
     position: index + 1,
     team: team.name,
