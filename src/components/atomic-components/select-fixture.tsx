@@ -1,4 +1,4 @@
-import { FixtureType } from "@/shared/types";
+import { FixtureType } from "@/lib/definitions";
 import { SelectItem } from "../shadcn-ui/select";
 
 interface SelectFixtureProps {

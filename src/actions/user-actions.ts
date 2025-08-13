@@ -2,7 +2,7 @@
 import { db } from "@/db";
 import { usersTable } from "@/db/schemas";
 import { fetchAuthUser } from "@/lib/data";
-import { User } from "@/shared/types";
+import { User } from "@/lib/definitions";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";

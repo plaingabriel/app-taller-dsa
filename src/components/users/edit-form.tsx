@@ -1,7 +1,7 @@
 "use client";
 
 import { updatePassword } from "@/actions/user-actions";
-import { UserClient } from "@/shared/client-types";
+import { User as UserClient } from "@/lib/definitions";
 import { Save, User } from "lucide-react";
 import { useActionState } from "react";
 import { ErrorField } from "../atomic-components/error-field";
