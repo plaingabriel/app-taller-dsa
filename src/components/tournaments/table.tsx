@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteTournament } from "@/actions/tournament-actions";
-import { Category, Tournament } from "@/lib/definitions";
+import { TournamentCategories } from "@/lib/definitions";
 import { allEqual, getTextByFixtureType } from "@/lib/utils";
 import { Plus, Settings, Trash } from "lucide-react";
 import { use } from "react";
@@ -10,14 +10,10 @@ import { FixtureBadge, InfoBadge } from "../badges";
 import { Button } from "../shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";
 
-type TournamentClient = Tournament & {
-  categories: Category[];
-};
-
 export function TournamentTable({
   tournaments,
 }: {
-  tournaments: Promise<TournamentClient[]>;
+  tournaments: Promise<TournamentCategories[]>;
 }) {
   const allTournaments = use(tournaments);
 

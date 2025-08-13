@@ -174,3 +174,7 @@ export type CategoryTeamsMatchesGroups = Category & {
 export type AllTournament = Tournament & {
   categories: CategoryTeamsMatchesGroups[];
 };
+
+export type TournamentCategories = Tournament & {
+  categories: Category[];
+};

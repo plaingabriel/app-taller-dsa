@@ -3,10 +3,11 @@ import { TableSkeleton } from "@/components/skeletons";
 import { AddButton } from "@/components/tournaments/add-button";
 import { TournamentTable } from "@/components/tournaments/table";
 import { fetchTournaments } from "@/lib/data";
+import { TournamentCategories } from "@/lib/definitions";
 import { Suspense } from "react";
 
 export default async function TournamentPage() {
-  const tournaments = fetchTournaments();
+  const tournaments = fetchTournaments() as Promise<TournamentCategories[]>;
 
   return (
     <div className="pb-8">
