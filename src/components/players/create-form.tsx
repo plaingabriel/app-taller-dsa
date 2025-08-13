@@ -34,6 +34,21 @@ export function CreatePlayersForm({
   const teamData = use(team);
   const agesRange = use(ages);
 
+  const [file, setFile] = useState<File | null>(null);
+  const [validationResult, setValidationResult] = useState<{
+    valid: boolean;
+    errors: string[];
+  } | null>(null);
+  const [previewData, setPreviewData] = useState<NewPlayerExcel[]>([]);
+  const [processingError, setProcessingError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setProcessingError(null);
+    setPreviewData([]);
+    setValidationResult(null);
+  }, [setFile]);
+
   if (!teamData || !agesRange) {
     return null;
   }
@@ -46,15 +61,6 @@ export function CreatePlayersForm({
   ) {
     return null;
   }
-
-  const [file, setFile] = useState<File | null>(null);
-  const [validationResult, setValidationResult] = useState<{
-    valid: boolean;
-    errors: string[];
-  } | null>(null);
-  const [previewData, setPreviewData] = useState<NewPlayerExcel[]>([]);
-  const [processingError, setProcessingError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const csvContent = `NOMBRE,CEDULA,NUMERO_CAMISETA,POSICION,EDAD
 Carlos Rodriguez,28702071,1,PORTERO,28
@@ -85,6 +91,7 @@ Manuel Suarez,32573016,10,MEDIOCAMPISTA,22`;
       setValidationResult(validation);
       setPreviewData(normalizedData);
     } catch (error) {
+      console.error(error);
       setProcessingError("Error al procesar el archivo");
     }
   };
@@ -121,12 +128,6 @@ Manuel Suarez,32573016,10,MEDIOCAMPISTA,22`;
     await createPlayers(teamData.id, previewData);
     window.location.reload();
   };
-
-  useEffect(() => {
-    setProcessingError(null);
-    setPreviewData([]);
-    setValidationResult(null);
-  }, [setFile]);
 
   return (
     <Card>

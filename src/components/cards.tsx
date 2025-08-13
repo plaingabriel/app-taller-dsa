@@ -11,7 +11,6 @@ import {
 import {
   FixtureType,
   MatchData,
-  MatchTeam,
   MatchTeamsPlayers,
   Player,
   Tournament,
@@ -233,7 +232,9 @@ export function MatchCard({
     try {
       const date = new Date(value).toISOString();
       await updateDates(match.id, date);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleTeamScored = (

@@ -30,6 +30,21 @@ export function CreateTeamsForm({
 }) {
   const categoryData = use(category);
 
+  const [file, setFile] = useState<File | null>(null);
+  const [validationResult, setValidationResult] = useState<{
+    valid: boolean;
+    errors: string[];
+  } | null>(null);
+  const [previewData, setPreviewData] = useState<NewTeamExcel[]>([]);
+  const [processingError, setProcessingError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setProcessingError(null);
+    setPreviewData([]);
+    setValidationResult(null);
+  }, [setFile]);
+
   if (!categoryData) {
     return null;
   }
@@ -40,15 +55,6 @@ export function CreateTeamsForm({
   ) {
     return null;
   }
-
-  const [file, setFile] = useState<File | null>(null);
-  const [validationResult, setValidationResult] = useState<{
-    valid: boolean;
-    errors: string[];
-  } | null>(null);
-  const [previewData, setPreviewData] = useState<NewTeamExcel[]>([]);
-  const [processingError, setProcessingError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const csvContent = `NOMBRE,CANTIDAD_JUGADORES,LOGO
 Equipo A,11,
@@ -78,6 +84,7 @@ Equipo D,9,`;
       setValidationResult(validation);
       setPreviewData(normalizedData);
     } catch (error) {
+      console.error(error);
       setProcessingError("Error al procesar el archivo");
     }
   };
@@ -117,12 +124,6 @@ Equipo D,9,`;
     await createEquiposFromExcel(categoryData, previewData);
     window.location.reload();
   };
-
-  useEffect(() => {
-    setProcessingError(null);
-    setPreviewData([]);
-    setValidationResult(null);
-  }, [setFile]);
 
   return (
     <Card>

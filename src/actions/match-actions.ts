@@ -7,13 +7,11 @@ import {
   matchTable,
   playerTable,
   teamTable,
-  tournamentTable,
 } from "@/db/schemas";
 import { fetchMatch } from "@/lib/data";
 import {
   CategoryTeamsPlayers,
   MatchData,
-  MatchTeam,
   MatchTeamsPlayers,
   Phase,
   TeamData,
@@ -331,14 +329,14 @@ async function updateGroups(
 
     if (!prevMatch) return;
 
-    // @ts-ignore
+    // @ts-expect-error: home_team and away_team are not null
     const home_team: TeamData = {
       id: prevMatch.home_team as string,
       points: prevMatch.home_score as number,
       players_scored: [],
     };
 
-    // @ts-ignore
+    // @ts-expect-error: home_team and away_team are not null
     const away_team: TeamData = {
       id: prevMatch.away_team as string,
       points: prevMatch.away_score as number,

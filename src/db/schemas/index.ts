@@ -154,7 +154,7 @@ export const matchTable = sqliteTable("Match", {
   penalty_win: text().$type<"home" | "away" | "none">().default("none"),
 });
 
-export const matchRelations = relations(matchTable, ({ one, many }) => ({
+export const matchRelations = relations(matchTable, ({ one }) => ({
   category: one(categoryTable, {
     fields: [matchTable.category_id],
     references: [categoryTable.id],

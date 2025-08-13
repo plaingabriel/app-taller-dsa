@@ -19,12 +19,13 @@ export default function TeamTable({
   category: Promise<CategoryTeamsPlayers | undefined>;
 }) {
   const categoryData = use(category);
+  const pathname = usePathname();
+
   if (!categoryData) return null;
 
   const teams = categoryData.teams;
   if (teams.length === 0) return null;
 
-  const pathname = usePathname();
   const allTeamsValidated = () => {
     for (const team of teams) {
       if (!team.has_validated_players) return false;

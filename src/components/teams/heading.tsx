@@ -1,4 +1,4 @@
-import { CategoryTeamsPlayers, Team } from "@/lib/definitions";
+import { CategoryTeamsPlayers } from "@/lib/definitions";
 import { redirect } from "next/navigation";
 
 export async function TeamPageHeading({

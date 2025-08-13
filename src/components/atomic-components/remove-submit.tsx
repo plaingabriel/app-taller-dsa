@@ -9,7 +9,7 @@ export function RemoveSubmit({
 }: {
   deleteAction: () => Promise<void>;
 }) {
-  const [_, deleteActionState, pending] = useActionState(
+  const [, deleteActionState, pending] = useActionState(
     deleteAction,
     undefined
   );

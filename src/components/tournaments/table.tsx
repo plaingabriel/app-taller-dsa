@@ -6,7 +6,6 @@ import { allEqual, getTextByFixtureType } from "@/lib/utils";
 import { Plus, Settings, Trash } from "lucide-react";
 import { use } from "react";
 import { ButtonLink } from "../atomic-components/button-link";
-import { RemoveSubmit } from "../atomic-components/remove-submit";
 import { FixtureBadge, InfoBadge } from "../badges";
 import { Button } from "../shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../shadcn-ui/card";

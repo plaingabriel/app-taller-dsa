@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { MatchTeam, MatchTeamsPlayers, Phase, User } from "@/lib/definitions";
+import { MatchTeamsPlayers, Phase } from "@/lib/definitions";
 import { MatchCard } from "../cards";
 
 interface MatchCardProps {
